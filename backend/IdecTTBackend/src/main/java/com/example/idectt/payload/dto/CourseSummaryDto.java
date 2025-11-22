@@ -13,6 +13,7 @@ public class CourseSummaryDto {
     private Long id;
     private String title;
     private String description;
+    private String image;
     private String instructorName;
     private double rating;
     private int students;

@@ -2,70 +2,115 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { apiService } from '../../services/apiService';
 
-// This interface should match the Course DTO from the backend for editing
-// We only need a subset of fields for the form.
-interface Course {
-  id: number;
+interface Instructor {
+    id: number;
+    name: string;
+}
+
+// DTO for creating/updating a course
+interface CourseFormDto {
   title: string;
   description: string;
-  rating: number;
-  students: number;
-  // Instructor is handled separately, not including here for simplicity
+  image: string;
+  instructorId: string; // Form uses string for select, converted to number for API
 }
 
 interface CourseFormModalProps {
-  course: Course | null;
+  course: any; // Can be null or existing course object
   onClose: () => void;
   onSuccess: () => void;
 }
 
 const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSuccess }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CourseFormDto>({
     title: '',
     description: '',
-    rating: 0,
-    students: 0,
+    image: '',
+    instructorId: '',
   });
+  
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingInstructors, setLoadingInstructors] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const isEditing = course !== null;
 
+  // Fetch instructors for the dropdown
+  useEffect(() => {
+    const fetchInstructors = async () => {
+        try {
+            setLoadingInstructors(true);
+            const data = await apiService.get('/instructors');
+            setInstructors(data);
+        } catch (err) {
+            console.error("Failed to load instructors", err);
+            setError("Eğitmen listesi yüklenemedi.");
+        } finally {
+            setLoadingInstructors(false);
+        }
+    };
+    fetchInstructors();
+  }, []);
+
+  // Populate form if editing
   useEffect(() => {
     if (isEditing) {
       setFormData({
         title: course.title,
         description: course.description,
-        rating: course.rating,
-        students: course.students,
+        image: course.image || '',
+        instructorId: course.instructor ? course.instructor.id.toString() : (course.instructorId ? course.instructorId.toString() : ''), 
       });
     } else {
         setFormData({
             title: '',
             description: '',
-            rating: 0,
-            students: 0,
+            image: '',
+            instructorId: '',
         });
     }
   }, [course, isEditing]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({ 
-        ...prev, 
-        [name]: type === 'number' ? parseFloat(value) : value 
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        setIsUploading(true);
+        try {
+            const url = await apiService.uploadFile(file);
+            setFormData(prev => ({ ...prev, image: url }));
+        } catch (err) {
+            setError("Dosya yüklenemedi.");
+        } finally {
+            setIsUploading(false);
+        }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    if (!formData.instructorId) {
+        setError("Lütfen bir eğitmen seçiniz.");
+        return;
+    }
+
+    const payload = {
+        ...formData,
+        instructorId: parseInt(formData.instructorId),
+    };
+
     try {
       if (isEditing) {
-        // The backend expects the full Course object on update for now
-        await apiService.put(`/courses/${course.id}`, { id: course.id, ...formData });
+        await apiService.put(`/courses/${course.id}`, payload);
       } else {
-        await apiService.post('/courses', formData);
+        await apiService.post('/courses', payload);
       }
       onSuccess();
     } catch (err: any) {
@@ -80,23 +125,60 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSu
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-              <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+              <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900">
                 {isEditing ? 'Kursu Düzenle' : 'Yeni Kurs Ekle'}
               </Dialog.Title>
               <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-                <input name="title" value={formData.title} onChange={handleChange} placeholder="Başlık" className="w-full border-gray-300 rounded-md" required />
-                <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Açıklama" className="w-full border-gray-300 rounded-md" required />
-                <input type="number" step="0.1" name="rating" value={formData.rating} onChange={handleChange} placeholder="Puan" className="w-full border-gray-300 rounded-md" />
-                <input type="number" name="students" value={formData.students} onChange={handleChange} placeholder="Öğrenci Sayısı" className="w-full border-gray-300 rounded-md" />
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Kurs Başlığı</label>
+                    <input name="title" value={formData.title} onChange={handleChange} placeholder="Örn: Sürdürülebilirlik 101" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />
+                </div>
                 
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
+                    <textarea name="description" value={formData.description} onChange={handleChange} rows={3} placeholder="Kurs içeriği hakkında kısa bilgi..." className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />
+                </div>
 
-                <div className="mt-6 flex justify-end space-x-2">
-                  <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Kapak Resmi</label>
+                    <div className="flex gap-2 mb-2">
+                        <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                            disabled={isUploading}
+                        />
+                        {isUploading && <span className="text-sm text-gray-500 self-center">Yükleniyor...</span>}
+                    </div>
+                    <input name="image" value={formData.image} onChange={handleChange} placeholder="veya Resim URL'si yapıştırın" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Eğitmen</label>
+                    <select 
+                        name="instructorId" 
+                        value={formData.instructorId} 
+                        onChange={handleChange} 
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                        required
+                        disabled={loadingInstructors}
+                    >
+                        <option value="">Eğitmen Seçiniz...</option>
+                        {instructors.map(inst => (
+                            <option key={inst.id} value={inst.id}>{inst.name}</option>
+                        ))}
+                    </select>
+                </div>
+                
+                {error && <div className="bg-red-50 text-red-600 text-sm p-2 rounded">{error}</div>}
+
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                     İptal
                   </button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-md hover:bg-emerald-700">
-                    {isEditing ? 'Güncelle' : 'Oluştur'}
+                  <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-md hover:bg-emerald-700 shadow-sm">
+                    {isEditing ? 'Değişiklikleri Kaydet' : 'Kurs Oluştur'}
                   </button>
                 </div>
               </form>

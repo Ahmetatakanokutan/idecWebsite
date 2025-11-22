@@ -38,6 +38,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
                 .claim("roles", roles)
+                .claim("fullName", userPrincipal.getFullName()) // Add fullName
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())

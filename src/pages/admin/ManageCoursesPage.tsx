@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, BookOpen, Loader, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Loader, AlertTriangle, Search } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import CourseFormModal from './CourseFormModal';
 
@@ -18,6 +18,7 @@ const ManageCoursesPage = () => {
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,6 @@ const ManageCoursesPage = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      // This endpoint returns CourseSummaryDto, which now needs to include description
       const data = await apiService.get('/courses');
       setCourses(data);
     } catch (err: any) {
@@ -71,6 +71,10 @@ const ManageCoursesPage = () => {
     fetchCourses(); // Refresh data
   };
 
+  const filteredCourses = courses.filter(c => 
+    c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.instructorName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -91,15 +95,30 @@ const ManageCoursesPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Kursları Yönet</h2>
-        <button
-          onClick={openModalForCreate}
-          className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Yeni Kurs Ekle
-        </button>
+        
+        <div className="flex gap-4 w-full sm:w-auto">
+            <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+                    placeholder="Kurs veya Eğitmen ara..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <button
+            onClick={openModalForCreate}
+            className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
+            >
+            <Plus className="h-5 w-5 mr-2" />
+            Yeni Kurs Ekle
+            </button>
+        </div>
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -118,7 +137,7 @@ const ManageCoursesPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {courses.map((course) => (
+            {filteredCourses.map((course) => (
               <tr key={course.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{course.title}</div>
@@ -127,18 +146,25 @@ const ManageCoursesPage = () => {
                   <div className="text-sm text-gray-500">{course.instructorName}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                   <Link to={`/admin/courses/${course.id}/lessons`} className="text-green-600 hover:text-green-900 inline-flex items-center">
+                   <Link to={`/admin/courses/${course.id}/lessons`} className="text-green-600 hover:text-green-900 inline-flex items-center" title="Dersleri Yönet">
                      <BookOpen className="h-5 w-5" />
                    </Link>
-                  <button onClick={() => openModalForUpdate(course)} className="text-indigo-600 hover:text-indigo-900">
+                  <button onClick={() => openModalForUpdate(course)} className="text-indigo-600 hover:text-indigo-900" title="Düzenle">
                     <Edit className="h-5 w-5" />
                   </button>
-                  <button onClick={() => handleDelete(course.id)} className="text-red-600 hover:text-red-900">
+                  <button onClick={() => handleDelete(course.id)} className="text-red-600 hover:text-red-900" title="Sil">
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </td>
               </tr>
             ))}
+            {filteredCourses.length === 0 && (
+                <tr>
+                    <td colSpan={3} className="px-6 py-10 text-center text-gray-500">
+                        Aradığınız kriterlere uygun kurs bulunamadı.
+                    </td>
+                </tr>
+            )}
           </tbody>
         </table>
       </div>

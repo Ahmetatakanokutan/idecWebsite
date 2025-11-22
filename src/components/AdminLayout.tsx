@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { FolderKanban, Library, LayoutDashboard } from 'lucide-react';
-import Layout from './Layout'; // Assuming a main layout exists for header/footer
+import { FolderKanban, Library, LayoutDashboard, Users, Shield } from 'lucide-react';
+import Layout from './Layout';
 
 const AdminLayout = () => {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
@@ -27,6 +27,14 @@ const AdminLayout = () => {
               <NavLink to="/admin/courses" className={navLinkClasses}>
                 <Library className="mr-3 h-5 w-5" />
                 <span>Kursları Yönet</span>
+              </NavLink>
+              <NavLink to="/admin/instructors" className={navLinkClasses}>
+                <Users className="mr-3 h-5 w-5" />
+                <span>Eğitmenleri Yönet</span>
+              </NavLink>
+              <NavLink to="/admin/users" className={navLinkClasses}>
+                <Shield className="mr-3 h-5 w-5" />
+                <span>Kullanıcıları Yönet</span>
               </NavLink>
             </nav>
           </aside>

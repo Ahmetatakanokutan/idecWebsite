@@ -4,13 +4,15 @@ import { jwtDecode } from 'jwt-decode';
 interface User {
   sub: string;
   roles: string[];
+  fullName: string; // Add fullName
   exp: number;
 }
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  isLoading: boolean; // Add isLoading state
+  isLoading: boolean;
   roles: string[];
+  fullName: string | null; // Add fullName
   login: (token: string) => void;
   logout: () => void;
 }
@@ -20,7 +22,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Start as loading
+  const [fullName, setFullName] = useState<string | null>(null); // State for fullName
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (decodedToken.exp * 1000 > Date.now()) {
           setIsLoggedIn(true);
           setRoles(decodedToken.roles);
+          setFullName(decodedToken.fullName); // Set fullName
         } else {
           localStorage.removeItem('token');
         }
@@ -38,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem('token');
       }
     }
-    setIsLoading(false); // Finished loading
+    setIsLoading(false);
   }, []);
 
   const login = (token: string) => {
@@ -47,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('token', token);
       setIsLoggedIn(true);
       setRoles(decodedToken.roles);
+      setFullName(decodedToken.fullName); // Set fullName
     } catch (error) {
       console.error("Failed to decode token:", error);
     }
@@ -56,12 +61,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     setRoles([]);
-    // Redirect to login to ensure clean state
+    setFullName(null);
     window.location.href = '/login';
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, isLoading, roles, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isLoading, roles, fullName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

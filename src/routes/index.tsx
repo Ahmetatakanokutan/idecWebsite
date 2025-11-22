@@ -8,6 +8,8 @@ import CourseDetailPage from '../pages/CourseDetailPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
+import ProfilePage from '../pages/ProfilePage';
+import FavoritesPage from '../pages/FavoritesPage';
 
 // Admin Components
 import AdminLayout from '../components/AdminLayout';
@@ -16,12 +18,14 @@ import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import ManageProjectsPage from '../pages/admin/ManageProjectsPage';
 import ManageCoursesPage from '../pages/admin/ManageCoursesPage';
 import ManageCourseLessonsPage from '../pages/admin/ManageCourseLessonsPage';
+import ManageInstructorsPage from '../pages/admin/ManageInstructorsPage';
+import ManageUsersPage from '../pages/admin/ManageUsersPage';
 
 export const AppRoutes = () => {
   const routes = useRoutes([
     { path: '/', element: <HomePage /> },
     { path: '/about', element: <AboutPage /> },
-    { path: '/contact', element: <AboutPage /> }, // "İletişim" also points to AboutPage
+    { path: '/contact', element: <AboutPage /> },
     { path: '/projects', element: <ProjectsPage /> },
     { path: '/projects/:projectId', element: <ProjectDetailPage /> },
     { path: '/courses', element: <CoursesPage /> },
@@ -29,6 +33,15 @@ export const AppRoutes = () => {
     { path: '/login', element: <LoginPage /> },
     { path: '/register', element: <RegisterPage /> },
     { path: '/forgot-password', element: <ForgotPasswordPage /> },
+    
+    // Protected User Routes (Any logged in user)
+    {
+        element: <ProtectedRoute requiredRole="ROLE_USER" />, 
+        children: [
+            { path: '/profile', element: <ProfilePage /> },
+            { path: '/favorites', element: <FavoritesPage /> }
+        ]
+    },
     
     // Admin Routes
     {
@@ -42,13 +55,12 @@ export const AppRoutes = () => {
             { path: 'projects', element: <ManageProjectsPage /> },
             { path: 'courses', element: <ManageCoursesPage /> },
             { path: 'courses/:courseId/lessons', element: <ManageCourseLessonsPage /> },
+            { path: 'instructors', element: <ManageInstructorsPage /> },
+            { path: 'users', element: <ManageUsersPage /> },
           ],
         },
       ],
     },
-
-    // Add a catch-all route for 404 if needed
-    // { path: '*', element: <NotFoundPage /> },
   ]);
 
   return routes;

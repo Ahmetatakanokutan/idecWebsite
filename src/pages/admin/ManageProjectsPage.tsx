@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Loader, AlertTriangle } from 'lucide-react';
-import { apiService } from '../../services/apiService'; // Assuming a shared service exists
+import { Plus, Edit, Trash2, Loader, Search } from 'lucide-react';
+import { apiService } from '../../services/apiService';
+import ProjectFormModal from './ProjectFormModal';
 
 // This interface should match the Project DTO from the backend
 interface Project {
@@ -19,6 +20,7 @@ const ManageProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // State for managing the modal and the currently selected project
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,6 +74,10 @@ const ManageProjectsPage = () => {
     fetchProjects(); // Refresh data
   };
 
+  const filteredProjects = projects.filter(p => 
+    p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.leader.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -92,15 +98,29 @@ const ManageProjectsPage = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Projeleri Yönet</h2>
-        <button
-          onClick={openModalForCreate}
-          className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Yeni Proje Ekle
-        </button>
+        <div className="flex gap-4 w-full sm:w-auto">
+            <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
+                    placeholder="Proje ara..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <button
+            onClick={openModalForCreate}
+            className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
+            >
+            <Plus className="h-5 w-5 mr-2" />
+            Yeni Proje
+            </button>
+        </div>
       </div>
       
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -119,7 +139,7 @@ const ManageProjectsPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <tr key={project.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{project.title}</div>
@@ -140,11 +160,7 @@ const ManageProjectsPage = () => {
           </tbody>
         </table>
       </div>
-import ProjectFormModal from './ProjectFormModal'; // Import the modal component
 
-// ... (rest of the component)
-
-      {/* The Modal for Add/Edit will be rendered here */}
       {isModalOpen && <ProjectFormModal project={selectedProject} onClose={handleModalClose} onSuccess={handleFormSuccess} />}
     </div>
   );

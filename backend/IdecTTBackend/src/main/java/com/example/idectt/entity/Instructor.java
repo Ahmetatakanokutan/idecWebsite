@@ -23,6 +23,7 @@ public class Instructor {
     private String title;
 
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Course> courses = new ArrayList<>();
 
     public Instructor(String name, String title) {

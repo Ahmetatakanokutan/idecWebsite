@@ -85,9 +85,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS isteklerini her zaman geçir
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**").permitAll()
-                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
+                                                                .requestMatchers("/api/auth/**").permitAll()
+                                                                .requestMatchers("/uploads/**").permitAll()
+                                                                .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").authenticated() 
+                                                                .requestMatchers(HttpMethod.POST, "/api/courses/*/favorite").authenticated() // Add favorite toggle
+                                                                .requestMatchers(HttpMethod.GET, "/api/courses/favorites").authenticated() // Add favorite list
+                                                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**").permitAll()                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/company/**").hasAnyRole("COMPANY", "ADMIN")
@@ -97,6 +100,9 @@ public class SecurityConfig {
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        
+        // Allow frames for H2 console and uploaded videos
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         
         // Spring Security'nin kendi CORS yapılandırmasını da etkinleştiriyoruz ki filtre zinciriyle uyumlu çalışsın
         http.cors(cors -> cors.configurationSource(request -> {

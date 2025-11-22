@@ -2,10 +2,11 @@ package com.example.idectt.controller;
 
 import com.example.idectt.entity.Course;
 import com.example.idectt.entity.Lesson;
-import com.example.idectt.payload.dto.CourseDetailDto;
-import com.example.idectt.payload.dto.CourseSummaryDto;
-import com.example.idectt.payload.dto.LessonDto;
+import com.example.idectt.entity.Section;
+import com.example.idectt.payload.dto.*;
 import com.example.idectt.service.CourseService;
+import com.example.idectt.security.services.UserDetailsImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +24,8 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-    // ... existing course methods ...
+    // === Course Endpoints ===
+
     @GetMapping
     public ResponseEntity<List<CourseSummaryDto>> getAllCourses() {
         List<CourseSummaryDto> courses = courseService.getAllCourses();
@@ -41,8 +43,8 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Course> createCourse(@Valid @RequestBody Course course) {
-        Course createdCourse = courseService.createCourse(course);
+    public ResponseEntity<Course> createCourse(@Valid @RequestBody CourseCreateDto courseDto) {
+        Course createdCourse = courseService.createCourse(courseDto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdCourse.getId()).toUri();
         return ResponseEntity.created(location).body(createdCourse);
@@ -50,8 +52,8 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody Course courseDetails) {
-        Course updatedCourse = courseService.updateCourse(id, courseDetails);
+    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody CourseCreateDto courseDto) {
+        Course updatedCourse = courseService.updateCourse(id, courseDto);
         return ResponseEntity.ok(updatedCourse);
     }
 
@@ -62,26 +64,75 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
-    // === Lesson Management Endpoints ===
+    // === Section Endpoints ===
 
-    @PostMapping("/{courseId}/lessons")
+    @PostMapping("/{courseId}/sections")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<LessonDto> addLessonToCourse(@PathVariable Long courseId, @Valid @RequestBody Lesson lesson) {
-        LessonDto newLesson = courseService.addLessonToCourse(courseId, lesson);
+    public ResponseEntity<SectionDto> addSectionToCourse(@PathVariable Long courseId, @Valid @RequestBody Section section) {
+        SectionDto newSection = courseService.addSectionToCourse(courseId, section);
+        return ResponseEntity.ok(newSection);
+    }
+
+    @PutMapping("/sections/{sectionId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SectionDto> updateSection(@PathVariable Long sectionId, @RequestBody Section sectionDetails) {
+        SectionDto updatedSection = courseService.updateSection(sectionId, sectionDetails.getTitle());
+        return ResponseEntity.ok(updatedSection);
+    }
+
+    @DeleteMapping("/sections/{sectionId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long sectionId) {
+        courseService.deleteSection(sectionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // === Lesson Endpoints ===
+
+    @PostMapping("/sections/{sectionId}/lessons")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<LessonDto> addLessonToSection(@PathVariable Long sectionId, @Valid @RequestBody Lesson lesson) {
+        LessonDto newLesson = courseService.addLessonToSection(sectionId, lesson);
         return ResponseEntity.ok(newLesson);
     }
 
-    @PutMapping("/{courseId}/lessons/{lessonId}")
+    @PutMapping("/lessons/{lessonId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<LessonDto> updateLessonInCourse(@PathVariable Long courseId, @PathVariable Long lessonId, @Valid @RequestBody Lesson lessonDetails) {
-        LessonDto updatedLesson = courseService.updateLessonInCourse(courseId, lessonId, lessonDetails);
+    public ResponseEntity<LessonDto> updateLesson(@PathVariable Long lessonId, @Valid @RequestBody Lesson lessonDetails) {
+        LessonDto updatedLesson = courseService.updateLesson(lessonId, lessonDetails);
         return ResponseEntity.ok(updatedLesson);
     }
 
-    @DeleteMapping("/{courseId}/lessons/{lessonId}")
+    @DeleteMapping("/lessons/{lessonId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteLessonFromCourse(@PathVariable Long courseId, @PathVariable Long lessonId) {
-        courseService.deleteLessonFromCourse(courseId, lessonId);
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long lessonId) {
+        courseService.deleteLesson(lessonId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/enroll")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> enrollUser(@PathVariable Long id) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        courseService.enrollUser(id, userDetails.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    // === Favorite Endpoints ===
+
+    @PostMapping("/{id}/favorite")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Boolean> toggleFavorite(@PathVariable Long id) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean isFavorited = courseService.toggleFavorite(id, userDetails.getId());
+        return ResponseEntity.ok(isFavorited);
+    }
+
+    @GetMapping("/favorites")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<CourseSummaryDto>> getUserFavorites() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<CourseSummaryDto> favorites = courseService.getUserFavorites(userDetails.getId());
+        return ResponseEntity.ok(favorites);
     }
 }

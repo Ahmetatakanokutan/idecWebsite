@@ -1,4 +1,5 @@
-import { Leaf } from "lucide-react";
+import { Leaf, MapPin, Phone, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -10,37 +11,48 @@ const Footer = () => {
               <Leaf className="w-6 h-6 text-emerald-400" />
               <h3 className="text-lg font-bold">IDEC-TT</h3>
             </div>
-            <p className="text-gray-400">
-              Sürdürülebilir gelecek için karbonsuzlaştırma projesi
+            <p className="text-gray-400 text-sm">
+              İstanbul Kalkınma Ajansı desteğiyle yürütülen, endüstriyel dekarbonizasyon ve ikiz dönüşüm projesi.
             </p>
           </div>
           <div>
-            <h4 className="text-sm font-semibold uppercase mb-4">Projeler</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Yenilenebilir Enerji</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Enerji Verimliliği</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Karbon Yakalama</a></li>
+            <h4 className="text-sm font-semibold uppercase mb-4">Faaliyet Alanları</h4>
+            <ul className="space-y-2 text-gray-400 text-sm">
+              <li><Link to="/projects" className="hover:text-white transition-colors">Endüstriyel Dekarbonizasyon</Link></li>
+              <li><Link to="/projects" className="hover:text-white transition-colors">KarbonBot Yapay Zeka</Link></li>
+              <li><Link to="/projects" className="hover:text-white transition-colors">Dijital Kütüphane</Link></li>
+              <li><Link to="/courses" className="hover:text-white transition-colors">Eğitim ve Mentorluk</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold uppercase mb-4">Kaynaklar</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Raporlar</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Araştırmalar</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Veri Seti</a></li>
+            <h4 className="text-sm font-semibold uppercase mb-4">Hızlı Erişim</h4>
+            <ul className="space-y-2 text-gray-400 text-sm">
+              <li><Link to="/about" className="hover:text-white transition-colors">Hakkında</Link></li>
+              <li><Link to="/courses" className="hover:text-white transition-colors">IDEC Akademi</Link></li>
+              <li><Link to="/projects" className="hover:text-white transition-colors">Projelerimiz</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">İletişim</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold uppercase mb-4">İletişim</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>info@idec-tt.org</li>
-              <li>+90 312 XXX XX XX</li>
-              <li>Ankara, Türkiye</li>
+            <ul className="space-y-3 text-gray-400 text-sm">
+              <li className="flex items-start">
+                <MapPin className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0" />
+                <span>İnönü Mah. Kayışdağı Cad. 326A, 26 Ağustos Yerleşimi, 34755 Ataşehir - İstanbul</span>
+              </li>
+              <li className="flex items-center">
+                <Phone className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0" />
+                <span>(0216) 578 00 00</span>
+              </li>
+              <li className="flex items-center">
+                <Mail className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0" />
+                <span>info@idec-tt.org</span>
+              </li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 IDEC-TT. Tüm hakları saklıdır.</p>
+        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-sm">
+          <p>&copy; {new Date().getFullYear()} IDEC-TT. Tüm hakları saklıdır.</p>
         </div>
       </div>
     </footer>

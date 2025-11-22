@@ -72,21 +72,31 @@ public class DataInitializer implements CommandLineRunner {
 
         Instructor instructor1 = instructorRepository.findByName("Dr. Ahmet Yılmaz")
                 .orElseGet(() -> instructorRepository.save(new Instructor("Dr. Ahmet Yılmaz", "Enerji Sistemleri Uzmanı")));
-        Course course1 = new Course("Karbonsuzlaştırma Temelleri", "Karbonsuzlaştırma süreçlerinin temel prensiplerini öğrenin", 4.8, 1250);
+        Course course1 = new Course("Karbonsuzlaştırma Temelleri", "Karbonsuzlaştırma süreçlerinin temel prensiplerini öğrenin", "https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=600");
         course1.setInstructor(instructor1);
-        course1.addLesson(new Lesson("Karbonsuzlaştırmaya Giriş", "15 dk", "https://www.youtube.com/embed/ScMzIvxBSi4"));
+        
+        Section section1 = new Section("Bölüm 1: Giriş", course1);
+        section1.addLesson(new Lesson("Karbonsuzlaştırmaya Giriş", "15 dk", "https://www.youtube.com/embed/ScMzIvxBSi4"));
+        course1.addSection(section1);
+        
         courseRepository.save(course1);
 
         Instructor instructor2 = instructorRepository.findByName("Prof. Dr. Zeynep Kaya")
                 .orElseGet(() -> instructorRepository.save(new Instructor("Prof. Dr. Zeynep Kaya", "Sürdürülebilirlik Profesörü")));
-        Course course2 = new Course("Sürdürülebilir Enerji Sistemleri", "Modern sürdürülebilir enerji sistemlerinin tasarımı ve uygulaması", 4.9, 890);
+        Course course2 = new Course("Sürdürülebilir Enerji Sistemleri", "Modern sürdürülebilir enerji sistemlerinin tasarımı ve uygulaması", "https://images.pexels.com/photos/414837/pexels-photo-414837.jpeg?auto=compress&cs=tinysrgb&w=600");
         course2.setInstructor(instructor2);
+        
+        Section section2 = new Section("Modül 1", course2);
+        course2.addSection(section2);
         courseRepository.save(course2);
 
         Instructor instructor3 = instructorRepository.findByName("Dr. Mehmet Özkan")
                 .orElseGet(() -> instructorRepository.save(new Instructor("Dr. Mehmet Özkan", "Karbon Yönetimi Stratejisti")));
-        Course course3 = new Course("Karbon Yakalama ve Depolama", "Karbon yakalama teknolojileri ve depolama yöntemleri", 4.7, 650);
+        Course course3 = new Course("Karbon Yakalama ve Depolama", "Karbon yakalama teknolojileri ve depolama yöntemleri", "https://images.pexels.com/photos/256381/pexels-photo-256381.jpeg?auto=compress&cs=tinysrgb&w=600");
         course3.setInstructor(instructor3);
+        
+        Section section3 = new Section("Giriş", course3);
+        course3.addSection(section3);
         courseRepository.save(course3);
 
         System.out.println("Initialized " + courseRepository.count() + " courses.");

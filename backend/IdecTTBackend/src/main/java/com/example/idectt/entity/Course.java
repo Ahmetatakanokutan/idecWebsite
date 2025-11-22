@@ -24,35 +24,28 @@ public class Course {
     @Column(length = 1000)
     private String description;
 
-    private double rating;
+    private String image; // Course thumbnail image URL
 
-    private int students;
+    private double rating = 0.0;
+
+    private int students = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id")
     private Instructor instructor;
 
-    @OneToMany(
-        mappedBy = "course",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    @JsonManagedReference // Prevents infinite recursion
-    private List<Lesson> lessons = new ArrayList<>();
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Section> sections = new ArrayList<>();
 
-    public Course(String title, String description, double rating, int students) {
+    public Course(String title, String description, String image) {
         this.title = title;
         this.description = description;
-        this.rating = rating;
-        this.students = students;
+        this.image = image;
     }
 
-    public void addLesson(Lesson lesson) {
-        lessons.add(lesson);
-        lesson.setCourse(this);
-    }
-
-    public void setInstructor(Instructor instructor) {
-        this.instructor = instructor;
+    public void addSection(Section section) {
+        sections.add(section);
+        section.setCourse(this);
     }
 }

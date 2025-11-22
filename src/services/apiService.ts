@@ -1,10 +1,5 @@
 const getAuthToken = () => {
-    const user = localStorage.getItem('user');
-    if (user) {
-        const userData = JSON.parse(user);
-        return userData.token || null;
-    }
-    return null;
+    return localStorage.getItem('token');
 };
 
 
@@ -62,7 +57,29 @@ const apiService = {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+    },
+    uploadFile: async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('http://localhost:8080/api/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+                // Content-Type header'ı FormData kullanırken tarayıcı tarafından otomatik ayarlanır (boundary ile birlikte)
+                // Bu yüzden buraya Content-Type eklememeliyiz!
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Dosya yüklenirken hata oluştu.');
+        }
+        
+        // Backend direkt string (URL) dönüyor
+        return await response.text();
     }
 }
+
 
 export { apiService };

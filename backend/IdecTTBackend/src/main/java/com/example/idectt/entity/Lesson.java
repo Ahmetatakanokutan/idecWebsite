@@ -23,9 +23,9 @@ public class Lesson {
     private String videoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
-    @JsonBackReference // Prevents infinite recursion
-    private Course course;
+    @JoinColumn(name = "section_id")
+    @JsonBackReference
+    private Section section;
 
     public Lesson(String title, String duration, String videoUrl) {
         this.title = title;

@@ -15,8 +15,9 @@ public class CourseDetailDto {
     private Long id;
     private String title;
     private String description;
+    private String image;
     private double rating;
     private int students;
     private InstructorDto instructor;
-    private List<LessonDto> lessons;
+    private List<SectionDto> sections;
 }
