@@ -1,4 +1,14 @@
+package com.example.idectt.security;
+
+import com.example.idectt.security.jwt.AuthEntryPointJwt;
+import com.example.idectt.security.jwt.AuthTokenFilter;
+import com.example.idectt.security.services.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,14 +18,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity // Enables @PreAuthorize, @PostAuthorize, @PreFilter, @PostFilter
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -29,24 +39,43 @@ public class SecurityConfig {
         return new AuthTokenFilter();
     }
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-     
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
+    /**
+     * Nükleer Çözüm: CORS Filtresini en yüksek öncelikle manuel olarak tanımlıyoruz.
+     * Bu sayede Spring Security'den önce devreye girer.
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        
+        // Frontend'in çalıştığı adresler
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
+        
+        // Tüm HTTP metodlarına izin ver
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
+        
+        // Tüm başlıklara izin ver
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        
+        // Cookie ve kimlik bilgilerine izin ver
+        config.setAllowCredentials(true);
+        
+        // Preflight (OPTIONS) isteklerini 1 saat boyunca önbellekle
+        config.setMaxAge(3600L);
+        
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
     @Bean
@@ -55,34 +84,30 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll() // Allow public access to auth endpoints
+                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS isteklerini her zaman geçir
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**").permitAll()
                                 .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
-                                .requestMatchers("/api/test/**").permitAll() // Example public endpoint
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN") // Admin-only access
-                                .requestMatchers("/api/company/**").hasAnyRole("COMPANY", "ADMIN") // Company or Admin access
-                                .requestMatchers("/api/user/**").hasAnyRole("USER", "COMPANY", "ADMIN") // User, Company or Admin access
-                                .anyRequest().authenticated() // All other requests require authentication
+                                .requestMatchers("/api/test/**").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/company/**").hasAnyRole("COMPANY", "ADMIN")
+                                .requestMatchers("/api/user/**").hasAnyRole("USER", "COMPANY", "ADMIN")
+                                .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        // Configure CORS
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        
+        // Spring Security'nin kendi CORS yapılandırmasını da etkinleştiriyoruz ki filtre zinciriyle uyumlu çalışsın
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
+            config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(Arrays.asList("*"));
+            config.setAllowCredentials(true);
+            return config;
+        }));
 
         return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Allow your frontend origin
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }
