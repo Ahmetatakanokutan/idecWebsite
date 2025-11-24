@@ -135,3 +135,70 @@ This section details a major refactoring effort to move static content to the ba
 *   **Functional Bug Fixes:**
     *   **Course Access:** Fixed a bug in `CourseDetailPage.tsx` where a logged-in user could not access course content. The page now correctly uses the global `AuthContext` to determine user access.
     *   **Registration Form:** Implemented the full API call logic in `RegisterPage.tsx`, allowing new users to successfully register. The component now features full state management, validation feedback, and error handling.
+
+---
+
+## Deployment & Environment Configuration (24 Kasım 2025 Pazartesi)
+
+This section documents the configuration of separate environments for localhost and the production server, as well as the complete deployment process on the Linux server.
+
+### Environment Variable Strategy
+
+*   **Approach:** Implemented `env` files to manage API base URLs dynamically.
+*   **Localhost:** Created `.env` with `VITE_API_BASE_URL=http://localhost:8080`.
+*   **Server (Production):** Created `.env.production` with `VITE_API_BASE_URL=http://51.20.56.7:8080`.
+*   **Code Update:** `src/services/apiService.ts` was refactored to use `import.meta.env.VITE_API_BASE_URL` instead of hardcoded strings.
+
+### Server Deployment Guide (Ubuntu/Linux)
+
+#### 1. Backend (Spring Boot) Service
+
+A `systemd` service was created to manage the backend application, ensuring it starts automatically on boot and restarts on failure.
+
+*   **Service File:** `/etc/systemd/system/idectt-backend.service`
+*   **Configuration Details:**
+    *   **User:** `ubuntu`
+    *   **Working Directory:** `/home/ubuntu/idecWebsite/backend/IdecTTBackend`
+    *   **ExecStart:** `/usr/bin/java -jar target/IdecTTBackend-0.0.1-SNAPSHOT.jar`
+    *   **Auto-Restart:** Enabled (`Restart=always`).
+*   **Commands:**
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable idectt-backend
+    sudo systemctl start idectt-backend
+    ```
+
+**Troubleshooting & Fixes Applied:**
+*   **Case Sensitivity:** Corrected a typo in the JAR filename in the service definition (`IdecTtBackend` -> `IdecTTBackend`).
+*   **Database Error:** Fixed `FATAL: database "idecttDb" does not exist` by manually creating the database via `psql` (`CREATE DATABASE "idecttDb";`).
+*   **Database Password:** Updated the `postgres` user password to match the application configuration (`131313`).
+
+#### 2. Frontend (React/Vite) Build
+
+The frontend is served as static files via Nginx.
+
+*   **Build Command:** `npm run build` (Executed in the root directory).
+*   **Output Directory:** `/home/ubuntu/idecWebsite/dist`.
+*   **Note:** The build process automatically picks up variables from `.env.production`.
+
+#### 3. Nginx Reverse Proxy Configuration
+
+Nginx is configured to serve the frontend and proxy API requests to the backend, closing port 8080 to the outside world.
+
+*   **Configuration File:** `/etc/nginx/sites-available/idectt` (Symlinked to `sites-enabled`).
+*   **Key Settings:**
+    *   **Port:** 80 (HTTP).
+    *   **Server Name:** `51.20.56.7` (Ready to accept domain names).
+    *   **Root:** `/home/ubuntu/idecWebsite/dist` (Serves React App).
+    *   **Location /api:** Proxies requests to `http://127.0.0.1:8080` (Backend).
+
+#### 4. Security
+
+*   **UFW (Uncomplicated Firewall):** Configured to allow only necessary traffic.
+    *   Allowed: `ssh`, `Nginx Full` (80/443).
+    *   Blocked: Direct access to port 8080.
+
+### Current Status
+*   **Backend:** Running actively via Systemd (`active (running)`).
+*   **Frontend:** Accessible via `http://51.20.56.7`.
+*   **SSL:** Pending domain acquisition. Once a domain is connected, `certbot` can be run to enable HTTPS.

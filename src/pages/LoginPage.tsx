@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiService } from '../services/apiService';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -15,22 +16,20 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: email, password: password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Giriş yapılamadı');
-      }
-
-      const data = await response.json();
+      // const response = await fetch('http://localhost:8080/api/auth/login', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ username: email, password }),
+      // });
+      
+      const data = await apiService.post('/auth/login', { username: email, password });
+      
+      // apiService throws error if not ok, so we catch it below. 
+      // And apiService returns the json directly.
+      
       login(data.token);
-      navigate('/');
     } catch (error: any) {
       setError(error.message);
     }

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Search, Star, Users, Leaf, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { Star, Users, AlertTriangle, Loader, Search } from 'lucide-react';
+import { apiService } from '../services/apiService';
 
-// Define the Course type based on the backend DTO
-interface CourseSummary {
+interface Course {
   id: number;
   title: string;
   description: string;
@@ -15,7 +15,7 @@ interface CourseSummary {
 }
 
 const CoursesPage = () => {
-  const [courses, setCourses] = useState<CourseSummary[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,14 +24,10 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8080/api/courses');
-        if (!response.ok) {
-          throw new Error('Dersler yüklenemedi.');
-        }
-        const data = await response.json();
+        const data = await apiService.get('/courses');
         setCourses(data);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || 'Dersler yüklenemedi.');
       } finally {
         setLoading(false);
       }

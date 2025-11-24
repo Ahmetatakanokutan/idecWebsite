@@ -1,35 +1,33 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Leaf, Globe, Users, Target, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } => 'react';
 import Layout from '../components/Layout';
-import { Target, Globe, Loader, AlertTriangle } from 'lucide-react';
+import { apiService } from '../services/apiService';
 
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  leader: string;
-  sectors: string[];
-  partners: string[];
-  objectives: string[];
-  outcomes: string[];
+// ... interface definition ...
+interface ProjectDetail {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    leader: string;
+    sectors: string[];
+    partners: string[];
+    objectives: string[];
+    outcomes: string[];
 }
 
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProjectDetail = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/projects/${projectId}`);
-        if (!response.ok) {
-          throw new Error('Proje detayı yüklenemedi.');
-        }
-        const data = await response.json();
+        const data = await apiService.get(`/projects/${projectId}`);
         setProject(data);
       } catch (err: any) {
         setError(err.message);
@@ -38,7 +36,9 @@ const ProjectDetailPage = () => {
       }
     };
 
-    fetchProject();
+    if (projectId) {
+        fetchProjectDetail();
+    }
   }, [projectId]);
 
   if (loading) {

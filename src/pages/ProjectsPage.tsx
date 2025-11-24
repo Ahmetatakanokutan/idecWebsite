@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Leaf, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { Loader, AlertTriangle } from 'lucide-react';
+import { apiService } from '../services/apiService';
 
 interface Project {
   id: number;
@@ -21,11 +22,7 @@ const ProjectsPage = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8080/api/projects');
-        if (!response.ok) {
-          throw new Error('Projeler yüklenemedi.');
-        }
-        const data = await response.json();
+        const data = await apiService.get('/projects');
         setProjects(data);
       } catch (err: any) {
         setError(err.message);
