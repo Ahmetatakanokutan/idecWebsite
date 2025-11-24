@@ -51,7 +51,7 @@ public class DataInitializer implements CommandLineRunner {
 
         if (userRepository.findByUsername("ahmetatakan.okutan@yeditepe.edu.tr").isEmpty()) {
             User adminUser = new User("ahmetatakan.okutan@yeditepe.edu.tr",
-                    passwordEncoder.encode("admin123"),
+                    passwordEncoder.encode("AatakanAdmin1349!"),
                     "IDEC-TT Admin",
                     "5551234567");
 
@@ -61,7 +61,7 @@ public class DataInitializer implements CommandLineRunner {
             roles.add(adminRole);
             adminUser.setRoles(roles);
             userRepository.save(adminUser);
-            System.out.println("Initial Admin user created: ahmetatakan.okutan@yeditepe.edu.tr / admin123");
+            System.out.println("Initial Admin user created: ahmetatakan.okutan@yeditepe.edu.tr / AatakanAdmin1349!");
         }
     }
 
