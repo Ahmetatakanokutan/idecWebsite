@@ -48,6 +48,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified = false;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CompanyProfile companyProfile;
 

@@ -15,7 +15,12 @@ const apiService = {
             }
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
+            } catch (e) { /* ignore */ }
+            throw new Error(errorMessage);
         }
         return await response.json();
     },
@@ -30,7 +35,12 @@ const apiService = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
+            } catch (e) { /* ignore */ }
+            throw new Error(errorMessage);
         }
         return await response.json();
     },
@@ -44,7 +54,12 @@ const apiService = {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
+            } catch (e) { /* ignore */ }
+            throw new Error(errorMessage);
         }
         return await response.json();
     },
@@ -57,7 +72,12 @@ const apiService = {
             }
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
+            } catch (e) { /* ignore */ }
+            throw new Error(errorMessage);
         }
     },
     uploadFile: async (file: File) => {

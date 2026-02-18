@@ -50,6 +50,9 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    @org.springframework.beans.factory.annotation.Value("${idectt.app.cors.allowedOrigins}")
+    private String allowedOrigins;
+
     /**
      * Nükleer Çözüm: CORS Filtresini en yüksek öncelikle manuel olarak tanımlıyoruz.
      * Bu sayede Spring Security'den önce devreye girer.
@@ -60,7 +63,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         
         // Frontend'in çalıştığı adresler
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         
         // Tüm HTTP metodlarına izin ver
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
@@ -90,7 +93,7 @@ public class SecurityConfig {
                                                                 .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").authenticated() 
                                                                 .requestMatchers(HttpMethod.POST, "/api/courses/*/favorite").authenticated() // Add favorite toggle
                                                                 .requestMatchers(HttpMethod.GET, "/api/courses/favorites").authenticated() // Add favorite list
-                                                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**").permitAll()                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
+                                                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**", "/api/announcements/**").permitAll()                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/company/**").hasAnyRole("COMPANY", "ADMIN")
@@ -107,7 +110,8 @@ public class SecurityConfig {
         // Spring Security'nin kendi CORS yapılandırmasını da etkinleştiriyoruz ki filtre zinciriyle uyumlu çalışsın
         http.cors(cors -> cors.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
+                    // Frontend'in çalıştığı adresler
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
             config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             config.setAllowedHeaders(Arrays.asList("*"));
             config.setAllowCredentials(true);

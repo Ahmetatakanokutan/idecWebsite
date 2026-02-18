@@ -30,8 +30,13 @@ const LoginPage = () => {
       // And apiService returns the json directly.
       
       login(data.token);
+      navigate('/'); // Redirect to home page after successful login
     } catch (error: any) {
-      setError(error.message);
+      if (error.message.includes('401')) {
+        setError('Kullanıcı adı veya şifre hatalı.');
+      } else {
+        setError('Giriş yapılırken bir sorun oluştu. Lütfen bilgilerinizi kontrol edip tekrar deneyin.');
+      }
     }
   };
 

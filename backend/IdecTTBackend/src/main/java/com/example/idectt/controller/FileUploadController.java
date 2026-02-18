@@ -46,8 +46,8 @@ public class FileUploadController {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            // Dosya URL'ini döndür
-            String fileUrl = "http://localhost:8080/uploads/" + fileName;
+            // Dosya URL'ini döndür (Relative path)
+            String fileUrl = "/uploads/" + fileName;
             return ResponseEntity.ok(fileUrl);
         } catch (IOException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not upload file: " + ex.getMessage());

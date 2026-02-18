@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Target, Users, Globe, ArrowRight, Leaf, Wind, Zap, BarChart3, Award, Layers } from 'lucide-react';
 import Layout from '../components/Layout';
+import AnnouncementsSection from '../components/AnnouncementsSection';
+import { useTranslation } from 'react-i18next';
 
 const heroImages = [
   "https://images.pexels.com/photos/9800009/pexels-photo-9800009.jpeg?auto=compress&cs=tinysrgb&w=1920", // Rüzgar Gülleri (Favori)
@@ -13,6 +15,7 @@ const heroImages = [
 const HomePage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -56,34 +59,27 @@ const HomePage = () => {
           <div className="max-w-3xl">
             <div className="inline-flex items-center space-x-2 mb-6 px-4 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-emerald-300 text-sm font-semibold tracking-wide uppercase animate-pulse">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>Geleceği Şekillendiriyoruz</span>
+              <span>{t('home.shaping_future')}</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight tracking-tight">
-              Yeşil Enerji, <br/>
+              {t('home.hero_main_title_part1')} <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                Güçlü Sanayi.
+                {t('home.hero_main_title_part2')}
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 mb-10 font-light leading-relaxed border-l-4 border-emerald-500 pl-6">
-              IDEC-TT ile endüstriyel dönüşümde karbon ayak izini siliyoruz. 
-              Teknoloji ve doğanın kusursuz uyumu için çalışıyoruz.
+              {t('home.hero_description_line1')} 
+              {t('home.hero_description_line2')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-5">
               <Link 
-                to="/projects"
-                className="group bg-emerald-600 text-white px-8 py-4 rounded-full hover:bg-emerald-500 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] font-bold flex items-center justify-center sm:justify-start"
-              >
-                Projeleri İncele 
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link 
                 to="/courses"
                 className="group bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-full hover:bg-white/20 transition-all font-semibold flex items-center justify-center sm:justify-start"
               >
-                Eğitimlere Katıl
+                {t('home.start_learning')}
                 <PlayCircleIcon className="ml-2 w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" />
               </Link>
             </div>
@@ -101,23 +97,26 @@ const HomePage = () => {
       {/* Stats Strip (Floating) */}
       <div className="relative z-20 -mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-2xl grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 p-8 border border-gray-100/50">
-            <StatItem number="400+" label="Eğitim Alan" icon={<Users className="w-5 h-5 text-emerald-600" />} />
-            <StatItem number="30+" label="Firma Mentörlüğü" icon={<BarChart3 className="w-5 h-5 text-blue-600" />} />
-            <StatItem number="4" label="Pilot Sektör" icon={<Layers className="w-5 h-5 text-purple-600" />} />
-            <StatItem number="5" label="Faaliyet Alanı" icon={<Award className="w-5 h-5 text-orange-600" />} />
+            <StatItem number="400+" label={t('home.stat_item_1_label')} icon={<Users className="w-5 h-5 text-emerald-600" />} />
+            <StatItem number="30+" label={t('home.stat_item_2_label')} icon={<BarChart3 className="w-5 h-5 text-blue-600" />} />
+            <StatItem number="4" label={t('home.stat_item_3_label')} icon={<Layers className="w-5 h-5 text-purple-600" />} />
+            <StatItem number="5" label={t('home.stat_item_4_label')} icon={<Award className="w-5 h-5 text-orange-600" />} />
         </div>
       </div>
+
+      {/* Announcements Section */}
+      <AnnouncementsSection />
 
       {/* Features Section */}
       <section id="about" className="py-32 bg-gray-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-sm font-bold text-emerald-600 tracking-widest uppercase mb-3">Vizyonumuz</h2>
+            <h2 className="text-sm font-bold text-emerald-600 tracking-widest uppercase mb-3">{t('home.vision_title_section')}</h2>
             <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Sürdürülebilirlik İçin <br/> 3 Temel Adım
+              {t('home.vision_subtitle_section')} <br/> {t('home.vision_main_title_section')}
             </h3>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Karmaşık sorunlara basit ve etkili çözümler üretiyoruz.
+              {t('home.vision_description_section')}
             </p>
           </div>
 
@@ -125,20 +124,20 @@ const HomePage = () => {
             <FeatureCard 
                 icon={<Target className="w-8 h-8 text-white" />}
                 color="bg-emerald-500"
-                title="Net Sıfır Stratejisi"
-                description="2053 hedefleri doğrultusunda karbon emisyonlarını sıfıra indiren yol haritaları."
+                title={t('home.feature_card_1_title')}
+                description={t('home.feature_card_1_desc')}
             />
             <FeatureCard 
                 icon={<Globe className="w-8 h-8 text-white" />}
                 color="bg-blue-600"
-                title="Global Entegrasyon"
-                description="Dünya standartlarında projelerle sınırları aşan iş birlikleri ve teknoloji transferi."
+                title={t('home.feature_card_2_title')}
+                description={t('home.feature_card_2_desc')}
             />
             <FeatureCard 
                 icon={<Users className="w-8 h-8 text-white" />}
                 color="bg-indigo-600"
-                title="Toplumsal Dönüşüm"
-                description="Sadece sanayiyi değil, toplumu da eğiten ve dönüştüren sosyal sorumluluk bilinci."
+                title={t('home.feature_card_3_title')}
+                description={t('home.feature_card_3_desc')}
             />
           </div>
         </div>
@@ -149,18 +148,17 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row items-center gap-16">
                 <div className="lg:w-1/2">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-6">Doğayla Uyumlu Teknoloji</h2>
+                    <h2 className="text-4xl font-bold text-gray-900 mb-6">{t('home.tech_harmony_title')}</h2>
                     <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                        Sanayi devriminin getirdiği yükleri, Endüstri 4.0 ve yeşil enerji teknolojileriyle hafifletiyoruz. 
-                        Güneşten, rüzgardan ve veriden güç alarak geleceği inşa ediyoruz.
+                        {t('home.tech_harmony_desc')}
                     </p>
                     <ul className="space-y-4 mb-8">
-                        <ListItem text="Karbon Yakalama ve Depolama Teknolojileri" />
-                        <ListItem text="Yapay Zeka Destekli Enerji Yönetimi" />
-                        <ListItem text="Döngüsel Ekonomi Modelleri" />
+                        <ListItem text={t('home.list_item_1')} />
+                        <ListItem text={t('home.list_item_2')} />
+                        <ListItem text={t('home.list_item_3')} />
                     </ul>
                     <Link to="/about" className="text-emerald-600 font-bold hover:text-emerald-700 inline-flex items-center group">
-                        Daha fazlasını oku <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        {t('home.read_more_about')} <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
                 <div className="lg:w-1/2 relative">
@@ -182,24 +180,23 @@ const HomePage = () => {
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-            Gezegenimiz İçin Harekete Geçin
+            {t('home.cta_title')}
           </h2>
           <p className="text-xl text-gray-300 mb-10 font-light">
-            Bugün atacağınız küçük bir adım, yarın büyük bir ormana dönüşebilir.
-            Projelerimize katılın, eğitim alın veya destek olun.
+            {t('home.cta_description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
                 to="/contact"
                 className="bg-emerald-500 text-white px-10 py-4 rounded-full hover:bg-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/40 font-bold"
             >
-                İletişime Geçin
+                {t('home.cta_contact')}
             </Link>
             <Link 
                 to="/register"
                 className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-10 py-4 rounded-full hover:bg-white/20 transition-all font-bold"
             >
-                Üye Olun
+                {t('home.cta_register')}
             </Link>
           </div>
         </div>

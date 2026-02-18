@@ -32,7 +32,7 @@ const ManageProjectsPage = () => {
       const data = await apiService.get('/projects');
       setProjects(data);
     } catch (err: any) {
-      setError(err.message || 'Projeler yüklenirken bir hata oluştu.');
+      setError(err.message || 'Veriler yüklenirken bir hata oluştu.');
     } finally {
       setLoading(false);
     }
@@ -43,13 +43,13 @@ const ManageProjectsPage = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Bu projeyi silmek istediğinizden emin misiniz?')) {
+    if (window.confirm('Bu kaydı silmek istediğinizden emin misiniz?')) {
       try {
         await apiService.delete(`/projects/${id}`);
         // Refresh the list after deletion
         fetchProjects();
       } catch (err: any) {
-        setError(err.message || 'Proje silinirken bir hata oluştu.');
+        setError(err.message || 'Silme işlemi sırasında bir hata oluştu.');
       }
     }
   };
@@ -99,7 +99,7 @@ const ManageProjectsPage = () => {
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold">Projeleri Yönet</h2>
+        <h2 className="text-2xl font-bold">Paydaşları ve İştirakleri Yönet</h2>
         <div className="flex gap-4 w-full sm:w-auto">
             <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -108,7 +108,7 @@ const ManageProjectsPage = () => {
                 <input
                     type="text"
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                    placeholder="Proje ara..."
+                    placeholder="Ara..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -118,7 +118,7 @@ const ManageProjectsPage = () => {
             className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
             >
             <Plus className="h-5 w-5 mr-2" />
-            Yeni Proje
+            Yeni Ekle
             </button>
         </div>
       </div>
@@ -128,10 +128,10 @@ const ManageProjectsPage = () => {
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Proje Başlığı
+                Başlık / İsim
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Proje Yürütücüsü
+                Yürütücü
               </th>
               <th scope="col" className="relative px-6 py-3">
                 <span className="sr-only">Eylemler</span>

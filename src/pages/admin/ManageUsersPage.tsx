@@ -9,6 +9,7 @@ interface User {
   fullName: string;
   phone: string;
   roles: string[];
+  isEmailVerified: boolean;
 }
 
 const ManageUsersPage = () => {
@@ -16,7 +17,7 @@ const ManageUsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -115,7 +116,14 @@ const ManageUsersPage = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900 flex items-center"><Mail className="w-4 h-4 mr-2 text-gray-400"/> {user.username}</div>
+                  <div className="text-sm text-gray-900 flex items-center">
+                    <Mail className="w-4 h-4 mr-2 text-gray-400"/> 
+                    {user.username}
+                    {user.isEmailVerified ? 
+                        <span title="Doğrulanmış E-posta" className="ml-2 text-green-600">✓</span> : 
+                        <span title="Doğrulanmamış E-posta" className="ml-2 text-red-500 text-xs">(Onaysız)</span>
+                    }
+                  </div>
                   <div className="text-sm text-gray-500 flex items-center mt-1"><Phone className="w-4 h-4 mr-2 text-gray-400"/> {user.phone || '-'}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

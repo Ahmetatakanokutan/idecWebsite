@@ -21,6 +21,12 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private com.example.idectt.repository.RoleRepository roleRepository;
+
     // === Admin Endpoints ===
 
     @GetMapping
@@ -33,7 +39,8 @@ public class UserController {
                         user.getFullName(),
                         user.getPhone(),
                         // role.getName() returns String, simple and safe
-                        user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList())
+                        user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()),
+                        user.getIsEmailVerified()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
@@ -57,7 +64,33 @@ public class UserController {
 
         if (updateDto.getFullName() != null) user.setFullName(updateDto.getFullName());
         if (updateDto.getPhone() != null) user.setPhone(updateDto.getPhone());
-        // Admin can potentially update roles here too if we extend UserUpdateDto, but for now basic info.
+        
+        // Admin Updates
+        if (updateDto.getEmail() != null && !updateDto.getEmail().equals(user.getUsername())) {
+             if (userRepository.existsByUsername(updateDto.getEmail())) {
+                 throw new RuntimeException("Error: Email is already in use!");
+             }
+             user.setUsername(updateDto.getEmail());
+        }
+
+        if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+        }
+
+        if (updateDto.getIsEmailVerified() != null) {
+            user.setIsEmailVerified(updateDto.getIsEmailVerified());
+        }
+
+        if (updateDto.getRoles() != null && !updateDto.getRoles().isEmpty()) {
+            java.util.Set<com.example.idectt.entity.Role> newRoles = new java.util.HashSet<>();
+            for (String roleName : updateDto.getRoles()) {
+                 com.example.idectt.entity.ERole eRole = com.example.idectt.entity.ERole.valueOf(roleName); 
+                 com.example.idectt.entity.Role role = roleRepository.findByRoleName(eRole)
+                         .orElseThrow(() -> new RuntimeException("Error: Role " + roleName + " is not found."));
+                 newRoles.add(role);
+            }
+            user.setRoles(newRoles);
+        }
 
         User updatedUser = userRepository.save(user);
 
@@ -66,7 +99,8 @@ public class UserController {
                 updatedUser.getUsername(),
                 updatedUser.getFullName(),
                 updatedUser.getPhone(),
-                updatedUser.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList())
+                updatedUser.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()),
+                updatedUser.getIsEmailVerified()
         ));
     }
 
@@ -84,7 +118,8 @@ public class UserController {
                 user.getUsername(),
                 user.getFullName(),
                 user.getPhone(),
-                user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList())
+                user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()),
+                user.getIsEmailVerified()
         ));
     }
 
@@ -105,7 +140,8 @@ public class UserController {
                 updatedUser.getUsername(),
                 updatedUser.getFullName(),
                 updatedUser.getPhone(),
-                updatedUser.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList())
+                updatedUser.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()),
+                updatedUser.getIsEmailVerified()
         ));
     }
 }

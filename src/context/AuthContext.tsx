@@ -45,6 +45,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
+  // Notify external widgets (like KarbonBot) about login status
+  useEffect(() => {
+    if (!isLoading) {
+      window.postMessage({ 
+        type: 'KYDDTR_LOGIN_STATUS', 
+        isLoggedIn: isLoggedIn 
+      }, '*');
+    }
+  }, [isLoggedIn, isLoading]);
+
   const login = (token: string) => {
     try {
       const decodedToken: User = jwtDecode(token);

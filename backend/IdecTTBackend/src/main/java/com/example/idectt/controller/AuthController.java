@@ -24,7 +24,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,6 +55,18 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestParam("code") String code) {
+        User user = userRepository.findByVerificationCode(code)
+                .orElseThrow(() -> new RuntimeException("Error: Invalid verification code."));
+
+        user.setIsEmailVerified(true);
+        user.setVerificationCode(null); // Clear code after use
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("Email verified successfully!"));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -73,6 +90,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        if (!isValidEmailDomain(registerRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Invalid email domain. Please use a real email address."));
+        }
+
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -127,8 +150,37 @@ public class AuthController {
         }
 
         user.setRoles(roles);
+        
+        // Generate Verification Code
+        String verificationCode = java.util.UUID.randomUUID().toString();
+        user.setVerificationCode(verificationCode);
+        user.setIsEmailVerified(false);
+        
         userRepository.save(user);
+        
+        // TODO: Send real email
+        System.out.println("SIMULATION: Sending verification email to " + user.getUsername() + " with code: " + verificationCode);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email to verify."));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmailExists(@RequestParam("email") String email) {
+        Boolean exists = userRepository.existsByUsername(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    private boolean isValidEmailDomain(String email) {
+        try {
+            String domain = email.substring(email.indexOf('@') + 1);
+            Hashtable<String, String> env = new Hashtable<>();
+            env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+            DirContext ctx = new InitialDirContext(env);
+            Attributes attrs = ctx.getAttributes(domain, new String[] { "MX" });
+            Attribute attr = attrs.get("MX");
+            return attr != null && attr.size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

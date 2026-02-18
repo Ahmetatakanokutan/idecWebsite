@@ -20,6 +20,7 @@ import ManageCoursesPage from '../pages/admin/ManageCoursesPage';
 import ManageCourseLessonsPage from '../pages/admin/ManageCourseLessonsPage';
 import ManageInstructorsPage from '../pages/admin/ManageInstructorsPage';
 import ManageUsersPage from '../pages/admin/ManageUsersPage';
+import ManageAnnouncementsPage from '../pages/admin/ManageAnnouncementsPage';
 
 export const AppRoutes = () => {
   const routes = useRoutes([
@@ -57,6 +58,7 @@ export const AppRoutes = () => {
             { path: 'courses/:courseId/lessons', element: <ManageCourseLessonsPage /> },
             { path: 'instructors', element: <ManageInstructorsPage /> },
             { path: 'users', element: <ManageUsersPage /> },
+            { path: 'announcements', element: <ManageAnnouncementsPage /> },
           ],
         },
       ],

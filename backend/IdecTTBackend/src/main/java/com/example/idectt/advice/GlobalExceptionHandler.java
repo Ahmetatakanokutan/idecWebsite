@@ -23,4 +23,21 @@ public class GlobalExceptionHandler {
         body.put("path", request.getDescription(false).substring(4)); // Remove "uri=" prefix
         return body;
     }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleValidationExceptions(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", HttpStatus.BAD_REQUEST.value());
+        errors.put("error", "Validation Error");
+        
+        StringBuilder message = new StringBuilder();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            message.append(errorMessage).append(" ");
+        });
+        
+        errors.put("message", message.toString().trim());
+        return errors;
+    }
 }

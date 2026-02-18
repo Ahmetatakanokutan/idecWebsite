@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, Users, ChevronRight, ChevronDown, BookOpen, Loader, AlertTriangle, CheckCircle, Heart } from 'lucide-react';
+import { Play, Star, Users, ChevronRight, ChevronDown, BookOpen, Loader2, AlertCircle, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/apiService';
+import { useTranslation } from 'react-i18next';
 
 // Backend DTO yapılarına göre arayüzleri tanımla
 interface Lesson {
@@ -36,6 +37,7 @@ interface CourseDetail {
 const CourseDetailPage = () => {
   const { isLoggedIn, token } = useAuth();
   const { courseId } = useParams();
+  const { t, i18n } = useTranslation();
 
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
@@ -82,20 +84,7 @@ const CourseDetailPage = () => {
         // For now, let's assume false or check via separate call if needed.
         // apiService.get(`/courses/${courseId}/isFavorited`).then(setIsFavorited).catch(() => {});
 
-        const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-             if (response.status === 401 || response.status === 403) {
-                 throw new Error("Bu dersi görüntülemek için yetkiniz yok veya oturumunuz dolmuş.");
-             }
-             throw new Error('Ders detayı yüklenemedi.');
-        }
-        
-        const data: CourseDetail = await response.json();
+        const data: CourseDetail = await apiService.get(`/courses/${courseId}`);
         setCourse(data);
 
         if (data.sections && data.sections.length > 0) {
@@ -124,10 +113,26 @@ const CourseDetailPage = () => {
     }
   };
 
+  const getLocalizedContent = (course: CourseDetail) => {
+    if (i18n.language === 'en') {
+      const translated = t(`courses.items.${course.title}`, { returnObjects: true }) as any;
+      if (translated && translated.title) {
+        return {
+          title: translated.title,
+          description: translated.description
+        };
+      }
+    }
+    return {
+      title: course.title,
+      description: course.description
+    };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
+          <Loader2 className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -138,9 +143,9 @@ const CourseDetailPage = () => {
         <div className="max-w-md w-full mx-4">
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
             <div className="flex justify-center mb-6"><div className="flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-lg"><BookOpen className="w-8 h-8 text-white" /></div></div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Bu Derse Erişmek İçin Giriş Yapmalısınız</h2>
-            <p className="text-gray-600 mb-6">Ders içeriklerini görüntülemek ve eğitiminize devam etmek için lütfen giriş yapın.</p>
-            <Link to="/login" className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold mb-4 inline-block">Giriş Yap</Link>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('courses.login_required_title')}</h2>
+            <p className="text-gray-600 mb-6">{t('courses.login_required_desc')}</p>
+            <Link to="/login" className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold mb-4 inline-block">{t('header.login')}</Link>
             <p className="text-sm text-gray-500">Hesabınız yok mu? <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">Kayıt olun</Link></p>
           </div>
         </div>
@@ -152,9 +157,9 @@ const CourseDetailPage = () => {
      return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center bg-red-50 p-8 rounded-lg">
-          <AlertTriangle className="w-12 h-12 mx-auto text-red-500" />
+          <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
           <p className="mt-4 text-lg text-red-700 font-semibold">{error}</p>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">Tüm derslere geri dön</Link>
+          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
@@ -164,12 +169,14 @@ const CourseDetailPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Ders Bulunamadı</h1>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">Tüm derslere geri dön</Link>
+          <h1 className="text-2xl font-bold text-gray-800">{t('courses.not_found')}</h1>
+          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
   }
+
+  const localized = getLocalizedContent(course);
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-50 overflow-hidden">
@@ -177,7 +184,7 @@ const CourseDetailPage = () => {
       <div className="flex-1 bg-black flex flex-col relative">
         <div className="absolute top-4 left-4 z-10">
              <Link to="/courses" className="text-white/80 hover:text-white bg-black/50 px-3 py-1 rounded-full text-sm flex items-center backdrop-blur-sm">
-                <ChevronRight className="w-4 h-4 rotate-180 mr-1" /> Derslere Dön
+                <ChevronRight className="w-4 h-4 rotate-180 mr-1" /> {t('courses.back_to_courses')}
              </Link>
         </div>
         <div className="flex-1 flex items-center justify-center bg-gray-900 overflow-hidden relative">
@@ -207,7 +214,7 @@ const CourseDetailPage = () => {
           ) : (
             <div className="text-white text-center z-10">
                 <Play className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Başlamak için sağ taraftan bir ders seçin</p>
+                <p className="text-lg font-medium">{t('courses.start_prompt')}</p>
             </div>
           )}
         </div>
@@ -228,7 +235,7 @@ const CourseDetailPage = () => {
         {/* Sidebar Header */}
         <div className="p-5 border-b border-gray-200 bg-gray-50">
           <div className="flex justify-between items-start mb-1">
-            <h2 className="text-lg font-bold text-gray-900 leading-tight">{course.title}</h2>
+            <h2 className="text-lg font-bold text-gray-900 leading-tight">{localized.title}</h2>
             <button 
                 onClick={handleToggleFavorite} 
                 className={`p-1.5 rounded-full hover:bg-gray-200 transition-colors ${isFavorited ? 'text-red-500' : 'text-gray-400'}`}
@@ -239,7 +246,7 @@ const CourseDetailPage = () => {
           </div>
           <div className="flex items-center space-x-3 text-xs text-gray-500">
              <div className="flex items-center"><Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />{course.rating}</div>
-             <div className="flex items-center"><Users className="w-3 h-3 mr-1" />{course.students} öğrenci</div>
+             <div className="flex items-center"><Users className="w-3 h-3 mr-1" />{course.students} {t('courses.students')}</div>
           </div>
         </div>
 
@@ -289,7 +296,7 @@ const CourseDetailPage = () => {
                                 );
                             })}
                             {section.lessons.length === 0 && (
-                                <p className="p-4 text-xs text-gray-400 text-center italic">Bu bölümde ders yok.</p>
+                                <p className="p-4 text-xs text-gray-400 text-center italic">{t('courses.no_lessons')}</p>
                             )}
                         </div>
                     )}

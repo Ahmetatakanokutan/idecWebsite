@@ -175,6 +175,7 @@ A `systemd` service was created to manage the backend application, ensuring it s
 
 #### 2. Frontend (React/Vite) Build
 
+
 The frontend is served as static files via Nginx.
 
 *   **Build Command:** `npm run build` (Executed in the root directory).
@@ -202,3 +203,74 @@ Nginx is configured to serve the frontend and proxy API requests to the backend,
 *   **Backend:** Running actively via Systemd (`active (running)`).
 *   **Frontend:** Accessible via `http://51.20.56.7`.
 *   **SSL:** Pending domain acquisition. Once a domain is connected, `certbot` can be run to enable HTTPS.
+---
+
+## Recent Modifications by Gemini (Wednesday, November 26, 2025)
+
+This section summarizes the key changes and bug fixes implemented during the current session to enhance deployment, functionality, and user experience.
+
+### Deployment & Environment Enhancements
+
+*   **Frontend API Base URL Correction:**
+    *   `_env.production_`: Corrected `VITE_API_BASE_URL` from `https://www.kyddtr.com/api` to `https://www.kyddtr.com` to prevent redundant `/api/api` paths in API calls.
+*   **PostgreSQL Installation & Configuration:**
+    *   Detected missing PostgreSQL installation.
+    *   Installed `postgresql` and `postgresql-contrib`.
+    *   Created `idecttDb` database.
+    *   Updated `postgres` user password to a strong, secure value (`p0stGr3s_!d3cTT_KydDTR_S3cr3t_2025#`).
+    *   **Fixed Bash `!` Escaping Issue:** Resolved `event not found` error when setting PostgreSQL password by correctly escaping `!` character in the shell command.
+*   **Nginx Setup & Configuration:**
+    *   Detected missing Nginx installation.
+    *   Installed Nginx.
+    *   Configured Nginx (`/etc/nginx/sites-available/kyddtr`) to serve the frontend from `/var/www/kyddtr` and proxy `/api` requests to `http://127.0.0.1:8080`.
+    *   Enabled the Nginx site and removed the default configuration.
+    *   **Fixed `500 Internal Server Error` (Permission Denied):** Granted Nginx (`www-data` user) execute permissions to `/home/ubuntu` and its subdirectories (`/home/ubuntu/idecWebsite`, `/home/ubuntu/idecWebsite/dist`) to resolve `Permission denied` errors when serving static files.
+    *   **Improved Security & Structure (Frontend Deployment):** Moved the production build (`dist`) to `/var/www/kyddtr` and adjusted Nginx `root` directive accordingly for a more standard and secure web server setup.
+*   **SSL Certificate Installation:**
+    *   Installed `certbot` and `python3-certbot-nginx`.
+    *   Ran `sudo certbot --nginx -d kyddtr.com -d www.kyddtr.com` to obtain and install SSL certificates, automatically configuring Nginx for HTTPS.
+    *   **AWS Security Group Fix:** Diagnosed and instructed the user to open ports 80 (HTTP) and 443 (HTTPS) in AWS Security Groups, which was preventing Certbot authentication and site access.
+*   **Backend Deployment:** Ensured `idectt-backend.service` was restarted after backend changes to apply new configurations.
+
+### Frontend Functionality & UI Enhancements
+
+*   **Multi-Language Support (i18n):**
+    *   Installed `i18next`, `react-i18next`, and `i18next-browser-languagedetector`.
+    *   Created `src/locales/tr/translation.json` and `src/locales/en/translation.json` for Turkish and English translations.
+    *   Configured `src/i18n.ts` for i18next initialization.
+    *   Integrated i18n into `src/main.tsx`.
+    *   **`Header.tsx`:** Added a language switcher button and translated navigation links, profile menu items.
+    *   **`HomePage.tsx`:** Translated all static texts (hero section, feature cards, CTA, stat items).
+    *   **`ProjectsPage.tsx`:** Translated static texts and implemented a dynamic mapping to display English descriptions for project titles based on `translation.json` if the language is English.
+    *   **`CoursesPage.tsx`:** Translated static texts and implemented a dynamic mapping to display English descriptions for course titles based on `translation.json` if the language is English.
+    *   **`ProjectDetailPage.tsx`:** Translated static texts and implemented dynamic content mapping.
+    *   **`CourseDetailPage.tsx`:** Translated static texts and implemented dynamic content mapping.
+    *   **`AboutPage.tsx`:** Translated all static texts, including project vision, problems, solutions, and contact information.
+*   **Registration Page Improvements (`RegisterPage.tsx`):**
+    *   **Phone Number Validation:** Implemented client-side validation to only allow numeric input, prevent leading zeros, and limit to a maximum of 10 digits.
+    *   **Email Format Validation:** Added a stricter regex check to `isValidEmail` to ensure a more realistic email format (e.g., proper domain extension length).
+    *   **Email Existence Check (with Debounce):**
+        *   Created `src/hooks/useDebounce.ts` hook.
+        *   Integrated `useDebounce` into `RegisterPage.tsx` to call a backend endpoint (`/api/auth/check-email`) as the user types, providing real-time feedback on email availability.
+        *   Added UI feedback (e.g., "E-posta kontrol ediliyor...", "Bu e-posta adresi zaten kullanımda.").
+*   **Login Page Improvements (`LoginPage.tsx`):**
+    *   Improved error handling to display user-friendly messages for `401 Unauthorized` errors (e.g., "Kullanıcı adı veya şifre hatalı.") instead of generic technical messages.
+
+### Backend Functionality & Error Handling
+
+*   **Email Domain Validation (MX Record Check):**
+    *   `AuthController.java`: Added `isValidEmailDomain` method to perform DNS MX record lookups, preventing registration with non-existent email domains (`.tro`, `.invalid` etc.).
+    *   Integrated this check into the `registerUser` method.
+*   **Improved Validation Error Responses:**
+    *   `GlobalExceptionHandler.java`: Added an exception handler for `MethodArgumentNotValidException` to provide clear, human-readable error messages for validation failures (e.g., password length rules) to the frontend.
+
+### Resolved Compilation & Runtime Errors
+
+*   **`Uncaught ReferenceError: StrictMode is not defined`:** Fixed by adding `import { StrictMode } from 'react';` to `src/main.tsx`.
+*   **`Uncaught ReferenceError: Loader is not defined`:** Fixed by consistently using `Loader2` (from `lucide-react`) instead of `Loader` in `ProjectsPage.tsx`, `CoursesPage.tsx`, `ProjectDetailPage.tsx`, and `CourseDetailPage.tsx`.
+*   **Backend Compilation Errors (`class, interface, enum, or record expected`):** Corrected a misplaced `checkEmailExists` method in `AuthController.java` that was outside the class's scope.
+*   **Frontend Compilation Errors (`Unexpected "export"`):** Fixed typo in `react-router-dom` import and ensured `handleRegister` function's closing brace was correctly placed in `RegisterPage.tsx`.
+
+### Outstanding Issues
+
+*   **KarbonBot CORS Policy / Domain Check (403 Forbidden):** This issue persists. It requires whitelisting `kyddtr.com` and `www.kyddtr.com` in the KarbonBot service provider's (Knowhy.info) management panel or contacting their support team. This is an external configuration and cannot be resolved through code changes in this project.

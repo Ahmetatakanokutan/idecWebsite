@@ -3,15 +3,17 @@ import { Leaf, LogIn, LogOut, UserCircle, Settings, Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
   const { isLoggedIn, logout, roles, fullName } = useAuth();
+  const { t, i18n } = useTranslation();
 
   const getDisplayName = () => {
     if (roles.includes('ROLE_ADMIN')) {
-        return 'Admin';
+        return t('header.admin_panel');
     }
-    return fullName || 'Kullanıcı';
+    return fullName || t('header.user');
   };
 
   return (
@@ -25,15 +27,23 @@ const Header = () => {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">IDEC-TT</h1>
           </Link>
           <nav className="hidden md:flex space-x-8">
-            <Link to="/about" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">Hakkında</Link>
-            <Link to="/projects" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">Projeler</Link>
-            <Link to="/courses" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">IDEC Akademi</Link>
-            <Link to="/contact" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">İletişim</Link>
+            <Link to="/about" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.about')}</Link>
+            <Link to="/projects" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.projects')}</Link>
+            <Link to="/courses" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.academy')}</Link>
+            <Link to="/contact" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.contact')}</Link>
             {isLoggedIn && roles.includes('ROLE_ADMIN') && (
-              <Link to="/admin" className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors bg-emerald-50 px-3 py-1 rounded-md">Yönetim Paneli</Link>
+              <Link to="/admin" className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors bg-emerald-50 px-3 py-1 rounded-md">{t('header.admin_panel')}</Link>
             )}
           </nav>
           <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <button
+              onClick={() => i18n.changeLanguage(i18n.language === 'tr' ? 'en' : 'tr')}
+              className="px-3 py-1.5 rounded-full text-sm font-medium transition-colors
+                         bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+            >
+              {i18n.language === 'tr' ? 'EN' : 'TR'}
+            </button>
             {isLoggedIn ? (
               <Menu as="div" className="relative inline-block text-left">
                 <div>
@@ -52,7 +62,7 @@ const Header = () => {
                 >
                   <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="px-4 py-3">
-                      <p className="text-sm text-gray-500">Hoşgeldiniz</p>
+                      <p className="text-sm text-gray-500">{t('header.welcome')}</p>
                       <p className="text-sm font-bold text-gray-900 truncate capitalize">
                         {getDisplayName()}
                       </p>
@@ -68,7 +78,7 @@ const Header = () => {
                             } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                           >
                             <Heart className="w-4 h-4 mr-2" aria-hidden="true" />
-                            Favorilerim
+                            {t('header.favorites')}
                           </Link>
                         )}
                       </Menu.Item>
@@ -81,7 +91,7 @@ const Header = () => {
                             } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                           >
                             <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
-                            Profil Ayarları
+                            {t('header.profile_settings')}
                           </Link>
                         )}
                       </Menu.Item>
@@ -97,7 +107,7 @@ const Header = () => {
                             } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                           >
                             <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
-                            Çıkış Yap
+                            {t('header.logout')}
                           </button>
                         )}
                       </Menu.Item>
@@ -111,7 +121,7 @@ const Header = () => {
                 className="flex items-center space-x-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full hover:bg-emerald-700 transition-colors font-medium shadow-sm hover:shadow-md"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Giriş Yap</span>
+                <span>{t('header.login')}</span>
               </Link>
             )}
           </div>

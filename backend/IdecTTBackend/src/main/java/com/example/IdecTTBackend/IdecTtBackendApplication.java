@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(scanBasePackages = {"com.example.idectt", "com.example.IdecTTBackend"})
-@EnableJpaRepositories("com.example.idectt.repository")
-@EntityScan("com.example.idectt.entity")
+@EnableJpaRepositories({"com.example.idectt.repository", "com.example.IdecTTBackend.repository"})
+@EntityScan({"com.example.idectt.entity", "com.example.IdecTTBackend.model"})
 public class IdecTtBackendApplication {
 
 	public static void main(String[] args) {

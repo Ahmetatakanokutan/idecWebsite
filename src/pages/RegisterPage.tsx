@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, User, Building } from 'lucide-react';
+import { apiService } from '../services/apiService';
+import useDebounce from '../hooks/useDebounce';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -23,14 +25,72 @@ const RegisterPage = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isEmailTaken, setIsEmailTaken] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+  const debouncedEmail = useDebounce(email, 500);
+
+  useEffect(() => {
+    if (debouncedEmail) {
+      setIsCheckingEmail(true);
+      apiService.get(`/auth/check-email?email=${debouncedEmail}`)
+        .then((exists: boolean) => {
+          setIsEmailTaken(exists);
+          setIsCheckingEmail(false);
+        })
+        .catch(() => {
+          setIsEmailTaken(false);
+          setIsCheckingEmail(false);
+        });
+    } else {
+      setIsEmailTaken(false);
+    }
+  }, [debouncedEmail]);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Sadece sayısal karakterleri tut
+    let numericValue = value.replace(/\D/g, '');
+    
+    // Başındaki 0'ları temizle
+    while (numericValue.startsWith('0')) {
+        numericValue = numericValue.substring(1);
+    }
+    
+    // Maksimum 10 karakter
+    if (numericValue.length > 10) {
+        numericValue = numericValue.substring(0, 10);
+    }
+    
+    setPhone(numericValue);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const isValidEmail = (email: string) => {
+    // Regex: chars + @ + chars + . + 2-6 letter extension
+    return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
+    if (!isValidEmail(email)) {
+      setError('Lütfen geçerli bir e-posta adresi girin.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Şifreler eşleşmiyor.');
+      return;
+    }
+
+    if (isEmailTaken) {
+      setError('Bu e-posta adresi zaten kullanımda.');
       return;
     }
 
@@ -48,21 +108,7 @@ const RegisterPage = () => {
     };
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Gelen hata mesajı "message" alanında olabilir, ya da validasyon hataları "errors" dizisinde olabilir.
-        const errorMessage = data.message || (data.errors && data.errors.map((err: any) => err.defaultMessage).join(', ')) || 'Kayıt işlemi başarısız oldu.';
-        throw new Error(errorMessage);
-      }
+      await apiService.post('/auth/register', requestBody);
       
       setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
       setTimeout(() => {
@@ -141,16 +187,18 @@ const RegisterPage = () => {
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi</label>
               <input id="email" name="email" type="email" required
-                value={email} onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                value={email} onChange={handleEmailChange}
+                className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 ${isEmailTaken ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="ornek@sirket.com" />
+              {isCheckingEmail && <p className="mt-1 text-sm text-gray-500">E-posta kontrol ediliyor...</p>}
+              {isEmailTaken && !isCheckingEmail && <p className="mt-1 text-sm text-red-600">Bu e-posta adresi zaten kullanımda.</p>}
             </div>
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefon Numarası</label>
               <input id="phone" name="phone" type="tel"
-                value={phone} onChange={(e) => setPhone(e.target.value)}
+                value={phone} onChange={handlePhoneChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="5XX XXX XX XX" />
+                placeholder="Telefon numaranızı girin (örn: 5XX XXX XX XX)" />
             </div>
 
             {userType === 'corporate' && (

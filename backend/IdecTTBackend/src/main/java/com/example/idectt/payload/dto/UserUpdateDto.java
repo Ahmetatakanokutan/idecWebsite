@@ -6,6 +6,10 @@ import lombok.Data;
 public class UserUpdateDto {
     private String fullName;
     private String phone;
-    // Password update usually requires a separate flow or current password verification
-    // For simplicity, we'll stick to basic info first
+    
+    // Admin fields
+    private String email;
+    private String password;
+    private Boolean isEmailVerified;
+    private java.util.List<String> roles;
 }

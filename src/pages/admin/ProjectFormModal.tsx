@@ -119,14 +119,17 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ project, onClose, o
             >
               <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                  {isEditing ? 'Projeyi Düzenle' : 'Yeni Proje Ekle'}
+                  {isEditing ? 'Düzenle' : 'Yeni Ekle'}
                 </Dialog.Title>
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                   {/* Form fields */}
                   <input name="title" value={formData.title} onChange={handleChange} placeholder="Başlık" className="w-full border-gray-300 rounded-md" required />
                   <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Açıklama" className="w-full border-gray-300 rounded-md" required />
                   <input name="image" value={formData.image} onChange={handleChange} placeholder="Resim URL" className="w-full border-gray-300 rounded-md" />
-                  <input name="leader" value={formData.leader} onChange={handleChange} placeholder="Proje Yürütücüsü" className="w-full border-gray-300 rounded-md" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Yürütücü / Sorumlu</label>
+                <input name="leader" value={formData.leader} onChange={handleChange} placeholder="Yürütücü Adı" className="w-full border-gray-300 rounded-md" />
+              </div>
                   <input name="sectors" value={formData.sectors} onChange={handleChange} placeholder="Sektörler (virgülle ayırın)" className="w-full border-gray-300 rounded-md" />
                   <input name="partners" value={formData.partners} onChange={handleChange} placeholder="Partnerler (virgülle ayırın)" className="w-full border-gray-300 rounded-md" />
                   <input name="objectives" value={formData.objectives} onChange={handleChange} placeholder="Hedefler (virgülle ayırın)" className="w-full border-gray-300 rounded-md" />
