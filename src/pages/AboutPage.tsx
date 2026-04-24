@@ -1,13 +1,99 @@
+import { useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+
+interface TeamMember {
+  name: string;
+  roleKey: string;
+  image: string;
+}
 
 const AboutPage = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const teamMembers: TeamMember[] = [
+    {
+      name: 'Doç. Dr. Ahmet Turan',
+      roleKey: 'about.team_role_project_lead',
+      image: 'https://myyu.yeditepe.edu.tr/sites/default/files/styles/272x272_image_style/public/pictures/2024-12/dscf5986-min_2_0.jpg?itok=LmeIF308'
+    },
+    {
+      name: 'Dr. Öğr. Üyesi Zeliha Cansu Canbek',
+      roleKey: 'about.team_role_project_coordinator',
+      image: 'https://myyu.yeditepe.edu.tr/sites/default/files/styles/272x272_image_style/public/pictures/2025-08/personel.png?itok=BfQ2BK0J'
+    },
+    {
+      name: 'Dr. Öğr. Üyesi Hatice Kübra Akben',
+      roleKey: 'about.team_role_researcher',
+      image: 'https://myyu.yeditepe.edu.tr/sites/default/files/styles/large/public/pictures/2025-08/hatice.png?itok=JIWPEKVV'
+    },
+    {
+      name: 'Prof. Dr. Emine Şule Aydeniz',
+      roleKey: 'about.team_role_researcher',
+      image: 'https://myyu.yeditepe.edu.tr/sites/default/files/styles/large/public/pictures/2024-07/sule_aydeniz_0.jpg?itok=81SOJlnY'
+    },
+    {
+      name: 'Doç. Dr. Dionysis Goularas',
+      roleKey: 'about.team_role_researcher',
+      image: 'https://myyu.yeditepe.edu.tr/sites/default/files/styles/large/public/pictures/2024-12/dionysis_goularas_cse_kare.jpg?itok=qofg-l91'
+    },
+    {
+      name: 'Aleyna İşler',
+      roleKey: 'about.team_role_specialist',
+      image: 'https://i1.rgstatic.net/ii/profile.image/11431281474101642-1748553486405_Q512/Aleyna-Isler.jpg'
+    },
+    {
+      name: 'Ahmet Atakan Okutan',
+      roleKey: 'about.team_role_specialist',
+      image: 'https://drive.google.com/thumbnail?id=1WwjDUcthm5mvo8MYBeiWM9yI_hJVSH__&sz=w1000'
+    }
+  ];
+
+  useEffect(() => {
+    if (location.pathname === '/contact' || location.hash === '#contact-section') {
+      setTimeout(() => {
+        document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+      return;
+    }
+    if (location.pathname === '/about') {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [location.pathname, location.hash]);
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="mb-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">{t('about.team_title')}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">{t('about.team_subtitle')}</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {teamMembers.map((member) => (
+              <article
+                key={member.name}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="h-72 bg-gray-100">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-gray-900">{member.name}</h3>
+                  <p className="text-sm text-emerald-700 mt-1">{t(member.roleKey)}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             {t('about.title')}
@@ -80,7 +166,7 @@ const AboutPage = () => {
         </div>
 
         {/* Contact Section */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div id="contact-section" className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">{t('contact.info_title')}</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Star, Users, AlertTriangle, Loader, Heart } from 'lucide-react';
 import { apiService } from '../services/apiService';
+import { useTranslation } from 'react-i18next';
 
 interface CourseSummary {
   id: number;
@@ -15,6 +16,7 @@ interface CourseSummary {
 }
 
 const FavoritesPage = () => {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<CourseSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ const FavoritesPage = () => {
       const data = await apiService.get('/courses/favorites');
       setCourses(data);
     } catch (err: any) {
-      setError(err.message || 'Favoriler yüklenirken bir hata oluştu.');
+      setError(err.message || t('favorites_page.error_loading'));
     } finally {
       setLoading(false);
     }
@@ -40,7 +42,7 @@ const FavoritesPage = () => {
       <Layout>
         <div className="text-center py-20">
           <Loader className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
-          <p className="mt-4 text-lg text-gray-600">Favoriler yükleniyor...</p>
+          <p className="mt-4 text-lg text-gray-600">{t('favorites_page.loading')}</p>
         </div>
       </Layout>
     );
@@ -62,20 +64,20 @@ const FavoritesPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Favorilerim
+            {t('favorites_page.title')}
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Kaydettiğiniz derslere buradan hızlıca erişebilirsiniz.
+            {t('favorites_page.subtitle')}
           </p>
         </div>
 
         {courses.length === 0 ? (
             <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
                 <Heart className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900">Henüz favori dersiniz yok</h3>
-                <p className="text-gray-500 mt-2">Beğendiğiniz dersleri favorilere ekleyerek burada görebilirsiniz.</p>
+                <h3 className="text-lg font-medium text-gray-900">{t('favorites_page.empty_title')}</h3>
+                <p className="text-gray-500 mt-2">{t('favorites_page.empty_desc')}</p>
                 <Link to="/courses" className="mt-6 inline-block bg-emerald-600 text-white px-6 py-2 rounded-md hover:bg-emerald-700 transition-colors">
-                    Dersleri Keşfet
+                    {t('favorites_page.explore_courses')}
                 </Link>
             </div>
         ) : (
@@ -87,7 +89,7 @@ const FavoritesPage = () => {
                         <img src={course.image} alt={course.title} className="w-full h-48 object-cover" />
                     ) : (
                         <div className="w-full h-48 bg-emerald-100 flex items-center justify-center">
-                            <span className="text-emerald-500 font-semibold">IDEC Akademi</span>
+                            <span className="text-emerald-500 font-semibold">{t('header.academy')}</span>
                         </div>
                     )}
                     <div className="p-6 flex flex-col flex-grow">
@@ -104,11 +106,11 @@ const FavoritesPage = () => {
                         </div>
                         <div className="flex items-center space-x-1">
                             <Users className="w-4 h-4" />
-                            <span>{course.students} öğrenci</span>
+                            <span>{course.students} {t('courses.students')}</span>
                         </div>
                         </div>
                         <div className="text-sm text-emerald-600 font-semibold">
-                        Eğitmen: {course.instructorName}
+                        {t('courses.instructor')} {course.instructorName}
                         </div>
                     </div>
                     </div>

@@ -1,0 +1,15 @@
+[Unit]
+Description=IDEC-TT Docker PostgreSQL Backup to Google Drive
+Wants=docker.service network-online.target
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/idectt/backup.env
+ExecStart=/usr/local/bin/idectt-db-backup-gdrive.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=multi-user.target

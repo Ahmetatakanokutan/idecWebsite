@@ -2,17 +2,46 @@ const getAuthToken = () => {
     return localStorage.getItem('token');
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
-const API_URL = `${API_BASE_URL}/api`;
+const buildHeaders = (useJsonContentType: boolean = true) => {
+    const headers: Record<string, string> = {};
+    const token = getAuthToken();
+
+    if (useJsonContentType) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+};
+
+const envBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const fallbackBaseUrl =
+    typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'http://localhost:8080';
+const API_BASE_URL = envBaseUrl || fallbackBaseUrl;
+const API_URL = `${API_BASE_URL.replace(/\/$/, '')}/api`;
+
+const parseResponseBody = async (response: Response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        return null;
+    }
+    const text = await response.text();
+    if (!text) {
+        return null;
+    }
+    return JSON.parse(text);
+};
 
 const apiService = {
     get: async (endpoint: string) => {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAuthToken()}`
-            }
+            headers: buildHeaders()
         });
         if (!response.ok) {
             let errorMessage = `HTTP error! status: ${response.status}`;
@@ -22,16 +51,12 @@ const apiService = {
             } catch (e) { /* ignore */ }
             throw new Error(errorMessage);
         }
-        return await response.json();
+        return await parseResponseBody(response);
     },
     post: async (endpoint: string, data: any) => {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAuthToken()}`
-
-            },
+            headers: buildHeaders(),
             body: JSON.stringify(data)
         });
         if (!response.ok) {
@@ -42,15 +67,12 @@ const apiService = {
             } catch (e) { /* ignore */ }
             throw new Error(errorMessage);
         }
-        return await response.json();
+        return await parseResponseBody(response);
     },
     put: async (endpoint: string, data: any) => {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAuthToken()}`
-            },
+            headers: buildHeaders(),
             body: JSON.stringify(data)
         });
         if (!response.ok) {
@@ -61,15 +83,12 @@ const apiService = {
             } catch (e) { /* ignore */ }
             throw new Error(errorMessage);
         }
-        return await response.json();
+        return await parseResponseBody(response);
     },
     delete: async (endpoint: string) => {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAuthToken()}`
-            }
+            headers: buildHeaders()
         });
         if (!response.ok) {
             let errorMessage = `HTTP error! status: ${response.status}`;
@@ -86,11 +105,7 @@ const apiService = {
 
         const response = await fetch(`${API_URL}/upload`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${getAuthToken()}`
-                // Content-Type header'ı FormData kullanırken tarayıcı tarafından otomatik ayarlanır (boundary ile birlikte)
-                // Bu yüzden buraya Content-Type eklememeliyiz!
-            },
+            headers: buildHeaders(false),
             body: formData
         });
 

@@ -8,14 +8,17 @@ import com.example.idectt.payload.request.LoginRequest;
 import com.example.idectt.payload.request.RegisterRequest;
 import com.example.idectt.payload.response.JwtResponse;
 import com.example.idectt.payload.response.MessageResponse;
-import com.example.idectt.repository.CompanyProfileRepository;
 import com.example.idectt.repository.RoleRepository;
 import com.example.idectt.repository.UserRepository;
+import com.example.idectt.service.EmailVerificationService;
 import com.example.idectt.security.jwt.JwtUtils;
 import com.example.idectt.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,6 +31,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -47,28 +51,51 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
-    CompanyProfileRepository companyProfileRepository;
-
-    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    EmailVerificationService emailVerificationService;
+
+    @Value("${idectt.app.frontendBaseUrl:http://localhost:5173}")
+    private String frontendBaseUrl;
+
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyUser(@RequestParam("code") String code) {
-        User user = userRepository.findByVerificationCode(code)
-                .orElseThrow(() -> new RuntimeException("Error: Invalid verification code."));
+    public ResponseEntity<?> verifyUser(@RequestParam("code") String code,
+                                        @RequestParam(value = "mode", defaultValue = "redirect") String mode) {
+        User user = userRepository.findByVerificationCode(code).orElse(null);
+        boolean apiMode = "api".equalsIgnoreCase(mode);
+
+        if (user == null) {
+            if (apiMode) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid verification code."));
+            }
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(buildFrontendRedirectUrl("error")))
+                    .build();
+        }
 
         user.setIsEmailVerified(true);
         user.setVerificationCode(null); // Clear code after use
         userRepository.save(user);
 
+        if (!apiMode) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(buildFrontendRedirectUrl("success")))
+                    .build();
+        }
         return ResponseEntity.ok(new MessageResponse("Email verified successfully!"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        User existingUser = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
+        if (existingUser != null && !Boolean.TRUE.equals(existingUser.getIsEmailVerified())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Please verify your email before logging in."));
+        }
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -90,6 +117,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        final String genericRegistrationMessage = "If the email can be registered, a verification email will be sent.";
+
         if (!isValidEmailDomain(registerRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -97,9 +126,7 @@ public class AuthController {
         }
 
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.ok(new MessageResponse(genericRegistrationMessage));
         }
 
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
@@ -124,6 +151,12 @@ public class AuthController {
 
         switch (registerRequest.getUserType()) {
             case "corporate":
+                if (isBlank(registerRequest.getCompanyName()) || isBlank(registerRequest.getTaxId()) || isBlank(registerRequest.getSector())) {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Company name, tax ID and sector are required for corporate registration."));
+                }
+
                 Role companyRole = roleRepository.findByRoleName(ERole.ROLE_COMPANY)
                         .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                 roles.add(companyRole);
@@ -157,17 +190,16 @@ public class AuthController {
         user.setIsEmailVerified(false);
         
         userRepository.save(user);
-        
-        // TODO: Send real email
-        System.out.println("SIMULATION: Sending verification email to " + user.getUsername() + " with code: " + verificationCode);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully! Please check your email to verify."));
-    }
+        try {
+            emailVerificationService.sendVerificationEmail(user.getUsername(), verificationCode);
+        } catch (MailException | IllegalStateException ex) {
+            userRepository.delete(user);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error: Verification email could not be sent. Please try again."));
+        }
 
-    @GetMapping("/check-email")
-    public ResponseEntity<?> checkEmailExists(@RequestParam("email") String email) {
-        Boolean exists = userRepository.existsByUsername(email);
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(new MessageResponse(genericRegistrationMessage));
     }
 
     private boolean isValidEmailDomain(String email) {
@@ -182,5 +214,17 @@ public class AuthController {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private String buildFrontendRedirectUrl(String verifiedStatus) {
+        String baseUrl = frontendBaseUrl == null ? "" : frontendBaseUrl.trim();
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        return baseUrl + "/login?verified=" + verifiedStatus;
     }
 }

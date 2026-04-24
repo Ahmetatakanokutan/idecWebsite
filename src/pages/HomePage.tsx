@@ -71,6 +71,7 @@ const HomePage = () => {
             
             <p className="text-xl md:text-2xl text-gray-300 mb-10 font-light leading-relaxed border-l-4 border-emerald-500 pl-6">
               {t('home.hero_description_line1')} 
+              <br />
               {t('home.hero_description_line2')}
             </p>
             

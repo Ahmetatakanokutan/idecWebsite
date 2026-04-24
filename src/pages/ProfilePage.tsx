@@ -3,6 +3,7 @@ import { User, Phone, Mail, Shield, Save, Loader, CheckCircle } from 'lucide-rea
 import Layout from '../components/Layout';
 import { apiService } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface UserProfile {
   id: number;
@@ -13,6 +14,7 @@ interface UserProfile {
 }
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const { logout } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,14 +35,14 @@ const ProfilePage = () => {
         setFullName(data.fullName);
         setPhone(data.phone || '');
       } catch (err: any) {
-        setError(err.message || 'Profil bilgileri yüklenemedi.');
+        setError(err.message || t('profile_page.error_loading'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [t]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,12 +56,12 @@ const ProfilePage = () => {
         phone,
       });
       setProfile(updatedProfile);
-      setSuccessMessage('Profil bilgileriniz başarıyla güncellendi.');
+      setSuccessMessage(t('profile_page.update_success'));
       
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
-      setError(err.message || 'Güncelleme sırasında bir hata oluştu.');
+      setError(err.message || t('profile_page.error_updating'));
     } finally {
       setSaving(false);
     }
@@ -78,7 +80,7 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <Layout>
-        <div className="text-center py-20 text-red-600">Profil bulunamadı.</div>
+        <div className="text-center py-20 text-red-600">{t('profile_page.not_found')}</div>
       </Layout>
     );
   }
@@ -111,7 +113,7 @@ const ProfilePage = () => {
               {/* Left Column: Read-only Info */}
               <div className="md:col-span-1 space-y-6">
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hesap Bilgileri</h3>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('profile_page.account_info')}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-700 text-sm">
                       <Mail className="w-4 h-4 mr-2 text-gray-400" />
@@ -119,21 +121,21 @@ const ProfilePage = () => {
                     </div>
                     <div className="flex items-center text-gray-700 text-sm">
                       <Shield className="w-4 h-4 mr-2 text-gray-400" />
-                      <span>ID: {profile.id}</span>
+                      <span>{t('profile_page.id_label')} {profile.id}</span>
                     </div>
                   </div>
                 </div>
                 
                 <div className="pt-4 border-t border-gray-100">
                     <button onClick={logout} className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors">
-                        Hesaptan Çıkış Yap
+                        {t('profile_page.logout')}
                     </button>
                 </div>
               </div>
 
               {/* Right Column: Edit Form */}
               <div className="md:col-span-2">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Profili Düzenle</h2>
+                <h2 className="text-lg font-medium text-gray-900 mb-4">{t('profile_page.edit_profile')}</h2>
                 
                 {successMessage && (
                     <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded flex items-center">
@@ -150,7 +152,7 @@ const ProfilePage = () => {
 
                 <form onSubmit={handleUpdate} className="space-y-4">
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Ad Soyad</label>
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">{t('profile_page.fullname_label')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <User className="h-5 w-5 text-gray-400" />
@@ -168,7 +170,7 @@ const ProfilePage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefon Numarası</label>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">{t('profile_page.phone_label')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Phone className="h-5 w-5 text-gray-400" />
@@ -191,10 +193,10 @@ const ProfilePage = () => {
                       disabled={saving}
                       className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50"
                     >
-                      {saving ? 'Kaydediliyor...' : (
+                      {saving ? t('profile_page.saving') : (
                         <>
                             <Save className="w-4 h-4 mr-2" />
-                            Değişiklikleri Kaydet
+                            {t('profile_page.save_changes')}
                         </>
                       )}
                     </button>

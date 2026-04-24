@@ -1,0 +1,11 @@
+[Unit]
+Description=Run IDEC-TT DB Backup to Google Drive Daily
+
+[Timer]
+Unit=idectt-db-backup-gdrive.service
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173", maxAge = 3600)
 @RestController
 @RequestMapping("/api/instructors")
 public class InstructorController {

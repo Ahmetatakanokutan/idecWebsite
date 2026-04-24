@@ -7,6 +7,7 @@ import CoursesPage from '../pages/CoursesPage';
 import CourseDetailPage from '../pages/CourseDetailPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
+import VerifyEmailPage from '../pages/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ProfilePage from '../pages/ProfilePage';
 import FavoritesPage from '../pages/FavoritesPage';
@@ -33,11 +34,12 @@ export const AppRoutes = () => {
     { path: '/courses/:courseId', element: <CourseDetailPage /> },
     { path: '/login', element: <LoginPage /> },
     { path: '/register', element: <RegisterPage /> },
+    { path: '/verify-email', element: <VerifyEmailPage /> },
     { path: '/forgot-password', element: <ForgotPasswordPage /> },
     
     // Protected User Routes (Any logged in user)
     {
-        element: <ProtectedRoute requiredRole="ROLE_USER" />, 
+        element: <ProtectedRoute />, 
         children: [
             { path: '/profile', element: <ProfilePage /> },
             { path: '/favorites', element: <FavoritesPage /> }
@@ -47,7 +49,7 @@ export const AppRoutes = () => {
     // Admin Routes
     {
       path: '/admin',
-      element: <ProtectedRoute requiredRole="ROLE_ADMIN" />,
+      element: <ProtectedRoute requiredRoles={['ROLE_ADMIN']} />,
       children: [
         {
           element: <AdminLayout />,

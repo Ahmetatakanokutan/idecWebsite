@@ -3,6 +3,7 @@ package com.example.idectt.config;
 import com.example.idectt.entity.*;
 import com.example.idectt.repository.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +20,31 @@ public class DataInitializer implements CommandLineRunner {
     private final InstructorRepository instructorRepository;
     private final CourseRepository courseRepository;
     private final ProjectRepository projectRepository;
+    private final boolean adminBootstrapEnabled;
+    private final String adminBootstrapEmail;
+    private final String adminBootstrapPassword;
+    private final String adminBootstrapFullName;
+    private final String adminBootstrapPhone;
 
     public DataInitializer(RoleRepository roleRepository, UserRepository userRepository,
                            PasswordEncoder passwordEncoder, InstructorRepository instructorRepository,
-                           CourseRepository courseRepository, ProjectRepository projectRepository) {
+                           CourseRepository courseRepository, ProjectRepository projectRepository,
+                           @Value("${idectt.bootstrap.admin.enabled:false}") boolean adminBootstrapEnabled,
+                           @Value("${idectt.bootstrap.admin.email:}") String adminBootstrapEmail,
+                           @Value("${idectt.bootstrap.admin.password:}") String adminBootstrapPassword,
+                           @Value("${idectt.bootstrap.admin.fullName:IDEC-TT Admin}") String adminBootstrapFullName,
+                           @Value("${idectt.bootstrap.admin.phone:}") String adminBootstrapPhone) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.instructorRepository = instructorRepository;
         this.courseRepository = courseRepository;
         this.projectRepository = projectRepository;
+        this.adminBootstrapEnabled = adminBootstrapEnabled;
+        this.adminBootstrapEmail = adminBootstrapEmail;
+        this.adminBootstrapPassword = adminBootstrapPassword;
+        this.adminBootstrapFullName = adminBootstrapFullName;
+        this.adminBootstrapPhone = adminBootstrapPhone;
     }
 
     @Override
@@ -49,20 +65,42 @@ public class DataInitializer implements CommandLineRunner {
             roleRepository.save(new Role(null, ERole.ROLE_COMPANY));
         }
 
-        if (userRepository.findByUsername("ahmetatakan.okutan@yeditepe.edu.tr").isEmpty()) {
-            User adminUser = new User("ahmetatakan.okutan@yeditepe.edu.tr",
-                    passwordEncoder.encode("AatakanAdmin1349!"),
-                    "IDEC-TT Admin",
-                    "5551234567");
-
-            Set<Role> roles = new HashSet<>();
-            Role adminRole = roleRepository.findByRoleName(ERole.ROLE_ADMIN)
-                    .orElseThrow(() -> new RuntimeException("Error: Admin Role not found."));
-            roles.add(adminRole);
-            adminUser.setRoles(roles);
-            userRepository.save(adminUser);
-            System.out.println("Initial Admin user created: ahmetatakan.okutan@yeditepe.edu.tr / AatakanAdmin1349!");
+        if (!adminBootstrapEnabled) {
+            return;
         }
+
+        if (adminBootstrapEmail == null || adminBootstrapEmail.isBlank()
+                || adminBootstrapPassword == null || adminBootstrapPassword.isBlank()) {
+            System.out.println("Admin bootstrap is enabled but BOOTSTRAP_ADMIN_EMAIL or BOOTSTRAP_ADMIN_PASSWORD is missing.");
+            return;
+        }
+
+        Role adminRole = roleRepository.findByRoleName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Error: Admin Role not found."));
+
+        User adminUser = userRepository.findByUsername(adminBootstrapEmail).orElseGet(() -> {
+            User user = new User(
+                    adminBootstrapEmail,
+                    passwordEncoder.encode(adminBootstrapPassword),
+                    adminBootstrapFullName,
+                    adminBootstrapPhone
+            );
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            user.setRoles(roles);
+            return user;
+        });
+
+        // Ensure bootstrap admin account is enabled for login.
+        if (!Boolean.TRUE.equals(adminUser.getIsEmailVerified())) {
+            adminUser.setIsEmailVerified(true);
+        }
+        if (adminUser.getRoles() == null) {
+            adminUser.setRoles(new HashSet<>());
+        }
+        adminUser.getRoles().add(adminRole);
+
+        userRepository.save(adminUser);
     }
 
     private void initializeCourses() {

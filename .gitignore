@@ -3,6 +3,7 @@ node_modules/
 dist/
 build/
 .env
+.env.docker
 .DS_Store
 npm-debug.log*
 yarn-debug.log*
@@ -17,6 +18,7 @@ yarn-error.log*
 
 # Java / Maven Backend
 target/
+backend/IdecTTBackend/uploads/
 *.class
 *.jar
 *.war

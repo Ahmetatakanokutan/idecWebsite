@@ -35,7 +35,7 @@ interface CourseDetail {
 }
 
 const CourseDetailPage = () => {
-  const { isLoggedIn, token } = useAuth();
+  const { isLoggedIn } = useAuth();
   const { courseId } = useParams();
   const { t, i18n } = useTranslation();
 
@@ -102,7 +102,7 @@ const CourseDetailPage = () => {
     };
 
     fetchCourseDetail();
-  }, [courseId, isLoggedIn, token]);
+  }, [courseId, isLoggedIn]);
 
   const handleToggleFavorite = async () => {
     try {
@@ -146,7 +146,12 @@ const CourseDetailPage = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('courses.login_required_title')}</h2>
             <p className="text-gray-600 mb-6">{t('courses.login_required_desc')}</p>
             <Link to="/login" className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold mb-4 inline-block">{t('header.login')}</Link>
-            <p className="text-sm text-gray-500">Hesabınız yok mu? <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">Kayıt olun</Link></p>
+            <p className="text-sm text-gray-500">
+              {t('courses.no_account')}{' '}
+              <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                {t('courses.register_now')}
+              </Link>
+            </p>
           </div>
         </div>
       </div>
@@ -208,7 +213,7 @@ const CourseDetailPage = () => {
                     key={selectedLesson.videoUrl}
                 >
                     <source src={selectedLesson.videoUrl} type="video/mp4" />
-                    Tarayıcınız video etiketini desteklemiyor.
+                    {t('courses.video_not_supported')}
                 </video>
             )
           ) : (
@@ -239,7 +244,7 @@ const CourseDetailPage = () => {
             <button 
                 onClick={handleToggleFavorite} 
                 className={`p-1.5 rounded-full hover:bg-gray-200 transition-colors ${isFavorited ? 'text-red-500' : 'text-gray-400'}`}
-                title={isFavorited ? "Favorilerden Çıkar" : "Favorilere Ekle"}
+                title={isFavorited ? t('courses.remove_from_favorites') : t('courses.add_to_favorites')}
             >
                 <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
             </button>

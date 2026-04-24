@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Loader2, Upload, ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, ImageIcon } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 
 interface Announcement {
@@ -34,7 +34,8 @@ const ManageAnnouncementsPage = () => {
             const data = await apiService.get('/announcements');
             setAnnouncements(data);
         } catch (error) {
-            console.error("Failed to fetch announcements", error);
+            console.error('Failed to fetch announcements', error);
+            alert('Duyurular alınamadı. Lütfen tekrar deneyin.');
         } finally {
             setLoading(false);
         }
@@ -50,21 +51,26 @@ const ManageAnnouncementsPage = () => {
             }
             setIsModalOpen(false);
             resetForm();
-            fetchAnnouncements();
-        } catch (error) {
-            console.error("Failed to save announcement", error);
-            alert("Bir hata oluştu.");
+            await fetchAnnouncements();
+        } catch (error: any) {
+            console.error('Failed to save announcement', error);
+            alert(error?.message || 'Duyuru kaydedilirken bir hata oluştu.');
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (window.confirm('Bu duyuruyu silmek istediğinizden emin misiniz?')) {
-            try {
-                await apiService.delete(`/announcements/${id}`);
-                fetchAnnouncements();
-            } catch (error) {
-                console.error("Failed to delete announcement", error);
-            }
+        if (!window.confirm('Bu duyuruyu silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        try {
+            // DELETE metodu bazı proxy katmanlarında engellenebildiği için
+            // backend'deki güvenli POST silme endpoint'ini kullanıyoruz.
+            await apiService.post(`/announcements/${id}/delete`, {});
+            await fetchAnnouncements();
+        } catch (error: any) {
+            console.error('Failed to delete announcement', error);
+            alert(error?.message || 'Duyuru silinemedi. Lütfen tekrar deneyin.');
         }
     };
 
@@ -88,8 +94,8 @@ const ManageAnnouncementsPage = () => {
             const url = await apiService.uploadFile(file);
             setFormData({ ...formData, imageUrl: url });
         } catch (error) {
-            console.error("Upload failed", error);
-            alert("Resim yüklenirken bir hata oluştu.");
+            console.error('Upload failed', error);
+            alert('Resim yüklenirken bir hata oluştu.');
         } finally {
             setUploading(false);
         }
@@ -119,7 +125,8 @@ const ManageAnnouncementsPage = () => {
                 </div>
             ) : (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
+                    <div className="overflow-x-auto">
+                    <table className="min-w-[920px] w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Görsel</th>
@@ -156,22 +163,30 @@ const ManageAnnouncementsPage = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {new Date(announcement.createdAt).toLocaleDateString()}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleEdit(announcement)} className="text-blue-600 hover:text-blue-900 mr-4">
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                        <button
+                                            onClick={() => handleEdit(announcement)}
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-blue-200 text-blue-700 hover:bg-blue-50"
+                                        >
                                             <Edit className="w-4 h-4" />
+                                            Düzenle
                                         </button>
-                                        <button onClick={() => handleDelete(announcement.id)} className="text-red-600 hover:text-red-900">
+                                        <button
+                                            onClick={() => handleDelete(announcement.id)}
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-red-200 text-red-700 hover:bg-red-50"
+                                        >
                                             <Trash2 className="w-4 h-4" />
+                                            Sil
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             )}
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto">
@@ -182,7 +197,6 @@ const ManageAnnouncementsPage = () => {
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Duyuru Görseli</label>
-                                
                                 <div className="mb-3">
                                     <input
                                         type="text"
@@ -200,7 +214,7 @@ const ManageAnnouncementsPage = () => {
                                                 <img src={formData.imageUrl} alt="Preview" className="mx-auto h-48 object-cover rounded-lg" />
                                                 <button
                                                     type="button"
-                                                    onClick={() => setFormData({...formData, imageUrl: ''})}
+                                                    onClick={() => setFormData({ ...formData, imageUrl: '' })}
                                                     className="absolute top-2 right-2 bg-red-100 text-red-600 p-1 rounded-full hover:bg-red-200"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -209,7 +223,7 @@ const ManageAnnouncementsPage = () => {
                                         ) : (
                                             <>
                                                 {uploading ? (
-                                                     <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
+                                                    <Loader2 className="mx-auto h-12 w-12 text-gray-400 animate-spin" />
                                                 ) : (
                                                     <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
                                                 )}
@@ -228,6 +242,7 @@ const ManageAnnouncementsPage = () => {
                                     </div>
                                 </div>
                             </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Başlık</label>
                                 <input
@@ -238,6 +253,7 @@ const ManageAnnouncementsPage = () => {
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 />
                             </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">İçerik</label>
                                 <textarea
@@ -248,30 +264,29 @@ const ManageAnnouncementsPage = () => {
                                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                 />
                             </div>
+
                             <div className="flex items-center">
                                 <input
-                                    type="checkbox"
                                     id="active"
+                                    type="checkbox"
                                     className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                                     checked={formData.active}
                                     onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                                 />
-                                <label htmlFor="active" className="ml-2 block text-sm text-gray-900">
-                                    Aktif olarak yayınla
-                                </label>
+                                <label htmlFor="active" className="ml-2 block text-sm text-gray-700">Aktif</label>
                             </div>
-                            <div className="pt-4 flex justify-end gap-3">
+
+                            <div className="pt-4 flex justify-end space-x-3">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                                 >
                                     İptal
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={uploading}
-                                    className="px-4 py-2 text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
                                 >
                                     {editingId ? 'Güncelle' : 'Kaydet'}
                                 </button>

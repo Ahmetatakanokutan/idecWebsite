@@ -87,13 +87,19 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS isteklerini her zaman geçir
-                                                                .requestMatchers("/api/auth/**").permitAll()
-                                                                .requestMatchers("/uploads/**").permitAll()
-                                                                .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").authenticated() 
-                                                                .requestMatchers(HttpMethod.POST, "/api/courses/*/favorite").authenticated() // Add favorite toggle
-                                                                .requestMatchers(HttpMethod.GET, "/api/courses/favorites").authenticated() // Add favorite list
-                                                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**", "/api/announcements/**").permitAll()                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
+                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/error").permitAll()
+                                .requestMatchers("/uploads/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/courses/*/enroll").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/courses/*/favorite").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/courses/favorites").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/courses/**", "/api/announcements/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/announcements/*/delete").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/announcements/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/announcements/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/announcements/**").hasRole("ADMIN")
+                                .requestMatchers("/api/projects/**", "/api/courses/**").hasRole("ADMIN")
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/company/**").hasAnyRole("COMPANY", "ADMIN")

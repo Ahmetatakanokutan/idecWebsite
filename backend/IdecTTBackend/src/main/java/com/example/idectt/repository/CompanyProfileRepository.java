@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CompanyProfileRepository extends JpaRepository<CompanyProfile, Long> {
+    void deleteByUserId(Long userId);
 }

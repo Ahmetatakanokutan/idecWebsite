@@ -4,6 +4,7 @@ import com.example.idectt.entity.*;
 import com.example.idectt.payload.dto.*;
 import com.example.idectt.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,17 +147,18 @@ public class CourseService {
 
     @Transactional
     public void enrollUser(Long courseId, Long userId) {
-        if (enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) {
-            return; // Zaten kayıtlı
-        }
-
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Enrollment enrollment = new Enrollment(user, course);
-        enrollmentRepository.save(enrollment);
+        try {
+            Enrollment enrollment = new Enrollment(user, course);
+            enrollmentRepository.save(enrollment);
+        } catch (DataIntegrityViolationException ex) {
+            // Concurrent requests can hit the unique constraint. Keep this endpoint idempotent.
+            return;
+        }
 
         // Kursun öğrenci sayısını artır
         course.setStudents(course.getStudents() + 1);
@@ -171,16 +173,21 @@ public class CourseService {
         
         if (existingFavorite.isPresent()) {
             favoriteRepository.delete(existingFavorite.get());
-            return false; // Removed
-        } else {
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new RuntimeException("Course not found"));
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            
+            return false;
+        }
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        try {
             Favorite favorite = new Favorite(user, course);
             favoriteRepository.save(favorite);
-            return true; // Added
+            return true;
+        } catch (DataIntegrityViolationException ex) {
+            // Another request inserted in parallel. Treat as already favorited.
+            return true;
         }
     }
 

@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/announcements")
-@CrossOrigin(origins = "*")
 public class AnnouncementController {
 
     @Autowired
@@ -63,5 +62,11 @@ public class AnnouncementController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAnnouncementWithPost(@PathVariable Long id) {
+        return deleteAnnouncement(id);
     }
 }

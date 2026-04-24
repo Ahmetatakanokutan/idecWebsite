@@ -1,15 +1,24 @@
 package com.example.idectt.controller;
 
+import com.example.idectt.entity.ERole;
 import com.example.idectt.entity.User;
 import com.example.idectt.payload.dto.UserDto;
 import com.example.idectt.payload.dto.UserUpdateDto;
+import com.example.idectt.payload.response.MessageResponse;
+import com.example.idectt.repository.CompanyProfileRepository;
+import com.example.idectt.repository.EnrollmentRepository;
+import com.example.idectt.repository.FavoriteRepository;
 import com.example.idectt.repository.UserRepository;
 import com.example.idectt.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +35,15 @@ public class UserController {
 
     @Autowired
     private com.example.idectt.repository.RoleRepository roleRepository;
+
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
+
+    @Autowired
+    private FavoriteRepository favoriteRepository;
+
+    @Autowired
+    private CompanyProfileRepository companyProfileRepository;
 
     // === Admin Endpoints ===
 
@@ -48,12 +66,41 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (!userRepository.existsById(id)) {
+    @Transactional
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (currentUser.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Kendi hesabinizi silemezsiniz."));
+        }
+
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        userRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+
+        boolean isAdminUser = user.getRoles() != null
+                && user.getRoles().stream().anyMatch(role -> "ROLE_ADMIN".equals(role.getName()));
+        if (isAdminUser && userRepository.countByRolesRoleName(ERole.ROLE_ADMIN) <= 1) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("Son admin kullanici silinemez."));
+        }
+
+        try {
+            // Clean dependent rows first to avoid FK violations.
+            enrollmentRepository.deleteByUserId(id);
+            favoriteRepository.deleteByUserId(id);
+            companyProfileRepository.deleteByUserId(id);
+            if (user.getRoles() != null) {
+                user.getRoles().clear();
+            }
+            userRepository.save(user);
+            userRepository.delete(user);
+            return ResponseEntity.noContent().build();
+        } catch (DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new MessageResponse("Kullanicinin bagli kayitlari oldugu icin silinemedi."));
+        }
     }
 
     @PutMapping("/{id}")
@@ -84,7 +131,12 @@ public class UserController {
         if (updateDto.getRoles() != null && !updateDto.getRoles().isEmpty()) {
             java.util.Set<com.example.idectt.entity.Role> newRoles = new java.util.HashSet<>();
             for (String roleName : updateDto.getRoles()) {
-                 com.example.idectt.entity.ERole eRole = com.example.idectt.entity.ERole.valueOf(roleName); 
+                 com.example.idectt.entity.ERole eRole;
+                 try {
+                     eRole = com.example.idectt.entity.ERole.valueOf(roleName);
+                 } catch (IllegalArgumentException ex) {
+                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + roleName);
+                 }
                  com.example.idectt.entity.Role role = roleRepository.findByRoleName(eRole)
                          .orElseThrow(() -> new RuntimeException("Error: Role " + roleName + " is not found."));
                  newRoles.add(role);

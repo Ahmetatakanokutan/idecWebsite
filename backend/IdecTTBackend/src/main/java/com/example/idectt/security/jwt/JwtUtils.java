@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +47,29 @@ public class JwtUtils {
     }
 
     private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET must be configured.");
+        }
+
+        byte[] keyBytes = decodeSecret(jwtSecret.trim());
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("JWT_SECRET must be at least 32 bytes or Base64-encoded equivalent.");
+        }
+
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private byte[] decodeSecret(String secret) {
+        try {
+            byte[] decoded = Decoders.BASE64.decode(secret);
+            if (decoded.length >= 32) {
+                return decoded;
+            }
+            logger.warn("JWT secret is Base64 but shorter than 32 bytes. Falling back to raw string bytes.");
+        } catch (IllegalArgumentException ex) {
+            // Secret is not Base64, treat as raw string.
+        }
+        return secret.getBytes(StandardCharsets.UTF_8);
     }
 
     public String getUserNameFromJwtToken(String token) {

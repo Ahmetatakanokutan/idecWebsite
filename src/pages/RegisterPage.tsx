@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, User, Building } from 'lucide-react';
 import { apiService } from '../services/apiService';
-import useDebounce from '../hooks/useDebounce';
+import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [userType, setUserType] = useState('individual'); // 'individual' or 'corporate'
   
@@ -25,27 +26,6 @@ const RegisterPage = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isEmailTaken, setIsEmailTaken] = useState(false);
-  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-
-  const debouncedEmail = useDebounce(email, 500);
-
-  useEffect(() => {
-    if (debouncedEmail) {
-      setIsCheckingEmail(true);
-      apiService.get(`/auth/check-email?email=${debouncedEmail}`)
-        .then((exists: boolean) => {
-          setIsEmailTaken(exists);
-          setIsCheckingEmail(false);
-        })
-        .catch(() => {
-          setIsEmailTaken(false);
-          setIsCheckingEmail(false);
-        });
-    } else {
-      setIsEmailTaken(false);
-    }
-  }, [debouncedEmail]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -80,17 +60,12 @@ const RegisterPage = () => {
     setSuccess(null);
 
     if (!isValidEmail(email)) {
-      setError('Lütfen geçerli bir e-posta adresi girin.');
+      setError(t('register_page.invalid_email'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Şifreler eşleşmiyor.');
-      return;
-    }
-
-    if (isEmailTaken) {
-      setError('Bu e-posta adresi zaten kullanımda.');
+      setError(t('register_page.password_mismatch'));
       return;
     }
 
@@ -108,12 +83,11 @@ const RegisterPage = () => {
     };
     
     try {
-      await apiService.post('/auth/register', requestBody);
-      
-      setSuccess('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
+      const response = await apiService.post('/auth/register', requestBody);
+      setSuccess(response?.message || t('register_page.success_default'));
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 3000);
 
     } catch (error: any) {
       setError(error.message);
@@ -131,10 +105,10 @@ const RegisterPage = () => {
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            Yeni Hesap Oluşturun
+            {t('register_page.title')}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            IDEC-TT platformuna katılın ve karbonsuzlaştırma yolculuğuna başlayın.
+            {t('register_page.subtitle')}
           </p>
         </div>
 
@@ -148,7 +122,7 @@ const RegisterPage = () => {
             }`}
           >
             <User className="w-5 h-5 mr-2" />
-            <span className="font-semibold">Bireysel Üyelik</span>
+            <span className="font-semibold">{t('register_page.user_type_individual')}</span>
           </button>
           <button
             onClick={() => setUserType('corporate')}
@@ -159,76 +133,77 @@ const RegisterPage = () => {
             }`}
           >
             <Building className="w-5 h-5 mr-2" />
-            <span className="font-semibold">Kurumsal Üyelik</span>
+            <span className="font-semibold">{t('register_page.user_type_corporate')}</span>
           </button>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleRegister}>
+          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
+            {t('register_page.email_verification_notice')}
+          </div>
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <strong className="font-bold">Hata: </strong>
+              <strong className="font-bold">{t('register_page.error_prefix')} </strong>
               <span className="block sm:inline">{error}</span>
             </div>
           )}
           {success && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-              <strong className="font-bold">Başarılı: </strong>
+              <strong className="font-bold">{t('register_page.success_prefix')} </strong>
               <span className="block sm:inline">{success}</span>
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Ad Soyad</label>
+              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">{t('register_page.fullname_label')}</label>
               <input id="fullname" name="fullname" type="text" required
                 value={fullName} onChange={(e) => setFullName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="Adınız ve soyadınız" />
+                placeholder={t('register_page.fullname_placeholder')} />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('register_page.email_label')}</label>
               <input id="email" name="email" type="email" required
                 value={email} onChange={handleEmailChange}
-                className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 ${isEmailTaken ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="ornek@sirket.com" />
-              {isCheckingEmail && <p className="mt-1 text-sm text-gray-500">E-posta kontrol ediliyor...</p>}
-              {isEmailTaken && !isCheckingEmail && <p className="mt-1 text-sm text-red-600">Bu e-posta adresi zaten kullanımda.</p>}
+                className="mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 border-gray-300"
+                placeholder={t('register_page.email_placeholder')} />
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Telefon Numarası</label>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">{t('register_page.phone_label')}</label>
               <input id="phone" name="phone" type="tel"
                 value={phone} onChange={handlePhoneChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="Telefon numaranızı girin (örn: 5XX XXX XX XX)" />
+                placeholder={t('register_page.phone_placeholder')} />
             </div>
 
             {userType === 'corporate' && (
               <>
                 <div>
-                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Şirket Adı</label>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">{t('register_page.company_name_label')}</label>
                   <input id="companyName" name="companyName" type="text" required={userType === 'corporate'}
                     value={companyName} onChange={(e) => setCompanyName(e.target.value)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="Şirketinizin tam adı" />
+                    placeholder={t('register_page.company_name_placeholder')} />
                 </div>
                 <div>
-                  <label htmlFor="taxId" className="block text-sm font-medium text-gray-700">Vergi Numarası</label>
+                  <label htmlFor="taxId" className="block text-sm font-medium text-gray-700">{t('register_page.tax_id_label')}</label>
                   <input id="taxId" name="taxId" type="text" required={userType === 'corporate'}
                     value={taxId} onChange={(e) => setTaxId(e.target.value)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="Şirketinizin vergi numarası" />
+                    placeholder={t('register_page.tax_id_placeholder')} />
                 </div>
                 <div>
-                  <label htmlFor="sector" className="block text-sm font-medium text-gray-700">Sektör</label>
+                  <label htmlFor="sector" className="block text-sm font-medium text-gray-700">{t('register_page.sector_label')}</label>
                   <select id="sector" name="sector" required={userType === 'corporate'}
                     value={sector} onChange={(e) => setSector(e.target.value)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                   >
-                    <option value="">Sektör seçin...</option>
-                    <option value="demir-celik">Demir-Çelik</option>
-                    <option value="cimento">Çimento</option>
-                    <option value="aluminyum">Alüminyum</option>
-                    <option value="kimya">Kimya</option>
-                    <option value="diger">Diğer</option>
+                    <option value="">{t('register_page.sector_placeholder')}</option>
+                    <option value="demir-celik">{t('register_page.sector_demir_celik')}</option>
+                    <option value="cimento">{t('register_page.sector_cimento')}</option>
+                    <option value="aluminyum">{t('register_page.sector_aluminyum')}</option>
+                    <option value="kimya">{t('register_page.sector_kimya')}</option>
+                    <option value="diger">{t('register_page.sector_diger')}</option>
                   </select>
                 </div>
               </>
@@ -236,24 +211,24 @@ const RegisterPage = () => {
             
             {userType === 'individual' && (
                 <div>
-                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700">Meslek / Unvan</label>
+                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700">{t('register_page.profession_label')}</label>
                     <input id="profession" name="profession" type="text"
                         value={profession} onChange={(e) => setProfession(e.target.value)}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                        placeholder="Örn: Çevre Mühendisi"
+                        placeholder={t('register_page.profession_placeholder')}
                     />
                 </div>
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Şifre</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">{t('register_page.password_label')}</label>
               <input id="password" name="password" type="password" required
                 value={password} onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
                 placeholder="••••••••" />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">Şifre Tekrarı</label>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">{t('register_page.confirm_password_label')}</label>
               <input id="confirm-password" name="confirm-password" type="password" required
                 value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
@@ -266,15 +241,15 @@ const RegisterPage = () => {
               type="submit"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
             >
-              Hesap Oluştur
+              {t('register_page.submit')}
             </button>
           </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Zaten bir hesabınız var mı?{' '}
+              {t('register_page.already_have_account')}{' '}
               <Link to="/login" className="font-medium text-emerald-600 hover:text-emerald-500">
-                Giriş yapın
+                {t('register_page.login_now')}
               </Link>
             </p>
           </div>

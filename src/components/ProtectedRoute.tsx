@@ -3,7 +3,11 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader } from 'lucide-react';
 
-const ProtectedRoute = ({ requiredRole }: { requiredRole: string }) => {
+interface ProtectedRouteProps {
+  requiredRoles?: string[];
+}
+
+const ProtectedRoute = ({ requiredRoles = [] }: ProtectedRouteProps) => {
   const { isLoggedIn, roles, isLoading } = useAuth();
 
   if (isLoading) {
@@ -15,7 +19,7 @@ const ProtectedRoute = ({ requiredRole }: { requiredRole: string }) => {
     );
   }
 
-  const hasRequiredRole = roles.includes(requiredRole);
+  const hasRequiredRole = requiredRoles.length === 0 || requiredRoles.some((role) => roles.includes(role));
 
   if (!isLoggedIn || !hasRequiredRole) {
     // Redirect them to the /login page

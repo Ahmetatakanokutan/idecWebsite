@@ -1,7 +1,21 @@
 import { useEffect, useRef } from 'react';
 
-const KarbonBot = () => {
+interface KarbonBotProps {
+  isLoggedIn: boolean;
+}
+
+const LOGIN_STATUS_REQUEST = 'CHECK_KYDDTR_LOGIN';
+const LOGIN_STATUS_EVENT = 'KYDDTR_LOGIN_STATUS';
+
+const KarbonBot = ({ isLoggedIn }: KarbonBotProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const applyAuthState = (botElement: Element, loggedIn: boolean) => {
+    const value = loggedIn ? 'true' : 'false';
+    botElement.setAttribute('isloggedin', value);
+    botElement.setAttribute('is_logged_in', value);
+    botElement.setAttribute('isLoggedIn', value);
+  };
 
   // Bot elementini oluşturan ve özelliklerini atayan yardımcı fonksiyon
   const createAndAppendBotElement = () => {
@@ -109,17 +123,19 @@ const KarbonBot = () => {
       botElement.setAttribute('loading_progress_rengi2', '#2E7D32');
       botElement.setAttribute('loading_dots_arkaplan', 'rgba(0,0,0,0.05)');
       botElement.setAttribute('loading_dots_rengi', '#4CAF50');
-      botElement.setAttribute('loading_dots_rengi2', '##2E7D32');
+      botElement.setAttribute('loading_dots_rengi2', '#2E7D32');
       botElement.setAttribute('loading_status_rengi', '#2E7D32');
       botElement.setAttribute('loading_metin_rengi', '#2c3e50');
       botElement.setAttribute('loading_pulse_rengi', '#4CAF50');
-        
+
+      applyAuthState(botElement, isLoggedIn);
       containerRef.current.appendChild(botElement);
     }
   };
 
   useEffect(() => {
     const scriptId = 'knowhy-bot-script';
+    const containerEl = containerRef.current;
 
     const initializeBot = () => {
       customElements.whenDefined('knowhy-bot').then(() => {
@@ -143,12 +159,50 @@ const KarbonBot = () => {
     document.body.appendChild(script);
 
     return () => {
-      // Sadece bot elementini (custom element) temizle, scripti DOM'dan kaldırma
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
+      if (containerEl) {
+        containerEl.innerHTML = '';
+      }
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        existingScript.remove();
       }
     };
   }, []);
+
+  useEffect(() => {
+    const botElement = containerRef.current?.querySelector('knowhy-bot');
+    if (!botElement) {
+      return;
+    }
+
+    applyAuthState(botElement, isLoggedIn);
+
+    window.postMessage({ type: LOGIN_STATUS_EVENT, isLoggedIn }, '*');
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const syncLoginStatus = () => {
+      const botElement = containerRef.current?.querySelector('knowhy-bot');
+      if (botElement) {
+        applyAuthState(botElement, isLoggedIn);
+      }
+      window.postMessage({ type: LOGIN_STATUS_EVENT, isLoggedIn }, '*');
+    };
+
+    const onMessage = (event: MessageEvent) => {
+      if (!event.data || typeof event.data !== 'object' || event.data.type !== LOGIN_STATUS_REQUEST) {
+        return;
+      }
+      syncLoginStatus();
+    };
+
+    window.addEventListener('message', onMessage);
+    syncLoginStatus();
+
+    return () => {
+      window.removeEventListener('message', onMessage);
+    };
+  }, [isLoggedIn]);
 
   return (
     <div ref={containerRef} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2147483647 }}>
