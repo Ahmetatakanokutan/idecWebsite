@@ -133,6 +133,16 @@ Go to `/admin/users`. You can now:
 *   Manually set "Email Verified" status.
 *   Assign/Remove Roles (USER, COMPANY, ADMIN).
 
+## 7. Lesson Video Sources
+
+Lesson videos can be added from the admin panel in two ways:
+*   Upload the video file directly to the backend. Uploaded files are stored under `/app/uploads` in the backend runtime, so keep the upload volume persistent if you deploy with Docker.
+*   Paste a public Google Drive file link such as `https://drive.google.com/file/d/FILE_ID/view?...`. The frontend converts it to the Drive preview player automatically.
+
+For Google Drive videos:
+*   The file must be shared publicly or at least accessible to the target users.
+*   Prefer the normal file share link; the application will transform it to `/preview`.
+
 ## Security Checklist
 - [ ] Database password is strong and set in systemd file.
 - [ ] JWT Secret is long, random, and set in systemd file.

@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.docker
+.env.production
+node_modules
+dist
+build
+backend/IdecTTBackend/target
+backend/IdecTTBackend/uploads
+CODEBASE_REVIEW_2026-05-16.md

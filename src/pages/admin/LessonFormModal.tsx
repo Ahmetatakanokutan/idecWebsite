@@ -118,8 +118,8 @@ const LessonFormModal: React.FC<LessonFormModalProps> = ({ lesson, sectionId, on
                           />
                           {isUploading && <span className="text-sm text-gray-500 self-center">Yükleniyor...</span>}
                       </div>
-                      <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} placeholder="veya YouTube Embed URL (https://www.youtube.com/embed/...)" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />
-                      <p className="text-xs text-gray-500 mt-1">Kendi videonuzu yükleyebilir veya YouTube embed linki kullanabilirsiniz.</p>
+                      <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} placeholder="veya YouTube / Google Drive video linki" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />
+                      <p className="text-xs text-gray-500 mt-1">Kendi videonuzu yükleyebilir, YouTube linki girebilir veya paylasima acik Google Drive dosya linki kullanabilirsiniz.</p>
                   </div>                    
                   
                   {error && <div className="bg-red-50 text-red-600 text-sm p-2 rounded">{error}</div>}

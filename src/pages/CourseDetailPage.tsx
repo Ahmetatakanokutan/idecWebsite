@@ -56,10 +56,40 @@ const CourseDetailPage = () => {
     );
   };
 
-  const getEmbedUrl = (url: string) => {
-    if (url.includes('/embed/') || !url.includes('youtube.com') && !url.includes('youtu.be')) {
+  const isYouTubeUrl = (url: string) => url.includes('youtube.com') || url.includes('youtu.be');
+  const isGoogleDriveUrl = (url: string) => url.includes('drive.google.com');
+
+  const getGoogleDrivePreviewUrl = (url: string) => {
+    try {
+      const parsedUrl = new URL(url);
+
+      if (!parsedUrl.hostname.includes('drive.google.com')) {
         return url;
+      }
+
+      const fileIdFromQuery = parsedUrl.searchParams.get('id');
+      const fileIdFromPath = parsedUrl.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
+      const fileId = fileIdFromQuery || fileIdFromPath;
+
+      if (!fileId) {
+        return url;
+      }
+
+      return `https://drive.google.com/file/d/${fileId}/preview`;
+    } catch {
+      return url;
     }
+  };
+
+  const getEmbedUrl = (url: string) => {
+    if (isGoogleDriveUrl(url)) {
+      return getGoogleDrivePreviewUrl(url);
+    }
+
+    if (url.includes('/embed/') || !isYouTubeUrl(url)) {
+      return url;
+    }
+
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11)
@@ -194,7 +224,7 @@ const CourseDetailPage = () => {
         </div>
         <div className="flex-1 flex items-center justify-center bg-gray-900 overflow-hidden relative">
           {selectedLesson ? (
-            (selectedLesson.videoUrl.includes('youtube.com') || selectedLesson.videoUrl.includes('youtu.be')) ? (
+            (isYouTubeUrl(selectedLesson.videoUrl) || isGoogleDriveUrl(selectedLesson.videoUrl)) ? (
                 <iframe 
                     width="100%" 
                     height="100%" 
