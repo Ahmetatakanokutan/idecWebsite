@@ -12,7 +12,9 @@
     "user": "User",
     "favorites": "Favorites",
     "profile_settings": "Profile Settings",
-    "contact": "Contact"
+    "contact": "Contact",
+    "carbon_calc_button": "Calculate Your Carbon Footprint",
+    "certificate": "My Certificate"
   },
   "footer": {
     "rights": "All rights reserved.",
@@ -126,6 +128,8 @@
     "video_not_supported": "Your browser does not support the video tag.",
     "add_to_favorites": "Add to Favorites",
     "remove_from_favorites": "Remove from Favorites",
+    "mark_lesson_complete": "I Completed This Lesson",
+    "lesson_completed": "Completed",
     "items": {
       "Karbonsuzlaştırma Temelleri": {
         "title": "Decarbonization Fundamentals",
@@ -247,16 +251,41 @@
     "confirm_password_label": "Confirm Password",
     "submit": "Create Account",
     "already_have_account": "Already have an account?",
-    "login_now": "Sign in"
+    "login_now": "Sign in",
+    "consent_checkbox_text": "I consent to the processing and storage of my personal data by IDEC-TT. ",
+    "consent_link_text": "I have read and accept the Privacy Notice.",
+    "consent_required_error": "You must accept the privacy notice to register.",
+    "consent_modal_title": "Personal Data Protection and Privacy Notice",
+    "consent_modal_close": "Close and Continue",
+    "consent_modal_body": "IDEC-TT Platform — Personal Data Processing Notice\n\n1. DATA CONTROLLER\nThe data controller processing your personal data within the IDEC-TT project is Yeditepe University. Address: Sanayi Mah. Teknopark Bulvarı 7C Blok, Kurtköy - Pendik / İstanbul, Turkey.\n\n2. PERSONAL DATA COLLECTED\nDuring registration: full name, e-mail address, phone number, profession/title (individual membership), company name, tax ID and sector (corporate membership). Data generated during platform use: courses watched, watch durations, progress status.\n\n3. DATA STORAGE AND SECURITY\nYour personal data and learning progress records are stored in encrypted form exclusively on IDEC-TT infrastructure servers. Data is not shared with or sold to third parties. The KarbonBot AI assistant featured on the platform runs on a physically separate, independent server from the IDEC-TT data infrastructure. Conversation content is processed only on that server and your personal data or learning progress is never transferred to the KarbonBot server.\n\n4. PURPOSE OF PROCESSING\na) Delivery and personalisation of training services,\nb) Progress tracking and certificate generation,\nc) Platform security,\nd) Compliance with legal obligations.\n\n5. RETENTION PERIOD\nYour personal data is retained for the duration of your active membership and for 3 years after account deletion. Data subject to legal requirements is retained for the period specified in applicable legislation.\n\n6. YOUR RIGHTS\nUnder the Turkish Personal Data Protection Law No. 6698, you have the right to access, correct, delete, restrict processing of, and object to the processing of your data. To exercise these rights, contact us at idectt@yeditepe.edu.tr.\n\n7. COOKIE POLICY\nThe platform uses only essential session cookies. No analytics or advertising cookies are used.\n\nBy accepting this notice, you give explicit consent to the processing of your personal data under the terms described above."
   },
   "forgot_password": {
     "title": "Forgot Your Password?",
-    "subtitle": "Enter the email address associated with your account to receive a password reset link.",
+    "subtitle": "Enter the email address for your account. If it's registered, we'll send you a reset link.",
     "email_label": "Email Address",
     "email_placeholder": "Enter your email address",
     "submit": "Send Reset Link",
+    "sending": "Sending...",
     "remembered_password": "Remembered your password?",
-    "login_now": "Sign in"
+    "login_now": "Sign in",
+    "success_message": "If this email is registered in our system, you'll receive a reset link shortly. Check your spam folder too.",
+    "error_generic": "An error occurred. Please try again later."
+  },
+  "reset_password": {
+    "title": "Set New Password",
+    "subtitle": "Choose a strong password (at least 8 characters).",
+    "new_password_label": "New Password",
+    "confirm_password_label": "Confirm Password",
+    "submit": "Update Password",
+    "saving": "Updating...",
+    "success_title": "Password Updated!",
+    "success_message": "You can now sign in with your new password. Redirecting to login...",
+    "go_to_login": "Go to login",
+    "invalid_token": "Invalid or missing reset link. Please request a new one.",
+    "request_new_link": "Request new link",
+    "password_too_short": "Password must be at least 8 characters.",
+    "password_mismatch": "Passwords do not match.",
+    "error_generic": "An error occurred. The link may be invalid or expired."
   },
   "favorites_page": {
     "error_loading": "An error occurred while loading favorites.",
@@ -279,7 +308,11 @@
     "fullname_label": "Full Name",
     "phone_label": "Phone Number",
     "saving": "Saving...",
-    "save_changes": "Save Changes"
+    "save_changes": "Save Changes",
+    "learning_progress": "My Learning Progress",
+    "lessons_completed": "{{completed}} / {{total}} lessons completed",
+    "certificate_eligible": "Congratulations! You completed 80% of the trainings. You can claim your certificate.",
+    "get_certificate": "Get My Certificate"
   },
   "common": {
     "announcements": "Announcements",

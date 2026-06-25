@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Bell, Calendar } from 'lucide-react';
-import { apiService } from '../services/apiService';
+import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 interface Announcement {
@@ -90,7 +90,7 @@ const AnnouncementsSection = () => {
                     {/* Image Area */}
                     <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden">
                         <img 
-                            src={current.imageUrl || "https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"} 
+                            src={resolveAssetUrl(current.imageUrl) || "https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"} 
                             alt={current.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Leaf, LogIn, LogOut, UserCircle, Settings, Heart, ChevronDown } from "lucide-react";
+import { Award, ChevronDown, Globe2, Heart, Leaf, LogIn, LogOut, Settings, UserCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -51,6 +51,15 @@ const Header = () => {
             )}
           </nav>
           <div className="flex items-center space-x-4">
+            <a
+              href="https://greentim.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm hover:shadow-md"
+            >
+              <Globe2 className="w-4 h-4" />
+              <span>{t('header.carbon_calc_button')}</span>
+            </a>
             <Menu as="div" className="relative inline-block text-left">
               <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                 Çalıştaylarımız
@@ -161,6 +170,19 @@ const Header = () => {
                           >
                             <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
                             {t('header.profile_settings')}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/certificate"
+                            className={`${
+                              active ? 'bg-emerald-500 text-white' : 'text-gray-700'
+                            } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
+                          >
+                            <Award className="w-4 h-4 mr-2" aria-hidden="true" />
+                            {t('header.certificate')}
                           </Link>
                         )}
                       </Menu.Item>

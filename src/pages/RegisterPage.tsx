@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, User, Building } from 'lucide-react';
+import { Building, Leaf, User, X } from 'lucide-react';
 import { apiService } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
@@ -24,6 +24,8 @@ const RegisterPage = () => {
   // Individual-specific state
   const [profession, setProfession] = useState('');
 
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -61,6 +63,11 @@ const RegisterPage = () => {
 
     if (!isValidEmail(email)) {
       setError(t('register_page.invalid_email'));
+      return;
+    }
+
+    if (!consentChecked) {
+      setError(t('register_page.consent_required_error'));
       return;
     }
 
@@ -236,6 +243,27 @@ const RegisterPage = () => {
             </div>
           </div>
 
+          <div className="flex items-start space-x-3">
+            <input
+              id="consent"
+              name="consent"
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer flex-shrink-0"
+            />
+            <label htmlFor="consent" className="text-sm text-gray-700 cursor-pointer leading-relaxed">
+              {t('register_page.consent_checkbox_text')}
+              <button
+                type="button"
+                onClick={() => setShowConsentModal(true)}
+                className="text-emerald-600 hover:text-emerald-700 font-medium underline underline-offset-2 focus:outline-none"
+              >
+                {t('register_page.consent_link_text')}
+              </button>
+            </label>
+          </div>
+
           <div className="pt-4">
             <button
               type="submit"
@@ -255,6 +283,46 @@ const RegisterPage = () => {
           </div>
         </form>
       </div>
+      {showConsentModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowConsentModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">{t('register_page.consent_modal_title')}</h3>
+              <button
+                type="button"
+                onClick={() => setShowConsentModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label={t('register_page.consent_modal_close')}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                {t('register_page.consent_modal_body')}
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setConsentChecked(true);
+                  setShowConsentModal(false);
+                }}
+                className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors text-sm"
+              >
+                {t('register_page.consent_modal_close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

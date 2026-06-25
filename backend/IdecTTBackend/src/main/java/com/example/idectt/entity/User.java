@@ -57,6 +57,12 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CompanyProfile companyProfile;
 
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private java.time.LocalDateTime passwordResetTokenExpiry;
+
     public User(String username, String password, String fullName, String phone) {
         this.username = username;
         this.password = password;

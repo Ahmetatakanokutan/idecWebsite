@@ -23,7 +23,24 @@ const fallbackBaseUrl =
         ? window.location.origin
         : 'http://localhost:8080';
 const API_BASE_URL = envBaseUrl || fallbackBaseUrl;
-const API_URL = `${API_BASE_URL.replace(/\/$/, '')}/api`;
+const normalizedApiBaseUrl = API_BASE_URL.replace(/\/$/, '');
+const API_URL = normalizedApiBaseUrl + '/api';
+
+const resolveAssetUrl = (url?: string | null) => {
+    if (!url) {
+        return '';
+    }
+
+    if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:')) {
+        return url;
+    }
+
+    if (url.startsWith('/')) {
+        return normalizedApiBaseUrl + url;
+    }
+
+    return url;
+};
 
 const parseResponseBody = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
@@ -116,7 +133,20 @@ const apiService = {
         // Backend direkt string (URL) dönüyor
         return await response.text();
     }
-}
+};
 
+const progressService = {
+    recordWatch: (lessonId: number, courseId: number) =>
+        apiService.post(`/progress/lesson/${lessonId}/watch`, { courseId }),
 
-export { apiService };
+    markComplete: (lessonId: number, courseId: number) =>
+        apiService.post(`/progress/lesson/${lessonId}/complete`, { courseId }),
+
+    getCourseProgress: (courseId: number) =>
+        apiService.get(`/progress/course/${courseId}`),
+
+    getSummary: () =>
+        apiService.get('/progress/summary'),
+};
+
+export { apiService, resolveAssetUrl, progressService };

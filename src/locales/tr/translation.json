@@ -12,7 +12,9 @@
     "user": "Kullanıcı",
     "favorites": "Favorilerim",
     "profile_settings": "Profil Ayarları",
-    "contact": "İletişim"
+    "contact": "İletişim",
+    "carbon_calc_button": "Karbon Ayak İzinizi Hesaplayın",
+    "certificate": "Sertifikam"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",
@@ -126,6 +128,8 @@
     "video_not_supported": "Tarayıcınız video etiketini desteklemiyor.",
     "add_to_favorites": "Favorilere Ekle",
     "remove_from_favorites": "Favorilerden Çıkar",
+    "mark_lesson_complete": "Dersi Tamamladım",
+    "lesson_completed": "Tamamlandı",
     "items": {
       "Karbonsuzlaştırma Temelleri": {
         "title": "Karbonsuzlaştırma Temelleri",
@@ -247,16 +251,41 @@
     "confirm_password_label": "Şifre Tekrarı",
     "submit": "Hesap Oluştur",
     "already_have_account": "Zaten bir hesabınız var mı?",
-    "login_now": "Giriş yapın"
+    "login_now": "Giriş yapın",
+    "consent_checkbox_text": "Kişisel verilerimin IDEC-TT tarafından işlenmesini ve saklanmasını onaylıyorum. ",
+    "consent_link_text": "Aydınlatma Metnini okudum ve kabul ediyorum.",
+    "consent_required_error": "Kayıt olmak için aydınlatma metnini onaylamanız zorunludur.",
+    "consent_modal_title": "Kişisel Verilerin Korunması ve Gizlilik Aydınlatma Metni",
+    "consent_modal_close": "Kapat ve Devam Et",
+    "consent_modal_body": "IDEC-TT Platformu Kişisel Verilerin İşlenmesine İlişkin Aydınlatma Metni\n\n1. VERİ SORUMLUSU\nYeditepe Üniversitesi Teknoloji Üssü bünyesinde yürütülen IDEC-TT projesi kapsamında kişisel verilerinizi işleyen veri sorumlusu Yeditepe Üniversitesi'dir. Adres: Sanayi Mah. Teknopark Bulvarı 7C Blok, Kurtköy - Pendik / İstanbul.\n\n2. İŞLENEN KİŞİSEL VERİLER\nKayıt sürecinde toplanan veriler: ad-soyad, e-posta adresi, telefon numarası, meslek/unvan (bireysel üyelik), şirket adı, vergi numarası ve sektör (kurumsal üyelik). Platform kullanımı sırasında oluşturulan log verileri: izlenen dersler, izlenme süreleri, ilerleme durumu.\n\n3. VERİLERİN SAKLANDIĞI ORTAM VE GÜVENLİK\nKişisel verileriniz ve eğitim ilerleme kayıtlarınız, yalnızca IDEC-TT altyapısına ait sunucularda şifreli olarak saklanmaktadır. Verileriniz üçüncü taraflarla paylaşılmaz ve satılmaz. Platformda kullanılan KarbonBot yapay zeka asistanı, IDEC-TT veri altyapısından fiziksel olarak ayrı, bağımsız bir sunucuda çalışmakta olup sizinle yaptığınız sohbet içerikleri sadece o sunucuda işlenmektedir. Eğitim ilerlemeniz ve kişisel verileriniz KarbonBot sunucusuna aktarılmamaktadır.\n\n4. VERİLERİN İŞLENME AMACI\na) Eğitim hizmetlerinin sunulması ve kişiselleştirilmesi,\nb) İlerleme takibi ve başarı belgesi oluşturulması,\nc) Platform güvenliğinin sağlanması,\nd) Yasal yükümlülüklerin yerine getirilmesi.\n\n5. VERİLERİN SAKLANMA SÜRESİ\nKişisel verileriniz, üyeliğiniz aktif olduğu süre boyunca ve üyelik silinmesinden itibaren 3 yıl süreyle saklanır. Yasal zorunluluk gerektiren veriler ilgili mevzuatta belirtilen süreler kadar tutulur.\n\n6. HAKLARINIZ\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında; verilerinize erişme, düzeltme, silme, işlemeyi kısıtlama ve itiraz etme haklarına sahipsiniz. Bu haklarınızı kullanmak için idectt@yeditepe.edu.tr adresine e-posta gönderebilirsiniz.\n\n7. ÇEREZ POLİTİKASI\nPlatform yalnızca oturum yönetimi için zorunlu çerezler kullanmaktadır. Analitik veya reklam amaçlı çerez kullanılmamaktadır.\n\nBu metni onaylayarak yukarıda belirtilen koşullarda kişisel verilerinizin işlenmesine açık rıza vermiş olursunuz."
   },
   "forgot_password": {
     "title": "Şifrenizi mi Unuttunuz?",
-    "subtitle": "Hesabınıza kayıtlı e-posta adresini girerek şifre sıfırlama bağlantısı alabilirsiniz.",
+    "subtitle": "Hesabınıza kayıtlı e-posta adresini girin. Sistemde kayıtlıysa sıfırlama bağlantısı gönderilecektir.",
     "email_label": "E-posta Adresi",
     "email_placeholder": "E-posta adresinizi girin",
     "submit": "Sıfırlama Bağlantısı Gönder",
+    "sending": "Gönderiliyor...",
     "remembered_password": "Şifrenizi hatırladınız mı?",
-    "login_now": "Giriş yapın"
+    "login_now": "Giriş yapın",
+    "success_message": "Eğer bu e-posta adresi sistemimizde kayıtlıysa, birkaç dakika içinde bir sıfırlama bağlantısı alacaksınız. Spam klasörünüzü de kontrol edin.",
+    "error_generic": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+  },
+  "reset_password": {
+    "title": "Yeni Şifre Belirle",
+    "subtitle": "Güçlü bir şifre seçin (en az 8 karakter).",
+    "new_password_label": "Yeni Şifre",
+    "confirm_password_label": "Şifre Tekrarı",
+    "submit": "Şifremi Güncelle",
+    "saving": "Güncelleniyor...",
+    "success_title": "Şifreniz Güncellendi!",
+    "success_message": "Yeni şifrenizle giriş yapabilirsiniz. Birkaç saniye içinde giriş sayfasına yönlendiriliyorsunuz.",
+    "go_to_login": "Giriş sayfasına git",
+    "invalid_token": "Geçersiz veya eksik sıfırlama bağlantısı. Lütfen yeni bir sıfırlama bağlantısı talep edin.",
+    "request_new_link": "Yeni bağlantı talep et",
+    "password_too_short": "Şifre en az 8 karakter olmalıdır.",
+    "password_mismatch": "Şifreler eşleşmiyor.",
+    "error_generic": "Bir hata oluştu. Bağlantı geçersiz veya süresi dolmuş olabilir."
   },
   "favorites_page": {
     "error_loading": "Favoriler yüklenirken bir hata oluştu.",
@@ -279,7 +308,11 @@
     "fullname_label": "Ad Soyad",
     "phone_label": "Telefon Numarası",
     "saving": "Kaydediliyor...",
-    "save_changes": "Değişiklikleri Kaydet"
+    "save_changes": "Değişiklikleri Kaydet",
+    "learning_progress": "Eğitim İlerlemem",
+    "lessons_completed": "{{completed}} / {{total}} ders tamamlandı",
+    "certificate_eligible": "Tebrikler! Eğitimlerin %80'ini tamamladınız. Sertifikanızı alabilirsiniz.",
+    "get_certificate": "Sertifikamı Al"
   },
   "common": {
     "announcements": "Duyurular",

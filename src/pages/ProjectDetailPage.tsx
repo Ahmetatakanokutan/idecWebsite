@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Globe, Target, AlertCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { apiService } from '../services/apiService';
+import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 // ... interface definition ...
@@ -107,7 +107,7 @@ const ProjectDetailPage = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <img src={project.image} alt={localized.title} className="w-full h-64 object-cover" />
+          <img src={resolveAssetUrl(project.image)} alt={localized.title} className="w-full h-64 object-cover" />
           <div className="p-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{localized.title}</h1>
             <p className="text-lg text-gray-600 mb-6">{localized.description}</p>

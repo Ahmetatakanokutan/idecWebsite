@@ -1,11 +1,18 @@
-package com.example.IdecTTBackend.controller;
+package com.example.idectt.controller;
 
-import com.example.IdecTTBackend.model.Announcement;
-import com.example.IdecTTBackend.service.AnnouncementService;
+import com.example.idectt.entity.Announcement;
+import com.example.idectt.service.AnnouncementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -16,13 +23,11 @@ public class AnnouncementController {
     @Autowired
     private AnnouncementService announcementService;
 
-    // Public endpoint for homepage
     @GetMapping("/active")
     public List<Announcement> getActiveAnnouncements() {
         return announcementService.getActiveAnnouncements();
     }
 
-    // Admin endpoints
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<Announcement> getAllAnnouncements() {

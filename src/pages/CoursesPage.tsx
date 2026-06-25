@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, Star, Users, Leaf, AlertCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { apiService } from '../services/apiService';
+import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 interface Course {
@@ -90,7 +90,7 @@ const CoursesPage = () => {
             <Link key={course.id} to={`/courses/${course.id}`} className="block">
               <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
                 {course.image ? (
-                  <img src={course.image} alt={localized.title} className="w-full h-48 object-cover" />
+                  <img src={resolveAssetUrl(course.image)} alt={localized.title} className="w-full h-48 object-cover" />
                 ) : (
                   <div className="w-full h-48 bg-emerald-100 flex items-center justify-center">
                       <span className="text-emerald-500 font-semibold">IDEC Akademi</span>

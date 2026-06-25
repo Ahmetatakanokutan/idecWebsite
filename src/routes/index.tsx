@@ -9,6 +9,8 @@ import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
+import CertificatePage from '../pages/CertificatePage';
 import ProfilePage from '../pages/ProfilePage';
 import FavoritesPage from '../pages/FavoritesPage';
 
@@ -36,6 +38,8 @@ export const AppRoutes = () => {
     { path: '/register', element: <RegisterPage /> },
     { path: '/verify-email', element: <VerifyEmailPage /> },
     { path: '/forgot-password', element: <ForgotPasswordPage /> },
+    { path: '/reset-password', element: <ResetPasswordPage /> },
+    { path: '/certificate', element: <CertificatePage /> },
     
     // Protected User Routes (Any logged in user)
     {

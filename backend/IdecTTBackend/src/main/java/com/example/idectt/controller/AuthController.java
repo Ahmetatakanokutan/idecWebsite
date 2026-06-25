@@ -11,6 +11,7 @@ import com.example.idectt.payload.response.MessageResponse;
 import com.example.idectt.repository.RoleRepository;
 import com.example.idectt.repository.UserRepository;
 import com.example.idectt.service.EmailVerificationService;
+import com.example.idectt.service.PasswordResetService;
 import com.example.idectt.security.jwt.JwtUtils;
 import com.example.idectt.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,9 @@ public class AuthController {
 
     @Autowired
     EmailVerificationService emailVerificationService;
+
+    @Autowired
+    PasswordResetService passwordResetService;
 
     @Value("${idectt.app.frontendBaseUrl:http://localhost:5173}")
     private String frontendBaseUrl;
@@ -226,5 +231,42 @@ public class AuthController {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         return baseUrl + "/login?verified=" + verifiedStatus;
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is required."));
+        }
+
+        passwordResetService.initiatePasswordReset(email.trim());
+        return ResponseEntity.ok(new MessageResponse(
+                "Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi. / " +
+                "If this email is registered in our system, a password reset link has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+        String confirmPassword = body.get("confirmPassword");
+
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Reset token is required."));
+        }
+        if (newPassword == null || newPassword.length() < 8) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Password must be at least 8 characters."));
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Passwords do not match."));
+        }
+
+        boolean success = passwordResetService.resetPassword(token, newPassword);
+        if (!success) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Invalid or expired reset token. Please request a new password reset."));
+        }
+        return ResponseEntity.ok(new MessageResponse("Şifreniz başarıyla güncellendi. / Your password has been updated successfully."));
     }
 }

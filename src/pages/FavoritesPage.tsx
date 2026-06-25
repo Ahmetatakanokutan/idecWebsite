@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Star, Users, AlertTriangle, Loader, Heart } from 'lucide-react';
-import { apiService } from '../services/apiService';
+import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 interface CourseSummary {
@@ -86,7 +86,7 @@ const FavoritesPage = () => {
                 <Link key={course.id} to={`/courses/${course.id}`} className="block">
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
                     {course.image ? (
-                        <img src={course.image} alt={course.title} className="w-full h-48 object-cover" />
+                        <img src={resolveAssetUrl(course.image)} alt={course.title} className="w-full h-48 object-cover" />
                     ) : (
                         <div className="w-full h-48 bg-emerald-100 flex items-center justify-center">
                             <span className="text-emerald-500 font-semibold">{t('header.academy')}</span>

@@ -1,7 +1,7 @@
-package com.example.IdecTTBackend.service;
+package com.example.idectt.service;
 
-import com.example.IdecTTBackend.model.Announcement;
-import com.example.IdecTTBackend.repository.AnnouncementRepository;
+import com.example.idectt.entity.Announcement;
+import com.example.idectt.repository.AnnouncementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ public class AnnouncementService {
         announcement.setContent(announcementDetails.getContent());
         announcement.setImageUrl(announcementDetails.getImageUrl());
         announcement.setActive(announcementDetails.isActive());
-        
+
         return announcementRepository.save(announcement);
     }
 

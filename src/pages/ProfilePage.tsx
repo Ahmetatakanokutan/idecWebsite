@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Phone, Mail, Shield, Save, Loader, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Award, User, Phone, Mail, Shield, Save, Loader, CheckCircle } from 'lucide-react';
 import Layout from '../components/Layout';
-import { apiService } from '../services/apiService';
+import { apiService, progressService } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +14,13 @@ interface UserProfile {
   roles: string[];
 }
 
+interface ProgressSummary {
+  totalLessons: number;
+  completedLessons: number;
+  completionPercentage: number;
+  certificateEligible: boolean;
+}
+
 const ProfilePage = () => {
   const { t } = useTranslation();
   const { logout } = useAuth();
@@ -21,6 +29,7 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
 
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -34,6 +43,9 @@ const ProfilePage = () => {
         setProfile(data);
         setFullName(data.fullName);
         setPhone(data.phone || '');
+        progressService.getSummary()
+          .then(setProgressSummary)
+          .catch(() => {});
       } catch (err: any) {
         setError(err.message || t('profile_page.error_loading'));
       } finally {
@@ -206,6 +218,44 @@ const ProfilePage = () => {
             </div>
           </div>
         </div>
+        {progressSummary && (
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mt-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('profile_page.learning_progress')}</h3>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm text-gray-600">
+                {t('profile_page.lessons_completed', {
+                  completed: progressSummary.completedLessons,
+                  total: progressSummary.totalLessons,
+                })}
+              </span>
+              <span className="text-sm font-semibold text-emerald-600">
+                %{progressSummary.completionPercentage.toFixed(1)}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(progressSummary.completionPercentage, 100)}%` }}
+              />
+            </div>
+            {progressSummary.certificateEligible && (
+              <div className="mt-4">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-800 font-medium text-center">
+                  {t('profile_page.certificate_eligible')}
+                </div>
+                <div className="mt-4 flex justify-center">
+                  <Link
+                    to="/certificate"
+                    className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors text-sm"
+                  >
+                    <Award className="w-4 h-4" />
+                    <span>{t('profile_page.get_certificate')}</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Layout>
   );

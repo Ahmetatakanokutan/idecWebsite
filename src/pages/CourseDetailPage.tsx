@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Star, Users, ChevronRight, ChevronDown, BookOpen, Loader2, AlertCircle, Heart } from 'lucide-react';
+import { AlertCircle, BookOpen, Check, ChevronDown, ChevronRight, Heart, Loader2, Play, Star, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { apiService } from '../services/apiService';
+import { apiService, progressService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 // Backend DTO yapılarına göre arayüzleri tanımla
@@ -44,6 +44,7 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
   
   // Accordion state: keep track of open sections
   const [openSections, setOpenSections] = useState<number[]>([]);
@@ -81,6 +82,8 @@ const CourseDetailPage = () => {
     }
   };
 
+  const getMediaUrl = (url: string) => resolveAssetUrl(url);
+
   const getEmbedUrl = (url: string) => {
     if (isGoogleDriveUrl(url)) {
       return getGoogleDrivePreviewUrl(url);
@@ -97,6 +100,13 @@ const CourseDetailPage = () => {
       : url;
   };
 
+  const handleSelectLesson = (lesson: Lesson, courseForProgress = course) => {
+    setSelectedLesson(lesson);
+    if (isLoggedIn && courseForProgress) {
+      progressService.recordWatch(lesson.id, courseForProgress.id).catch(() => {});
+    }
+  };
+
   useEffect(() => {
     if (!isLoggedIn) {
       setLoading(false);
@@ -110,17 +120,27 @@ const CourseDetailPage = () => {
         // Enroll user
         apiService.post(`/courses/${courseId}/enroll`, {}).catch((err) => console.error("Enrollment failed:", err));
 
-        // Check if favorited (Optimized way would be backend sending this flag)
-        // For now, let's assume false or check via separate call if needed.
-        // apiService.get(`/courses/${courseId}/isFavorited`).then(setIsFavorited).catch(() => {});
-
         const data: CourseDetail = await apiService.get(`/courses/${courseId}`);
         setCourse(data);
+
+        try {
+          const progressData = await progressService.getCourseProgress(Number(courseId));
+          if (Array.isArray(progressData)) {
+            const completedIds = new Set<number>(
+              progressData
+                .filter((progress: any) => progress.completed)
+                .map((progress: any) => progress.lessonId)
+            );
+            setCompletedLessons(completedIds);
+          }
+        } catch {
+          /* Progress bilgisi yüklenemezse kurs görüntüleme akışı devam eder. */
+        }
 
         if (data.sections && data.sections.length > 0) {
             setOpenSections([data.sections[0].id]);
             if (data.sections[0].lessons && data.sections[0].lessons.length > 0) {
-                setSelectedLesson(data.sections[0].lessons[0]);
+                handleSelectLesson(data.sections[0].lessons[0], data);
             }
         }
 
@@ -228,7 +248,7 @@ const CourseDetailPage = () => {
                 <iframe 
                     width="100%" 
                     height="100%" 
-                    src={getEmbedUrl(selectedLesson.videoUrl)} 
+                    src={getEmbedUrl(getMediaUrl(selectedLesson.videoUrl))}
                     title={selectedLesson.title} 
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -240,9 +260,9 @@ const CourseDetailPage = () => {
                     controls 
                     autoPlay 
                     className="w-full h-full absolute inset-0 object-contain"
-                    key={selectedLesson.videoUrl}
+                    key={getMediaUrl(selectedLesson.videoUrl)}
                 >
-                    <source src={selectedLesson.videoUrl} type="video/mp4" />
+                    <source src={getMediaUrl(selectedLesson.videoUrl)} type="video/mp4" />
                     {t('courses.video_not_supported')}
                 </video>
             )
@@ -261,6 +281,23 @@ const CourseDetailPage = () => {
               <span>•</span>
               <span>{selectedLesson.duration}</span>
             </div>
+            {isLoggedIn && course && !completedLessons.has(selectedLesson.id) && (
+              <button
+                onClick={() => {
+                  progressService.markComplete(selectedLesson.id, course.id).catch(() => {});
+                  setCompletedLessons(prev => new Set([...prev, selectedLesson.id]));
+                }}
+                className="mt-3 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-full transition-colors"
+              >
+                {t('courses.mark_lesson_complete')}
+              </button>
+            )}
+            {completedLessons.has(selectedLesson.id) && (
+              <span className="mt-3 inline-flex items-center text-emerald-400 text-xs font-medium">
+                <Check className="w-4 h-4 mr-1" />
+                {t('courses.lesson_completed')}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -306,12 +343,14 @@ const CourseDetailPage = () => {
                                 return (
                                     <div 
                                         key={lesson.id} 
-                                        onClick={() => setSelectedLesson(lesson)}
+                                        onClick={() => handleSelectLesson(lesson)}
                                         className={`flex items-start p-3 cursor-pointer transition-all border-l-4 ${isActive ? 'border-emerald-500 bg-emerald-50' : 'border-transparent hover:bg-gray-50'}`}
                                     >
                                         <div className="mt-0.5 mr-3">
                                             {isActive ? (
                                                 <Play className="w-4 h-4 text-emerald-600 fill-current" />
+                                            ) : completedLessons.has(lesson.id) ? (
+                                                <Check className="w-4 h-4 text-emerald-500" />
                                             ) : (
                                                 <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>

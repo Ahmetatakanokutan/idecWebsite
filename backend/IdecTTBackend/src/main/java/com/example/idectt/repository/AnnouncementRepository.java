@@ -1,6 +1,6 @@
-package com.example.IdecTTBackend.repository;
+package com.example.idectt.repository;
 
-import com.example.IdecTTBackend.model.Announcement;
+import com.example.idectt.entity.Announcement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
