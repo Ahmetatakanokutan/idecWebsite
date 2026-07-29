@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Loader2, ImageIcon } from 'lucide-react';
-import { apiService } from '../../services/apiService';
+import { apiService, resolveAssetUrl } from '../../services/apiService';
 
 interface Announcement {
     id: number;
@@ -142,7 +142,7 @@ const ManageAnnouncementsPage = () => {
                                 <tr key={announcement.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {announcement.imageUrl ? (
-                                            <img src={announcement.imageUrl} alt={announcement.title} className="w-12 h-12 object-cover rounded" />
+                                            <img src={resolveAssetUrl(announcement.imageUrl)} alt={announcement.title} className="w-12 h-12 object-cover rounded" />
                                         ) : (
                                             <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400">
                                                 <ImageIcon className="w-6 h-6" />
@@ -211,7 +211,7 @@ const ManageAnnouncementsPage = () => {
                                     <div className="space-y-1 text-center">
                                         {formData.imageUrl ? (
                                             <div className="relative">
-                                                <img src={formData.imageUrl} alt="Preview" className="mx-auto h-48 object-cover rounded-lg" />
+                                                <img src={resolveAssetUrl(formData.imageUrl)} alt="Preview" className="mx-auto h-48 object-cover rounded-lg" />
                                                 <button
                                                     type="button"
                                                     onClick={() => setFormData({ ...formData, imageUrl: '' })}
