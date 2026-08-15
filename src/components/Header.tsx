@@ -44,7 +44,6 @@ const Header = () => {
           <nav className="hidden md:flex space-x-8">
             <Link to="/about" onClick={handleAboutClick} className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.about')}</Link>
             <Link to="/projects" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.projects')}</Link>
-            <Link to="/courses" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.academy')}</Link>
             <Link to="/contact" onClick={handleContactClick} className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.contact')}</Link>
             {isLoggedIn && roles.includes('ROLE_ADMIN') && (
               <Link to="/admin" className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors bg-emerald-50 px-3 py-1 rounded-md">{t('header.admin_panel')}</Link>
@@ -60,6 +59,46 @@ const Header = () => {
               <Globe2 className="w-4 h-4" />
               <span>{t('header.carbon_calc_button')}</span>
             </a>
+            <Menu as="div" className="relative inline-block text-left">
+              <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                {t('header.academy')}
+                <ChevronDown className="w-4 h-4 ml-1" />
+              </Menu.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                  <div className="py-1">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/courses"
+                          className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                        >
+                          {t('header.academy_courses')}
+                        </Link>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/courses?tab=webinars"
+                          className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                        >
+                          {t('header.academy_webinars')}
+                        </Link>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
             <Menu as="div" className="relative inline-block text-left">
               <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                 Çalıştaylarımız

@@ -12,6 +12,7 @@ interface CourseSummary {
   instructorName: string;
   rating: number;
   students: number;
+  courseType: 'COURSE' | 'WEBINAR';
 }
 
 const ManageCoursesPage = () => {
@@ -19,6 +20,7 @@ const ManageCoursesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'COURSE' | 'WEBINAR'>('ALL');
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,9 +73,10 @@ const ManageCoursesPage = () => {
     fetchCourses(); // Refresh data
   };
 
-  const filteredCourses = courses.filter(c => 
-    c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.instructorName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCourses = courses.filter(c =>
+    (typeFilter === 'ALL' || (c.courseType === 'WEBINAR' ? 'WEBINAR' : 'COURSE') === typeFilter) &&
+    (c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.instructorName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (loading) {
@@ -111,6 +114,15 @@ const ManageCoursesPage = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
+            <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value as 'ALL' | 'COURSE' | 'WEBINAR')}
+                className="border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm bg-white"
+            >
+                <option value="ALL">Tümü</option>
+                <option value="COURSE">Dersler</option>
+                <option value="WEBINAR">Webinarlar</option>
+            </select>
             <button
             onClick={openModalForCreate}
             className="flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
@@ -129,6 +141,9 @@ const ManageCoursesPage = () => {
                 Kurs Başlığı
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Tür
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Eğitmen
               </th>
               <th scope="col" className="relative px-6 py-3">
@@ -141,6 +156,11 @@ const ManageCoursesPage = () => {
               <tr key={course.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{course.title}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${course.courseType === 'WEBINAR' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                    {course.courseType === 'WEBINAR' ? 'Webinar' : 'Ders'}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">{course.instructorName}</div>
@@ -160,7 +180,7 @@ const ManageCoursesPage = () => {
             ))}
             {filteredCourses.length === 0 && (
                 <tr>
-                    <td colSpan={3} className="px-6 py-10 text-center text-gray-500">
+                    <td colSpan={4} className="px-6 py-10 text-center text-gray-500">
                         Aradığınız kriterlere uygun kurs bulunamadı.
                     </td>
                 </tr>

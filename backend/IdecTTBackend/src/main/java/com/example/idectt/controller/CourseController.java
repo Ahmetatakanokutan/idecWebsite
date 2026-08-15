@@ -1,6 +1,7 @@
 package com.example.idectt.controller;
 
 import com.example.idectt.entity.Course;
+import com.example.idectt.entity.CourseType;
 import com.example.idectt.entity.Lesson;
 import com.example.idectt.entity.Section;
 import com.example.idectt.payload.dto.*;
@@ -27,8 +28,8 @@ public class CourseController {
     // === Course Endpoints ===
 
     @GetMapping
-    public ResponseEntity<List<CourseSummaryDto>> getAllCourses() {
-        List<CourseSummaryDto> courses = courseService.getAllCourses();
+    public ResponseEntity<List<CourseSummaryDto>> getAllCourses(@RequestParam(required = false) CourseType type) {
+        List<CourseSummaryDto> courses = courseService.getAllCourses(type);
         return ResponseEntity.ok(courses);
     }
 

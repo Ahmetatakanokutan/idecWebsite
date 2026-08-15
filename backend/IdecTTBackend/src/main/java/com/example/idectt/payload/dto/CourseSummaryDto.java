@@ -1,5 +1,6 @@
 package com.example.idectt.payload.dto;
 
+import com.example.idectt.entity.CourseType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,5 @@ public class CourseSummaryDto {
     private String instructorName;
     private double rating;
     private int students;
+    private CourseType courseType;
 }
