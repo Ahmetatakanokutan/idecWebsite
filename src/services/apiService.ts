@@ -149,4 +149,36 @@ const progressService = {
         apiService.get('/progress/summary'),
 };
 
-export { apiService, resolveAssetUrl, progressService };
+const seminarCertificateService = {
+    list: (q?: string) =>
+        apiService.get(`/seminar-certificates${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+
+    upload: async (file: File, fullName: string) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (fullName) {
+            formData.append('fullName', fullName);
+        }
+
+        const response = await fetch(`${API_URL}/seminar-certificates`, {
+            method: 'POST',
+            headers: buildHeaders(false),
+            body: formData
+        });
+
+        if (!response.ok) {
+            let errorMessage = 'Sertifika yüklenirken hata oluştu.';
+            try {
+                errorMessage = await response.text() || errorMessage;
+            } catch (e) { /* ignore */ }
+            throw new Error(errorMessage);
+        }
+
+        return await parseResponseBody(response);
+    },
+
+    remove: (id: number) =>
+        apiService.delete(`/seminar-certificates/${id}`),
+};
+
+export { apiService, resolveAssetUrl, progressService, seminarCertificateService };

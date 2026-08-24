@@ -325,5 +325,20 @@
     "tel": "Tel:",
     "fax": "Fax:",
     "email_short": "E-Posta:"
+  },
+  "seminar_certificates": {
+    "title": "Seminer Sertifikaları",
+    "subtitle": "Zoom eğitimlerimize katılım sertifikanızı adınızla arayıp buradan indirebilirsiniz.",
+    "search_placeholder": "Ad soyad ile ara...",
+    "loading": "Sertifikalar yükleniyor...",
+    "no_results": "Aradığınız kriterlere uygun sertifika bulunamadı.",
+    "fetch_error": "Sertifikalar yüklenemedi.",
+    "download": "İndir",
+    "downloading": "İndiriliyor...",
+    "download_error": "Sertifika indirilirken bir hata oluştu."
+  },
+  "announcement_detail": {
+    "not_found": "Duyuru bulunamadı.",
+    "back_home": "Ana Sayfaya Dön"
   }
 }

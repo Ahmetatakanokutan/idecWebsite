@@ -12,6 +12,10 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@supabase/supabase-js": "^2.57.4",
+    "@tiptap/extension-link": "^3.30.2",
+    "@tiptap/pm": "^3.30.2",
+    "@tiptap/react": "^3.30.2",
+    "@tiptap/starter-kit": "^3.30.2",
     "@types/jwt-decode": "^2.2.1",
     "@types/react-router-dom": "^5.3.3",
     "i18next": "^25.6.3",

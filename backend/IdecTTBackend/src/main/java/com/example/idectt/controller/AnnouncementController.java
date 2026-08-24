@@ -34,10 +34,12 @@ public class AnnouncementController {
         return announcementService.getAllAnnouncements();
     }
 
+    // Public: giriş yapmamış kullanıcı da aktif bir duyurunun detayını görebilir.
+    // Aktif olmayan (veya var olmayan) bir id için 404 döner.
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
         return announcementService.getAnnouncementById(id)
+                .filter(Announcement::isActive)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

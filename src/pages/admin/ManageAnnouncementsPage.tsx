@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Loader2, ImageIcon } from 'lucide-react';
 import { apiService, resolveAssetUrl } from '../../services/apiService';
+import RichTextEditor from '../../components/admin/RichTextEditor';
+
+const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+};
 
 interface Announcement {
     id: number;
@@ -43,6 +49,12 @@ const ManageAnnouncementsPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!stripHtml(formData.content)) {
+            alert('Lütfen duyuru içeriği girin.');
+            return;
+        }
+
         try {
             if (editingId) {
                 await apiService.put(`/announcements/${editingId}`, formData);
@@ -153,7 +165,7 @@ const ManageAnnouncementsPage = () => {
                                         <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm text-gray-500 truncate max-w-xs">{announcement.content}</div>
+                                        <div className="text-sm text-gray-500 truncate max-w-xs">{stripHtml(announcement.content)}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${announcement.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -256,12 +268,9 @@ const ManageAnnouncementsPage = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">İçerik</label>
-                                <textarea
-                                    required
-                                    rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                <RichTextEditor
                                     value={formData.content}
-                                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                                    onChange={(html) => setFormData({ ...formData, content: html })}
                                 />
                             </div>
 

@@ -325,5 +325,20 @@
     "tel": "Tel:",
     "fax": "Fax:",
     "email_short": "Email:"
+  },
+  "seminar_certificates": {
+    "title": "Seminar Certificates",
+    "subtitle": "Search for your name and download your Zoom training attendance certificate here.",
+    "search_placeholder": "Search by name...",
+    "loading": "Loading certificates...",
+    "no_results": "No certificates found matching your criteria.",
+    "fetch_error": "Could not load certificates.",
+    "download": "Download",
+    "downloading": "Downloading...",
+    "download_error": "An error occurred while downloading the certificate."
+  },
+  "announcement_detail": {
+    "not_found": "Announcement not found.",
+    "back_home": "Back to Home"
   }
 }

@@ -2,6 +2,7 @@ package com.example.idectt.service;
 
 import com.example.idectt.entity.Announcement;
 import com.example.idectt.repository.AnnouncementRepository;
+import com.example.idectt.util.HtmlSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class AnnouncementService {
     }
 
     public Announcement createAnnouncement(Announcement announcement) {
+        announcement.setContent(HtmlSanitizer.sanitize(announcement.getContent()));
         return announcementRepository.save(announcement);
     }
 
@@ -35,7 +37,7 @@ public class AnnouncementService {
                 .orElseThrow(() -> new RuntimeException("Announcement not found"));
 
         announcement.setTitle(announcementDetails.getTitle());
-        announcement.setContent(announcementDetails.getContent());
+        announcement.setContent(HtmlSanitizer.sanitize(announcementDetails.getContent()));
         announcement.setImageUrl(announcementDetails.getImageUrl());
         announcement.setActive(announcementDetails.isActive());
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Bell, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Bell, Calendar, ArrowRight } from 'lucide-react';
 import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +11,20 @@ interface Announcement {
     imageUrl?: string;
     createdAt: string;
 }
+
+const SUMMARY_MAX_LENGTH = 220;
+
+const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+};
+
+const truncate = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) {
+        return text;
+    }
+    return text.slice(0, maxLength).trimEnd() + '...';
+};
 
 const AnnouncementsSection = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -107,9 +122,15 @@ const AnnouncementsSection = () => {
                             {current.title}
                         </h3>
                         <p className="text-gray-600 text-lg leading-relaxed mb-8 line-clamp-4">
-                            {current.content}
+                            {truncate(stripHtml(current.content), SUMMARY_MAX_LENGTH)}
                         </p>
-                        {/* Read more removed */}
+                        <Link
+                            to={`/announcements/${current.id}`}
+                            className="inline-flex items-center gap-2 text-emerald-600 font-semibold hover:text-emerald-700 transition-colors w-fit"
+                        >
+                            {t('common.read_more')}
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
                     </div>
 
                     {/* Indicator Dots */}

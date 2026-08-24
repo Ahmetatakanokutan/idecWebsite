@@ -32,7 +32,7 @@ public class CourseService {
 
 
     @Transactional
-    public Course createCourse(CourseCreateDto courseDto) {
+    public CourseDetailDto createCourse(CourseCreateDto courseDto) {
         Course course = new Course(courseDto.getTitle(), courseDto.getDescription(), courseDto.getImage());
         course.setCourseType(courseDto.getCourseType());
 
@@ -42,7 +42,8 @@ public class CourseService {
             course.setInstructor(instructor);
         }
 
-        return courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+        return mapToCourseDetailDto(savedCourse);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +62,7 @@ public class CourseService {
     }
 
     @Transactional
-    public Course updateCourse(Long id, CourseCreateDto courseDetails) {
+    public CourseDetailDto updateCourse(Long id, CourseCreateDto courseDetails) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
 
@@ -78,8 +79,11 @@ public class CourseService {
                     .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + courseDetails.getInstructorId()));
             course.setInstructor(instructor);
         }
-        
-        return courseRepository.save(course);
+
+        Course savedCourse = courseRepository.save(course);
+        // Entity'yi değil DTO'yu döndürüyoruz: lazy instructor proxy'si hâlâ açık
+        // transaction içinde DTO'ya çevriliyor, Jackson'a asla Hibernate proxy'si gitmiyor.
+        return mapToCourseDetailDto(savedCourse);
     }
 
     @Transactional
