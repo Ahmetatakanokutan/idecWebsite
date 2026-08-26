@@ -5,6 +5,29 @@ import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 
+interface SubNavItem {
+  key: string;
+  labelKey?: string;
+  label?: string;
+  to?: string;
+  href?: string;
+  disabled?: boolean;
+}
+
+interface NavLink {
+  key: string;
+  labelKey: string;
+  to: string;
+  onClick?: () => void;
+}
+
+interface DropdownNav {
+  key: string;
+  labelKey?: string;
+  label?: string;
+  items: SubNavItem[];
+}
+
 const Header = () => {
   const { isLoggedIn, logout, roles, fullName } = useAuth();
   const { t, i18n } = useTranslation();
@@ -31,138 +54,157 @@ const Header = () => {
     }
   };
 
+  // Yeni bir üst menü başlığı eklemek: buraya bir satır eklemek kadar basit olsun diye.
+  const navLinks: NavLink[] = [
+    { key: 'about', labelKey: 'header.about', to: '/about', onClick: handleAboutClick },
+    { key: 'projects', labelKey: 'header.projects', to: '/projects' },
+    { key: 'contact', labelKey: 'header.contact', to: '/contact', onClick: handleContactClick },
+  ];
+
+  // Açılır menüler de aynı mantıkla: yeni bir başlık ya da alt öğe eklemek diziye
+  // bir satır eklemek kadar kolay.
+  const dropdownMenus: DropdownNav[] = [
+    {
+      key: 'academy',
+      labelKey: 'header.academy',
+      items: [
+        { key: 'academy-courses', labelKey: 'header.academy_courses', to: '/courses' },
+        { key: 'academy-webinars', labelKey: 'header.academy_webinars', to: '/courses?tab=webinars' },
+      ],
+    },
+    {
+      key: 'workshops',
+      label: 'Çalıştaylarımız',
+      items: [
+        { key: 'kydd-2025', label: 'KYDD 2025', href: 'https://kyddtr.wixsite.com/ulusal-karbon-yakala' },
+        { key: 'karbon-azaltim', label: 'Karbon Azaltım Sempozyumunu', disabled: true },
+        { key: 'zemin-istanbul', label: 'Zemin İstanbul', disabled: true },
+      ],
+    },
+  ];
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* max-w-7xl kaldırıldı: header artık ekran genişliğini kullanıyor, sadece kenarlarda
+          responsive padding kalıyor (geniş ekranlarda içerik ortada dar bir şeride sıkışmasın). */}
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3 flex-shrink-0">
             <div className="flex items-center justify-center w-10 h-10 bg-emerald-600 rounded-lg shadow-sm">
               <Leaf className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">IDEC-TT</h1>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight whitespace-nowrap">IDEC-TT</h1>
           </Link>
-          <nav className="hidden md:flex space-x-8">
-            <Link to="/about" onClick={handleAboutClick} className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.about')}</Link>
-            <Link to="/projects" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.projects')}</Link>
-            <Link to="/contact" onClick={handleContactClick} className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">{t('header.contact')}</Link>
+
+          <nav className="hidden lg:flex space-x-8 flex-shrink-0 whitespace-nowrap">
+            {navLinks.map((item) => (
+              <Link
+                key={item.key}
+                to={item.to}
+                onClick={item.onClick}
+                className="text-gray-600 hover:text-emerald-600 font-medium transition-colors"
+              >
+                {t(item.labelKey)}
+              </Link>
+            ))}
             {isLoggedIn && roles.includes('ROLE_ADMIN') && (
               <Link to="/admin" className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors bg-emerald-50 px-3 py-1 rounded-md">{t('header.admin_panel')}</Link>
             )}
           </nav>
-          <div className="flex items-center space-x-4">
+
+          <div className="flex flex-wrap items-center justify-end gap-4">
             <a
               href="https://greentim.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm hover:shadow-md"
+              className="hidden lg:flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm hover:shadow-md flex-shrink-0 whitespace-nowrap"
             >
               <Globe2 className="w-4 h-4" />
               <span>{t('header.carbon_calc_button')}</span>
             </a>
-            <Menu as="div" className="relative inline-block text-left">
-              <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                {t('header.academy')}
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Menu.Button>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                  <div className="py-1">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <Link
-                          to="/courses"
-                          className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
-                        >
-                          {t('header.academy_courses')}
-                        </Link>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <Link
-                          to="/courses?tab=webinars"
-                          className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
-                        >
-                          {t('header.academy_webinars')}
-                        </Link>
-                      )}
-                    </Menu.Item>
-                  </div>
-                </Menu.Items>
-              </Transition>
-            </Menu>
-            <Menu as="div" className="relative inline-block text-left">
-              <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                Çalıştaylarımız
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Menu.Button>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                  <div className="py-1">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a
-                          href="https://kyddtr.wixsite.com/ulusal-karbon-yakala"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
-                        >
-                          KYDD 2025
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          type="button"
-                          disabled
-                          className={`${active ? 'bg-gray-50' : ''} block w-full text-left px-4 py-2 text-sm text-gray-500 cursor-not-allowed`}
-                        >
-                          Karbon Azaltım Sempozyumunu
-                        </button>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <button
-                          type="button"
-                          disabled
-                          className={`${active ? 'bg-gray-50' : ''} block w-full text-left px-4 py-2 text-sm text-gray-500 cursor-not-allowed`}
-                        >
-                          Zemin İstanbul
-                        </button>
-                      )}
-                    </Menu.Item>
-                  </div>
-                </Menu.Items>
-              </Transition>
-            </Menu>
+
+            {dropdownMenus.map((menu) => (
+              <Menu key={menu.key} as="div" className="relative inline-block text-left flex-shrink-0">
+                <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 whitespace-nowrap">
+                  {menu.labelKey ? t(menu.labelKey) : menu.label}
+                  <ChevronDown className="w-4 h-4 ml-1" />
+                </Menu.Button>
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items className="absolute right-0 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                    <div className="py-1">
+                      {menu.items.map((sub) => {
+                        const label = sub.labelKey ? t(sub.labelKey) : sub.label;
+
+                        if (sub.disabled) {
+                          return (
+                            <Menu.Item key={sub.key} disabled>
+                              {({ active }) => (
+                                <button
+                                  type="button"
+                                  disabled
+                                  className={`${active ? 'bg-gray-50' : ''} block w-full text-left px-4 py-2 text-sm text-gray-500 cursor-not-allowed`}
+                                >
+                                  {label}
+                                </button>
+                              )}
+                            </Menu.Item>
+                          );
+                        }
+
+                        if (sub.href) {
+                          return (
+                            <Menu.Item key={sub.key}>
+                              {({ active }) => (
+                                <a
+                                  href={sub.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                                >
+                                  {label}
+                                </a>
+                              )}
+                            </Menu.Item>
+                          );
+                        }
+
+                        return (
+                          <Menu.Item key={sub.key}>
+                            {({ active }) => (
+                              <Link
+                                to={sub.to!}
+                                className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                              >
+                                {label}
+                              </Link>
+                            )}
+                          </Menu.Item>
+                        );
+                      })}
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </Menu>
+            ))}
+
             {/* Language Switcher */}
             <button
               onClick={() => i18n.changeLanguage(i18n.language === 'tr' ? 'en' : 'tr')}
-              className="px-3 py-1.5 rounded-full text-sm font-medium transition-colors
+              className="px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex-shrink-0 whitespace-nowrap
                          bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
             >
               {i18n.language === 'tr' ? 'EN' : 'TR'}
             </button>
             {isLoggedIn ? (
-              <Menu as="div" className="relative inline-block text-left">
+              <Menu as="div" className="relative inline-block text-left flex-shrink-0">
                 <div>
                   <Menu.Button className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all">
                     <UserCircle className="w-6 h-6" />
@@ -184,7 +226,7 @@ const Header = () => {
                         {getDisplayName()}
                       </p>
                     </div>
-                    
+
                     <div className="px-1 py-1">
                       <Menu.Item>
                         {({ active }) => (
@@ -248,7 +290,7 @@ const Header = () => {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center space-x-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full hover:bg-emerald-700 transition-colors font-medium shadow-sm hover:shadow-md"
+                className="flex items-center space-x-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full hover:bg-emerald-700 transition-colors font-medium shadow-sm hover:shadow-md flex-shrink-0 whitespace-nowrap"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{t('header.login')}</span>
