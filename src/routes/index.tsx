@@ -14,6 +14,7 @@ import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import CertificatePage from '../pages/CertificatePage';
 import SeminarCertificatesPage from '../pages/SeminarCertificatesPage';
+import AnnouncementsPage from '../pages/AnnouncementsPage';
 import AnnouncementDetailPage from '../pages/AnnouncementDetailPage';
 import ProfilePage from '../pages/ProfilePage';
 import FavoritesPage from '../pages/FavoritesPage';
@@ -47,6 +48,7 @@ export const AppRoutes = () => {
     { path: '/forgot-password', element: <ForgotPasswordPage /> },
     { path: '/reset-password', element: <ResetPasswordPage /> },
     { path: '/certificate', element: <CertificatePage /> },
+    { path: '/announcements', element: <AnnouncementsPage /> },
     { path: '/announcements/:id', element: <AnnouncementDetailPage /> },
 
     // Protected User Routes (Any logged in user)

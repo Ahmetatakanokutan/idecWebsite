@@ -20,7 +20,7 @@ WORKDIR /app
 
 COPY --from=build /app/target/app.jar app.jar
 
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/uploads /app/seminar-certificates
 
 EXPOSE 8080
 

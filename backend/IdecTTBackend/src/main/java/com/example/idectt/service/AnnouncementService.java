@@ -4,6 +4,7 @@ import com.example.idectt.entity.Announcement;
 import com.example.idectt.repository.AnnouncementRepository;
 import com.example.idectt.util.HtmlSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,16 @@ public class AnnouncementService {
         return announcementRepository.findAll();
     }
 
-    public List<Announcement> getActiveAnnouncements() {
+    // limit verilmezse mevcut davranis (hepsi) korunur.
+    public List<Announcement> getActiveAnnouncements(Integer limit) {
+        if (limit != null && limit > 0) {
+            return announcementRepository.findByActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, limit));
+        }
         return announcementRepository.findByActiveTrueOrderByCreatedAtDesc();
+    }
+
+    public List<Announcement> getArchivedAnnouncements() {
+        return announcementRepository.findByActiveFalseOrderByCreatedAtDesc();
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {

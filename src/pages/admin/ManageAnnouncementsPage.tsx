@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Loader2, ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, ImageIcon, Upload, Copy, Check } from 'lucide-react';
 import { apiService, resolveAssetUrl } from '../../services/apiService';
 import RichTextEditor from '../../components/admin/RichTextEditor';
-
-const stripHtml = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
-};
+import { stripHtml } from '../../utils/text';
 
 interface Announcement {
     id: number;
@@ -23,6 +19,9 @@ const ManageAnnouncementsPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [documentUploading, setDocumentUploading] = useState(false);
+    const [uploadedDocumentUrl, setUploadedDocumentUrl] = useState('');
+    const [documentCopied, setDocumentCopied] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -113,9 +112,41 @@ const ManageAnnouncementsPage = () => {
         }
     };
 
+    const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setDocumentUploading(true);
+            setDocumentCopied(false);
+            const url = await apiService.uploadFile(file);
+            setUploadedDocumentUrl(url);
+        } catch (error) {
+            console.error('Document upload failed', error);
+            alert('Belge yüklenirken bir hata oluştu.');
+        } finally {
+            setDocumentUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleCopyDocumentUrl = async () => {
+        if (!uploadedDocumentUrl) return;
+        try {
+            await navigator.clipboard.writeText(resolveAssetUrl(uploadedDocumentUrl));
+            setDocumentCopied(true);
+            setTimeout(() => setDocumentCopied(false), 2000);
+        } catch (error) {
+            console.error('Copy failed', error);
+            alert('Bağlantı kopyalanamadı.');
+        }
+    };
+
     const resetForm = () => {
         setEditingId(null);
         setFormData({ title: '', content: '', imageUrl: '', active: true });
+        setUploadedDocumentUrl('');
+        setDocumentCopied(false);
     };
 
     return (
@@ -272,6 +303,56 @@ const ManageAnnouncementsPage = () => {
                                     value={formData.content}
                                     onChange={(html) => setFormData({ ...formData, content: html })}
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Belge Yükle (PDF, Word, Excel)</label>
+                                <p className="text-xs text-gray-500 mb-2">
+                                    Bir PDF, Word (.doc/.docx) veya Excel (.xls/.xlsx) dosyası yükleyin, oluşan bağlantıyı kopyalayıp yukarıdaki editörde bir metni seçip link olarak ekleyin.
+                                </p>
+                                <label
+                                    htmlFor="document-upload"
+                                    className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                                >
+                                    {documentUploading ? (
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : (
+                                        <Upload className="w-4 h-4 mr-2" />
+                                    )}
+                                    {documentUploading ? 'Yükleniyor...' : 'Belge Seç'}
+                                    <input
+                                        id="document-upload"
+                                        type="file"
+                                        className="sr-only"
+                                        accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/msword,.doc,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,application/vnd.ms-excel,.xls"
+                                        onChange={handleDocumentUpload}
+                                        disabled={documentUploading}
+                                    />
+                                </label>
+
+                                {uploadedDocumentUrl && (
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={resolveAssetUrl(uploadedDocumentUrl)}
+                                            onFocus={(e) => e.target.select()}
+                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-700"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleCopyDocumentUrl}
+                                            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 whitespace-nowrap"
+                                        >
+                                            {documentCopied ? (
+                                                <Check className="w-4 h-4 mr-1 text-emerald-600" />
+                                            ) : (
+                                                <Copy className="w-4 h-4 mr-1" />
+                                            )}
+                                            {documentCopied ? 'Kopyalandı' : 'Kopyala'}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center">

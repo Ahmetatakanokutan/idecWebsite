@@ -322,6 +322,7 @@
     "error": "Bir hata oluştu.",
     "search": "Ara...",
     "read_more": "Devamını Oku",
+    "view_all_announcements": "Tüm Duyurular",
     "tel": "Tel:",
     "fax": "Fax:",
     "email_short": "E-Posta:"
@@ -340,5 +341,13 @@
   "announcement_detail": {
     "not_found": "Duyuru bulunamadı.",
     "back_home": "Ana Sayfaya Dön"
+  },
+  "announcements_page": {
+    "title": "Tüm Duyurular",
+    "subtitle": "IDEC-TT platformundaki güncel duyurular ve geçmiş duyuru arşivi.",
+    "tab_active": "Aktif Duyurular",
+    "tab_archive": "Duyuru Arşivi",
+    "no_results": "Bu kategoride duyuru bulunamadı.",
+    "fetch_error": "Duyurular yüklenemedi."
   }
 }

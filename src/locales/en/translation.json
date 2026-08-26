@@ -322,6 +322,7 @@
     "error": "An error occurred.",
     "search": "Search...",
     "read_more": "Read More",
+    "view_all_announcements": "All Announcements",
     "tel": "Tel:",
     "fax": "Fax:",
     "email_short": "Email:"
@@ -340,5 +341,13 @@
   "announcement_detail": {
     "not_found": "Announcement not found.",
     "back_home": "Back to Home"
+  },
+  "announcements_page": {
+    "title": "All Announcements",
+    "subtitle": "Current announcements and the archive of past announcements on the IDEC-TT platform.",
+    "tab_active": "Active Announcements",
+    "tab_archive": "Announcement Archive",
+    "no_results": "No announcements found in this category.",
+    "fetch_error": "Could not load announcements."
   }
 }
