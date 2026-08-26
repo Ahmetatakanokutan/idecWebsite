@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation, type Location } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -46,7 +47,15 @@ const LoginPage = () => {
       // And apiService returns the json directly.
       
       login(data.token);
-      navigate('/'); // Redirect to home page after successful login
+
+      // ProtectedRoute, giriş yapılmamış kullanıcıyı buraya yönlendirirken hedeflediği
+      // sayfayı state.from'a koyar; varsa oraya, yoksa eski davranış (ana sayfa).
+      const from = (location.state as { from?: Location } | null)?.from;
+      if (from) {
+        navigate(`${from.pathname}${from.search}${from.hash}`);
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       const backendMessage = error?.message || '';
       if (backendMessage.toLowerCase().includes('verify your email')) {
