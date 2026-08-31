@@ -125,8 +125,8 @@ const Header = () => {
       onClick={item.onClick}
       className={
         variant === 'desktop'
-          ? 'text-gray-600 hover:text-emerald-600 font-medium transition-colors whitespace-nowrap flex-shrink-0'
-          : 'block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-emerald-600'
+          ? 'text-gray-600 hover:text-brand font-medium transition-colors whitespace-nowrap flex-shrink-0'
+          : 'block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-brand'
       }
     >
       {t(item.labelKey)}
@@ -135,7 +135,7 @@ const Header = () => {
 
   const renderDropdown = (menu: DropdownNav) => (
     <Menu key={menu.key} as="div" className="relative inline-block text-left flex-shrink-0">
-      <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 whitespace-nowrap">
+      <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-brand-light/10 hover:text-brand focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand whitespace-nowrap">
         {menu.labelKey ? t(menu.labelKey) : menu.label}
         <ChevronDown className="w-4 h-4 ml-1" />
       </Menu.Button>
@@ -177,7 +177,7 @@ const Header = () => {
                         href={sub.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                        className={`${active ? 'bg-brand-light/10 text-brand' : 'text-gray-700'} block px-4 py-2 text-sm`}
                       >
                         {label}
                       </a>
@@ -191,7 +191,7 @@ const Header = () => {
                   {({ active }) => (
                     <Link
                       to={sub.to!}
-                      className={`${active ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                      className={`${active ? 'bg-brand-light/10 text-brand' : 'text-gray-700'} block px-4 py-2 text-sm`}
                     >
                       {label}
                     </Link>
@@ -212,8 +212,8 @@ const Header = () => {
       rel="noopener noreferrer"
       className={
         variant === 'desktop'
-          ? 'flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm hover:shadow-md flex-shrink-0 whitespace-nowrap'
-          : 'flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm'
+          ? 'flex items-center space-x-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-dark transition-colors shadow-sm hover:shadow-md flex-shrink-0 whitespace-nowrap'
+          : 'flex items-center justify-center space-x-2 bg-brand text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-dark transition-colors shadow-sm'
       }
     >
       <Globe2 className="w-4 h-4" />
@@ -222,9 +222,9 @@ const Header = () => {
   );
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      {/* Üst şerit: ince, açık gri, sağa hizalı yönetim/dil/giriş */}
-      <div className="bg-gray-50 border-b border-gray-200">
+    <header className="bg-white shadow-sm sticky top-0 z-50 font-archivo">
+      {/* Üst şerit: ince, koyu marka yeşili, sağa hizalı yönetim/dil/giriş */}
+      <div className="bg-brand-dark">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div className="flex items-center justify-between h-9">
             <div />
@@ -232,21 +232,21 @@ const Header = () => {
               {isLoggedIn && roles.includes('ROLE_ADMIN') && (
                 <Link
                   to="/admin"
-                  className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors bg-emerald-50 px-2.5 py-0.5 rounded-md text-xs"
+                  className="text-white font-semibold hover:text-brand-light transition-colors bg-brand-light/20 px-2.5 py-0.5 rounded-md text-xs"
                 >
                   {t('header.admin_panel')}
                 </Link>
               )}
               <button
                 onClick={() => i18n.changeLanguage(i18n.language === 'tr' ? 'en' : 'tr')}
-                className="text-xs font-medium text-gray-600 hover:text-emerald-600 transition-colors"
+                className="text-xs font-medium text-white/80 hover:text-brand-light transition-colors"
               >
                 {i18n.language === 'tr' ? 'EN' : 'TR'}
               </button>
               {isLoggedIn ? (
                 <Menu as="div" className="relative inline-block text-left">
                   <div>
-                    <Menu.Button className="flex items-center justify-center w-7 h-7 bg-gray-100 rounded-full hover:bg-emerald-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all">
+                    <Menu.Button className="flex items-center justify-center w-7 h-7 bg-white/10 text-white rounded-full hover:bg-white/20 hover:text-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-dark focus:ring-brand-light transition-all">
                       <UserCircle className="w-4 h-4" />
                     </Menu.Button>
                   </div>
@@ -273,7 +273,7 @@ const Header = () => {
                             <Link
                               to="/favorites"
                               className={`${
-                                active ? 'bg-emerald-500 text-white' : 'text-gray-700'
+                                active ? 'bg-brand text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Heart className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -286,7 +286,7 @@ const Header = () => {
                             <Link
                               to="/profile"
                               className={`${
-                                active ? 'bg-emerald-500 text-white' : 'text-gray-700'
+                                active ? 'bg-brand text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -299,7 +299,7 @@ const Header = () => {
                             <Link
                               to="/certificate"
                               className={`${
-                                active ? 'bg-emerald-500 text-white' : 'text-gray-700'
+                                active ? 'bg-brand text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Award className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -330,7 +330,7 @@ const Header = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="text-gray-600 hover:text-emerald-600 transition-colors"
+                  className="text-white/80 hover:text-brand-light transition-colors"
                   title={t('header.login')}
                   aria-label={t('header.login')}
                 >
@@ -343,11 +343,11 @@ const Header = () => {
       </div>
 
       {/* Ana satır: logo + ana menü / hamburger */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-brand-light/30">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div className="flex items-center justify-between py-4">
             <Link to="/" className="flex items-center space-x-3 flex-shrink-0">
-              <div className="flex items-center justify-center w-12 h-12 bg-emerald-600 rounded-lg shadow-sm">
+              <div className="flex items-center justify-center w-12 h-12 bg-brand rounded-lg shadow-sm">
                 <Leaf className="w-7 h-7 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight whitespace-nowrap">IDEC-TT</h1>
@@ -365,7 +365,7 @@ const Header = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="xl:hidden flex-shrink-0 p-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+              className="xl:hidden flex-shrink-0 p-2 rounded-lg text-gray-600 hover:bg-brand-light/10 hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand transition-colors"
               aria-label={mobileMenuOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}
               aria-expanded={mobileMenuOpen}
             >

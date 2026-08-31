@@ -30,8 +30,9 @@ const HomePage = () => {
 
   return (
     <Layout>
+      <div className="font-archivo">
       {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-gray-900">
+      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-brand-navy">
         
         {/* Background Slider with Ken Burns Effect */}
         {heroImages.map((image, index) => (
@@ -49,36 +50,36 @@ const HomePage = () => {
               }`}
             />
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/80 via-brand-navy/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-navy/90" />
           </div>
         ))}
 
         {/* Content */}
         <div className={`relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="max-w-3xl">
-            <div className="inline-flex items-center space-x-2 mb-6 px-4 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-emerald-300 text-sm font-semibold tracking-wide uppercase animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <div className="inline-flex items-center space-x-2 mb-6 px-4 py-1.5 rounded-full bg-brand-light/20 backdrop-blur-md border border-brand-light/30 text-brand-light text-sm font-semibold tracking-wide uppercase animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-brand-light"></span>
               <span>{t('home.shaping_future')}</span>
             </div>
-            
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight tracking-tight">
+
+            <h1 className="font-archivo text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 leading-tight tracking-tight">
               {t('home.hero_main_title_part1')} <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+              <span className="text-brand-light">
                 {t('home.hero_main_title_part2')}
               </span>
             </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-300 mb-10 font-light leading-relaxed border-l-4 border-emerald-500 pl-6">
-              {t('home.hero_description_line1')} 
+
+            <p className="text-xl md:text-2xl text-gray-300 mb-10 font-light leading-relaxed border-l-4 border-brand-light pl-6">
+              {t('home.hero_description_line1')}
               <br />
               {t('home.hero_description_line2')}
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-5">
-              <Link 
+              <Link
                 to="/courses"
-                className="group bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-full hover:bg-white/20 transition-all font-semibold flex items-center justify-center sm:justify-start"
+                className="group bg-brand text-white px-8 py-4 rounded-lg hover:bg-brand-dark transition-all font-semibold flex items-center justify-center sm:justify-start shadow-lg hover:shadow-xl"
               >
                 {t('home.start_learning')}
                 <PlayCircleIcon className="ml-2 w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -98,10 +99,10 @@ const HomePage = () => {
       {/* Stats Strip (Floating) */}
       <div className="relative z-20 -mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-2xl grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 p-8 border border-gray-100/50">
-            <StatItem number="400+" label={t('home.stat_item_1_label')} icon={<Users className="w-5 h-5 text-emerald-600" />} />
-            <StatItem number="30+" label={t('home.stat_item_2_label')} icon={<BarChart3 className="w-5 h-5 text-blue-600" />} />
-            <StatItem number="4" label={t('home.stat_item_3_label')} icon={<Layers className="w-5 h-5 text-purple-600" />} />
-            <StatItem number="5" label={t('home.stat_item_4_label')} icon={<Award className="w-5 h-5 text-orange-600" />} />
+            <StatItem number="400+" label={t('home.stat_item_1_label')} icon={<Users className="w-5 h-5 text-brand" />} />
+            <StatItem number="30+" label={t('home.stat_item_2_label')} icon={<BarChart3 className="w-5 h-5 text-brand-navy" />} />
+            <StatItem number="4" label={t('home.stat_item_3_label')} icon={<Layers className="w-5 h-5 text-brand-dark" />} />
+            <StatItem number="5" label={t('home.stat_item_4_label')} icon={<Award className="w-5 h-5 text-brand-light" />} />
         </div>
       </div>
 
@@ -109,11 +110,11 @@ const HomePage = () => {
       <AnnouncementsSection />
 
       {/* Features Section */}
-      <section id="about" className="py-32 bg-gray-50 relative">
+      <section id="about" className="py-36 bg-gray-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-sm font-bold text-emerald-600 tracking-widest uppercase mb-3">{t('home.vision_title_section')}</h2>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-sm font-bold text-brand tracking-widest uppercase mb-3">{t('home.vision_title_section')}</h2>
+            <h3 className="font-archivo text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               {t('home.vision_subtitle_section')} <br/> {t('home.vision_main_title_section')}
             </h3>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
@@ -124,19 +125,19 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <FeatureCard 
                 icon={<Target className="w-8 h-8 text-white" />}
-                color="bg-emerald-500"
+                color="bg-brand"
                 title={t('home.feature_card_1_title')}
                 description={t('home.feature_card_1_desc')}
             />
-            <FeatureCard 
+            <FeatureCard
                 icon={<Globe className="w-8 h-8 text-white" />}
-                color="bg-blue-600"
+                color="bg-brand-navy"
                 title={t('home.feature_card_2_title')}
                 description={t('home.feature_card_2_desc')}
             />
-            <FeatureCard 
-                icon={<Users className="w-8 h-8 text-white" />}
-                color="bg-indigo-600"
+            <FeatureCard
+                icon={<Users className="w-8 h-8 text-brand-dark" />}
+                color="bg-brand-light"
                 title={t('home.feature_card_3_title')}
                 description={t('home.feature_card_3_desc')}
             />
@@ -145,11 +146,11 @@ const HomePage = () => {
       </section>
 
       {/* Image Grid Section */}
-      <section className="py-24 bg-white overflow-hidden">
+      <section className="py-28 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row items-center gap-16">
                 <div className="lg:w-1/2">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-6">{t('home.tech_harmony_title')}</h2>
+                    <h2 className="font-source-serif text-4xl font-bold text-gray-900 mb-6">{t('home.tech_harmony_title')}</h2>
                     <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                         {t('home.tech_harmony_desc')}
                     </p>
@@ -158,12 +159,12 @@ const HomePage = () => {
                         <ListItem text={t('home.list_item_2')} />
                         <ListItem text={t('home.list_item_3')} />
                     </ul>
-                    <Link to="/about" className="text-emerald-600 font-bold hover:text-emerald-700 inline-flex items-center group">
+                    <Link to="/about" className="text-brand font-bold hover:text-brand-dark inline-flex items-center group">
                         {t('home.read_more_about')} <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
                 <div className="lg:w-1/2 relative">
-                    <div className="absolute -top-10 -right-10 w-72 h-72 bg-emerald-100 rounded-full blur-3xl opacity-50"></div>
+                    <div className="absolute -top-10 -right-10 w-72 h-72 bg-brand-light/20 rounded-full blur-3xl opacity-50"></div>
                     <div className="grid grid-cols-2 gap-4 relative z-10">
                         <img src="https://images.pexels.com/photos/414837/pexels-photo-414837.jpeg?auto=compress&cs=tinysrgb&w=600" className="rounded-2xl shadow-lg transform translate-y-8" alt="Nature" />
                         <img src="https://images.pexels.com/photos/256381/pexels-photo-256381.jpeg?auto=compress&cs=tinysrgb&w=600" className="rounded-2xl shadow-lg" alt="Tech" />
@@ -174,34 +175,35 @@ const HomePage = () => {
       </section>
 
       {/* Modern CTA */}
-      <section className="py-24 bg-gray-900 relative overflow-hidden">
+      <section className="py-28 bg-brand-navy relative overflow-hidden">
         <div className="absolute inset-0">
             <img src="https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=1920" className="w-full h-full object-cover opacity-20" alt="Background" />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/80 to-transparent"></div>
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+          <h2 className="font-archivo text-4xl md:text-5xl font-bold text-white mb-8">
             {t('home.cta_title')}
           </h2>
           <p className="text-xl text-gray-300 mb-10 font-light">
             {t('home.cta_description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
                 to="/contact"
-                className="bg-emerald-500 text-white px-10 py-4 rounded-full hover:bg-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/40 font-bold"
+                className="bg-brand text-white px-10 py-4 rounded-lg hover:bg-brand-dark transition-all shadow-lg hover:shadow-brand/40 font-bold"
             >
                 {t('home.cta_contact')}
             </Link>
-            <Link 
+            <Link
                 to="/register"
-                className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-10 py-4 rounded-full hover:bg-white/20 transition-all font-bold"
+                className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-10 py-4 rounded-lg hover:bg-white/20 transition-all font-bold"
             >
                 {t('home.cta_register')}
             </Link>
           </div>
         </div>
       </section>
+      </div>
     </Layout>
   );
 };
@@ -210,17 +212,17 @@ const HomePage = () => {
 const StatItem = ({ number, label, icon }: { number: string, label: string, icon: React.ReactNode }) => (
     <div className="flex flex-col items-center justify-center p-4 text-center">
         <div className="mb-3 p-3 bg-gray-50 rounded-full">{icon}</div>
-        <span className="text-4xl font-extrabold text-gray-900 mb-1">{number}</span>
+        <span className="font-source-serif text-4xl font-extrabold text-gray-900 mb-1">{number}</span>
         <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{label}</span>
     </div>
 );
 
 const FeatureCard = ({ icon, color, title, description }: { icon: React.ReactNode, color: string, title: string, description: string }) => (
-    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 group cursor-default">
+    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out group cursor-default">
         <div className={`w-16 h-16 ${color} rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
             {icon}
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
+        <h3 className="text-xl font-bold text-gray-900 mb-3">
             {title}
         </h3>
         <p className="text-gray-600 leading-relaxed">
@@ -231,7 +233,7 @@ const FeatureCard = ({ icon, color, title, description }: { icon: React.ReactNod
 
 const ListItem = ({ text }: { text: string }) => (
     <li className="flex items-center text-gray-700">
-        <span className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3 text-emerald-600 flex-shrink-0">
+        <span className="w-6 h-6 bg-brand-light/20 rounded-full flex items-center justify-center mr-3 text-brand flex-shrink-0">
             <Leaf className="w-3 h-3 fill-current" />
         </span>
         {text}
