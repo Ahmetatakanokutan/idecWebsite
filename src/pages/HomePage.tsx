@@ -32,7 +32,7 @@ const HomePage = () => {
     <Layout>
       <div className="font-archivo">
       {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-brand-navy">
+      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-gray-900">
         
         {/* Background Slider with Ken Burns Effect */}
         {heroImages.map((image, index) => (
@@ -50,8 +50,8 @@ const HomePage = () => {
               }`}
             />
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-navy/80 via-brand-navy/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-navy/90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
           </div>
         ))}
 
