@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Target, Users, Globe, ArrowRight, Leaf, Wind, Zap, BarChart3, Award, Layers } from 'lucide-react';
 import Layout from '../components/Layout';
 import AnnouncementsSection from '../components/AnnouncementsSection';
+import { useScrollReveal, usePrefersReducedMotion } from '../hooks/useScrollReveal';
 import { useTranslation } from 'react-i18next';
 
 const heroImages = [
@@ -14,19 +15,34 @@ const heroImages = [
 
 const HomePage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const [isVisible, setIsVisible] = useState(reducedMotion);
   const { t } = useTranslation();
 
+  const statsReveal = useScrollReveal<HTMLDivElement>();
+  const featuresReveal = useScrollReveal<HTMLDivElement>();
+  const imageGridReveal = useScrollReveal<HTMLDivElement>();
+  const ctaReveal = useScrollReveal<HTMLDivElement>();
+
   useEffect(() => {
+    // Reduced motion: Ken Burns kaydırmasını durdur, ilk görsel sabit kalsın.
+    if (reducedMotion) {
+      setIsVisible(true);
+      return;
+    }
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
     }, 6000); // 6 saniye
 
     // Initial animation trigger
-    setTimeout(() => setIsVisible(true), 100);
+    const timeout = setTimeout(() => setIsVisible(true), 100);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [reducedMotion]);
 
   return (
     <Layout>
@@ -42,11 +58,13 @@ const HomePage = () => {
               index === currentImageIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img 
-              src={image} 
-              alt={`Slide ${index + 1}`} 
-              className={`w-full h-full object-cover transition-transform duration-[10000ms] ease-linear ${
-                index === currentImageIndex ? 'scale-110' : 'scale-100'
+            <img
+              src={image}
+              alt={`Slide ${index + 1}`}
+              className={`w-full h-full object-cover ${
+                reducedMotion
+                  ? 'scale-100'
+                  : `transition-transform duration-[10000ms] ease-linear ${index === currentImageIndex ? 'scale-110' : 'scale-100'}`
               }`}
             />
             {/* Gradient Overlay */}
@@ -58,7 +76,7 @@ const HomePage = () => {
         {/* Content */}
         <div className={`relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="max-w-3xl">
-            <div className="inline-flex items-center space-x-2 mb-6 px-4 py-1.5 rounded-full bg-brand-light/20 backdrop-blur-md border border-brand-light/30 text-brand-light text-sm font-semibold tracking-wide uppercase animate-pulse">
+            <div className="inline-flex items-center space-x-2 mb-6 px-4 py-1.5 rounded-full bg-brand-light/20 backdrop-blur-md border border-brand-light/30 text-brand-light text-sm font-semibold tracking-wide uppercase animate-pulse motion-reduce:animate-none">
               <span className="w-2 h-2 rounded-full bg-brand-light"></span>
               <span>{t('home.shaping_future')}</span>
             </div>
@@ -89,7 +107,7 @@ const HomePage = () => {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/50 animate-bounce">
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/50 animate-bounce motion-reduce:animate-none">
             <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
                 <div className="w-1 h-2 bg-white/50 rounded-full mt-2"></div>
             </div>
@@ -97,12 +115,17 @@ const HomePage = () => {
       </section>
 
       {/* Stats Strip (Floating) */}
-      <div className="relative z-20 -mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        ref={statsReveal.ref}
+        className={`relative z-20 -mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-out ${
+          statsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         <div className="bg-white rounded-2xl shadow-2xl grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 p-8 border border-gray-100/50">
-            <StatItem number="400+" label={t('home.stat_item_1_label')} icon={<Users className="w-5 h-5 text-brand" />} />
-            <StatItem number="30+" label={t('home.stat_item_2_label')} icon={<BarChart3 className="w-5 h-5 text-brand-navy" />} />
-            <StatItem number="4" label={t('home.stat_item_3_label')} icon={<Layers className="w-5 h-5 text-brand-dark" />} />
-            <StatItem number="5" label={t('home.stat_item_4_label')} icon={<Award className="w-5 h-5 text-brand-light" />} />
+            <StatItem number="400+" label={t('home.stat_item_1_label')} icon={<Users className="w-5 h-5" />} colorClass="text-brand" active={statsReveal.isVisible} reducedMotion={statsReveal.reducedMotion} />
+            <StatItem number="30+" label={t('home.stat_item_2_label')} icon={<BarChart3 className="w-5 h-5" />} colorClass="text-brand-navy" active={statsReveal.isVisible} reducedMotion={statsReveal.reducedMotion} />
+            <StatItem number="4" label={t('home.stat_item_3_label')} icon={<Layers className="w-5 h-5" />} colorClass="text-brand-dark" active={statsReveal.isVisible} reducedMotion={statsReveal.reducedMotion} />
+            <StatItem number="5" label={t('home.stat_item_4_label')} icon={<Award className="w-5 h-5" />} colorClass="text-brand-light" active={statsReveal.isVisible} reducedMotion={statsReveal.reducedMotion} />
         </div>
       </div>
 
@@ -111,7 +134,12 @@ const HomePage = () => {
 
       {/* Features Section */}
       <section id="about" className="py-36 bg-gray-50 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          ref={featuresReveal.ref}
+          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-out ${
+            featuresReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           <div className="text-center mb-20">
             <h2 className="text-sm font-bold text-brand tracking-widest uppercase mb-3">{t('home.vision_title_section')}</h2>
             <h3 className="font-archivo text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -147,7 +175,12 @@ const HomePage = () => {
 
       {/* Image Grid Section */}
       <section className="py-28 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          ref={imageGridReveal.ref}
+          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-out ${
+            imageGridReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
             <div className="flex flex-col lg:flex-row items-center gap-16">
                 <div className="lg:w-1/2">
                     <h2 className="font-source-serif text-4xl font-bold text-gray-900 mb-6">{t('home.tech_harmony_title')}</h2>
@@ -180,7 +213,12 @@ const HomePage = () => {
             <img src="https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=1920" className="w-full h-full object-cover opacity-20" alt="Background" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/80 to-transparent"></div>
         </div>
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <div
+          ref={ctaReveal.ref}
+          className={`max-w-4xl mx-auto px-4 text-center relative z-10 transition-all duration-700 ease-out ${
+            ctaReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+        >
           <h2 className="font-archivo text-4xl md:text-5xl font-bold text-white mb-8">
             {t('home.cta_title')}
           </h2>
@@ -209,17 +247,111 @@ const HomePage = () => {
 };
 
 // Helper Components for cleaner code
-const StatItem = ({ number, label, icon }: { number: string, label: string, icon: React.ReactNode }) => (
-    <div className="flex flex-col items-center justify-center p-4 text-center">
-        <div className="mb-3 p-3 bg-gray-50 rounded-full">{icon}</div>
-        <span className="font-source-serif text-4xl font-extrabold text-gray-900 mb-1">{number}</span>
-        <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{label}</span>
-    </div>
-);
+const COUNT_UP_DURATION_MS = 1200;
+
+// Sayiyi (400+, 30+, 4, 5) rakam + sonek olarak ayirir, gorunur oldugunda
+// requestAnimationFrame ile ease-out sayarak hedefe ulasir. Reduced motion'da
+// (veya henuz aktif degilken) dogrudan hedef/0 gosterir, kutuphane gerekmez.
+const useCountUp = (target: number, active: boolean, reducedMotion: boolean) => {
+    const [value, setValue] = useState(reducedMotion ? target : 0);
+
+    useEffect(() => {
+        if (!active) return;
+        if (reducedMotion) {
+            setValue(target);
+            return;
+        }
+
+        let frameId: number;
+        const start = performance.now();
+
+        const tick = (now: number) => {
+            const progress = Math.min((now - start) / COUNT_UP_DURATION_MS, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setValue(Math.round(target * eased));
+            if (progress < 1) {
+                frameId = requestAnimationFrame(tick);
+            }
+        };
+
+        frameId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frameId);
+    }, [active, target, reducedMotion]);
+
+    return value;
+};
+
+// Ikonun etrafinda dolan dairesel gosterge (SVG). Kutuphane gerektirmez;
+// stroke-dashoffset her render'da useCountUp'in guncel degeriyle birlikte
+// hesaplandigi icin sayimla birebir senkron doluyor, ayrica CSS transition'a
+// gerek yok (zaten her frame'de JS tarafindan guncelleniyor).
+const RING_SIZE = 64;
+const RING_STROKE = 4;
+const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+const StatItem = ({
+    number,
+    label,
+    icon,
+    colorClass,
+    active,
+    reducedMotion,
+}: {
+    number: string;
+    label: string;
+    icon: React.ReactNode;
+    colorClass: string;
+    active: boolean;
+    reducedMotion: boolean;
+}) => {
+    const match = number.match(/^(\d+)(.*)$/);
+    const target = match ? parseInt(match[1], 10) : 0;
+    const suffix = match ? match[2] : '';
+    const displayValue = useCountUp(target, active, reducedMotion);
+    const progress = active && target > 0 ? displayValue / target : 0;
+
+    return (
+        <div className="flex flex-col items-center justify-center p-4 text-center">
+            <div className="relative mb-3" style={{ width: RING_SIZE, height: RING_SIZE }}>
+                <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90">
+                    <circle
+                        cx={RING_SIZE / 2}
+                        cy={RING_SIZE / 2}
+                        r={RING_RADIUS}
+                        fill="none"
+                        strokeWidth={RING_STROKE}
+                        className="text-gray-100"
+                        stroke="currentColor"
+                    />
+                    <circle
+                        cx={RING_SIZE / 2}
+                        cy={RING_SIZE / 2}
+                        r={RING_RADIUS}
+                        fill="none"
+                        strokeWidth={RING_STROKE}
+                        strokeLinecap="round"
+                        className={colorClass}
+                        stroke="currentColor"
+                        strokeDasharray={RING_CIRCUMFERENCE}
+                        strokeDashoffset={RING_CIRCUMFERENCE * (1 - progress)}
+                    />
+                </svg>
+                <div className={`absolute inset-0 flex items-center justify-center ${colorClass}`}>
+                    {icon}
+                </div>
+            </div>
+            <span className="font-source-serif text-4xl font-extrabold text-gray-900 mb-1">
+                {displayValue}{suffix}
+            </span>
+            <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{label}</span>
+        </div>
+    );
+};
 
 const FeatureCard = ({ icon, color, title, description }: { icon: React.ReactNode, color: string, title: string, description: string }) => (
-    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out group cursor-default">
-        <div className={`w-16 h-16 ${color} rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+    <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 motion-reduce:hover:translate-y-0 transition-all duration-300 ease-out group cursor-default">
+        <div className={`w-16 h-16 ${color} rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 motion-reduce:group-hover:scale-100 transition-transform duration-300`}>
             {icon}
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-3">

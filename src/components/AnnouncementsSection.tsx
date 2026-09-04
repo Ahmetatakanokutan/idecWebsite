@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Bell, Calendar, ArrowRight } from 'lucide-react';
 import { apiService, resolveAssetUrl } from '../services/apiService';
 import { stripHtml, truncate } from '../utils/text';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useTranslation } from 'react-i18next';
 
 interface Announcement {
@@ -28,6 +29,7 @@ const AnnouncementsSection = () => {
     const [loading, setLoading] = useState(true);
     const [isDragging, setIsDragging] = useState(false);
     const { t, i18n } = useTranslation();
+    const sectionReveal = useScrollReveal<HTMLDivElement>();
 
     const containerRef = useRef<HTMLDivElement>(null);
     // nextSlide/prevSlide'in her zaman guncel uzunlugu gormesi icin (asagidaki jest
@@ -53,14 +55,16 @@ const AnnouncementsSection = () => {
     }, []);
 
     useEffect(() => {
-        if (announcements.length <= 1) return;
+        // Reduced motion: otomatik ilerlemeyi durdur, gecis kullanicinin kontrolunde kalsin
+        // (ok butonlari / nokta gostergeleri / surukleme hala calisir).
+        if (announcements.length <= 1 || sectionReveal.reducedMotion) return;
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % announcements.length);
         }, 7000);
 
         return () => clearInterval(interval);
-    }, [announcements.length]);
+    }, [announcements.length, sectionReveal.reducedMotion]);
 
     // useCallback + lengthRef sayesinde bu iki fonksiyonun kimligi hic degismiyor;
     // asagidaki native event listener'lar bunlari guvenle kapatabiliyor (stale closure yok).
@@ -200,11 +204,16 @@ const AnnouncementsSection = () => {
 
     return (
         <section className="py-24 bg-gray-50 border-b border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                ref={sectionReveal.ref}
+                className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-out ${
+                    sectionReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+            >
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
                         <div className="p-2 bg-brand-light/20 rounded-lg mr-3">
-                            <Bell className="w-6 h-6 text-brand animate-bounce" />
+                            <Bell className="w-6 h-6 text-brand animate-bounce motion-reduce:animate-none" />
                         </div>
                         <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
                             {t('common.announcements')}
