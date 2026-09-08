@@ -4,15 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Sertifika şablonuyla uyumlu marka paleti. brand-dark: koyu zeminler/footer/ana
-        // başlıklar, brand: birincil butonlar/aktif durumlar, brand-light: SADECE küçük
-        // vurgular (ikon, hover, altı çizgi, ayraç) — beyaz metinli buton zemini olarak kullanma.
+        // ESKİ palet — sadece Header.tsx hâlâ kullanıyor (henüz dokunulmadı). Yeni
+        // tasarım (ink/accent/paper) bunları kullanmıyor; Header'a geçince silinebilir.
         'brand-dark': '#063005',
         brand: '#1E8A1B',
         'brand-light': '#40BF39',
-        // İkincil marka rengi (Yeditepe Üniversitesi lacivertinden): bölüm zeminleri,
-        // kart ikonları, alternatif vurgular. Yeşil birincil, bu ikincil kalır.
         'brand-navy': '#1B3A6B',
+
+        // YENİ palet: koyu gradyan tuval + tek parlak vurgu rengi.
+        ink: {
+          deep: '#0A1F3D', // gradyanın başlangıcı (sol üst)
+          mid: '#0E3A5C',  // gradyanın ortası
+          teal: '#0F5F52', // gradyanın bitişi (sağ alt)
+        },
+        accent: {
+          DEFAULT: '#4ADE80', // TEK vurgu rengi — sadece koyu zeminde, cimri kullan
+          deep: '#16A34A',    // açık zeminde vurgu gerektiğinde (kontrast için)
+        },
+        paper: '#F8FAFC', // açık bölüm zemini
+      },
+      backgroundImage: {
+        // 135°, sol üstten sağ alta: ink-deep -> ink-mid -> ink-teal
+        'ink-gradient': 'linear-gradient(135deg, #0A1F3D 0%, #0E3A5C 50%, #0F5F52 100%)',
       },
       fontFamily: {
         // Mevcut varsayılan sans/serif ailelerine dokunmuyoruz (diğer sayfalar etkilenmesin);

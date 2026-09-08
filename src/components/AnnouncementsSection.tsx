@@ -203,26 +203,26 @@ const AnnouncementsSection = () => {
     const current = announcements[currentIndex];
 
     return (
-        <section className="py-24 bg-gray-50 border-b border-gray-100">
+        <section className="py-24 bg-paper">
             <div
                 ref={sectionReveal.ref}
-                className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-out ${
-                    sectionReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-out ${
+                    sectionReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
                 }`}
             >
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
-                        <div className="p-2 bg-brand-light/20 rounded-lg mr-3">
-                            <Bell className="w-6 h-6 text-brand animate-bounce motion-reduce:animate-none" />
+                        <div className="p-2 bg-accent-deep/10 rounded-lg mr-3">
+                            <Bell className="w-6 h-6 text-accent-deep animate-bounce motion-reduce:animate-none" />
                         </div>
-                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                        <h2 className="text-3xl font-extrabold text-ink-deep tracking-tight">
                             {t('common.announcements')}
                         </h2>
                     </div>
                     <div className="flex items-center space-x-4">
                         <Link
                             to="/announcements"
-                            className="text-sm font-semibold text-brand hover:text-brand-dark transition-colors whitespace-nowrap"
+                            className="text-sm font-semibold text-accent-deep hover:text-ink-deep transition-colors whitespace-nowrap"
                         >
                             {t('common.view_all_announcements')}
                         </Link>
@@ -230,13 +230,13 @@ const AnnouncementsSection = () => {
                             <div className="flex space-x-2">
                                 <button
                                     onClick={prevSlide}
-                                    className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-brand-light/10 hover:text-brand hover:border-brand-light/40 transition-all shadow-sm"
+                                    className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-accent-deep/10 hover:text-accent-deep hover:border-accent-deep/30 transition-all shadow-sm"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={nextSlide}
-                                    className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-brand-light/10 hover:text-brand hover:border-brand-light/40 transition-all shadow-sm"
+                                    className="p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-accent-deep/10 hover:text-accent-deep hover:border-accent-deep/30 transition-all shadow-sm"
                                 >
                                     <ChevronRight className="w-5 h-5" />
                                 </button>
@@ -247,7 +247,7 @@ const AnnouncementsSection = () => {
 
                 <div
                     ref={containerRef}
-                    className={`relative group bg-white rounded-3xl shadow-xl overflow-hidden min-h-[400px] flex flex-col md:flex-row transition-all duration-500 hover:shadow-2xl touch-pan-y ${
+                    className={`relative group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px] flex flex-col md:flex-row transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1 touch-pan-y ${
                         isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'
                     }`}
                 >
@@ -265,11 +265,11 @@ const AnnouncementsSection = () => {
 
                     {/* Content Area */}
                     <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                        <div className="flex items-center text-brand text-sm font-semibold mb-4 uppercase tracking-widest">
+                        <div className="flex items-center text-accent-deep text-sm font-semibold mb-4 uppercase tracking-widest">
                             <Calendar className="w-4 h-4 mr-2" />
                             {new Date(current.createdAt).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' })}
                         </div>
-                        <h3 className="font-source-serif text-2xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                        <h3 className="font-source-serif text-2xl md:text-4xl font-bold text-ink-deep mb-6 leading-tight">
                             {current.title}
                         </h3>
                         <p className="text-gray-600 text-lg leading-relaxed mb-8 line-clamp-4">
@@ -277,7 +277,7 @@ const AnnouncementsSection = () => {
                         </p>
                         <Link
                             to={`/announcements/${current.id}`}
-                            className="inline-flex items-center gap-2 text-brand font-semibold hover:text-brand-dark transition-colors w-fit"
+                            className="inline-flex items-center gap-2 text-accent-deep font-semibold hover:text-ink-deep transition-colors w-fit"
                         >
                             {t('common.read_more')}
                             <ArrowRight className="w-4 h-4" />
@@ -292,7 +292,7 @@ const AnnouncementsSection = () => {
                                     key={idx}
                                     onClick={() => setCurrentIndex(idx)}
                                     className={`h-1.5 transition-all duration-300 rounded-full ${
-                                        idx === currentIndex ? 'w-8 bg-brand' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                                        idx === currentIndex ? 'w-8 bg-accent-deep' : 'w-2 bg-gray-300 hover:bg-gray-400'
                                     }`}
                                 />
                             ))}

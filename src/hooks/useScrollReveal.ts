@@ -51,7 +51,16 @@ export function useScrollReveal<T extends HTMLElement>(options?: IntersectionObs
         );
 
         observer.observe(node);
-        return () => observer.disconnect();
+
+        // Güvenlik ağı: bazı tarayıcı/ortamlarda (örn. IntersectionObserver'ın hiç
+        // tetiklenmediği uç durumlar) içerik kalıcı olarak opacity:0'da takılı
+        // kalmasın diye, makul bir süre sonra ne olursa olsun görünür yap.
+        const fallback = setTimeout(() => setIsVisible(true), 1500);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(fallback);
+        };
     }, [reducedMotion]);
 
     return { ref, isVisible, reducedMotion };
