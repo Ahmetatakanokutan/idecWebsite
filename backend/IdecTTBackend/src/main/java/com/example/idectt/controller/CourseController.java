@@ -1,6 +1,6 @@
 package com.example.idectt.controller;
 
-import com.example.idectt.entity.Course;
+import com.example.idectt.entity.CourseType;
 import com.example.idectt.entity.Lesson;
 import com.example.idectt.entity.Section;
 import com.example.idectt.payload.dto.*;
@@ -27,8 +27,8 @@ public class CourseController {
     // === Course Endpoints ===
 
     @GetMapping
-    public ResponseEntity<List<CourseSummaryDto>> getAllCourses() {
-        List<CourseSummaryDto> courses = courseService.getAllCourses();
+    public ResponseEntity<List<CourseSummaryDto>> getAllCourses(@RequestParam(required = false) CourseType type) {
+        List<CourseSummaryDto> courses = courseService.getAllCourses(type);
         return ResponseEntity.ok(courses);
     }
 
@@ -43,8 +43,8 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Course> createCourse(@Valid @RequestBody CourseCreateDto courseDto) {
-        Course createdCourse = courseService.createCourse(courseDto);
+    public ResponseEntity<CourseDetailDto> createCourse(@Valid @RequestBody CourseCreateDto courseDto) {
+        CourseDetailDto createdCourse = courseService.createCourse(courseDto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdCourse.getId()).toUri();
         return ResponseEntity.created(location).body(createdCourse);
@@ -52,8 +52,8 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @Valid @RequestBody CourseCreateDto courseDto) {
-        Course updatedCourse = courseService.updateCourse(id, courseDto);
+    public ResponseEntity<CourseDetailDto> updateCourse(@PathVariable Long id, @Valid @RequestBody CourseCreateDto courseDto) {
+        CourseDetailDto updatedCourse = courseService.updateCourse(id, courseDto);
         return ResponseEntity.ok(updatedCourse);
     }
 

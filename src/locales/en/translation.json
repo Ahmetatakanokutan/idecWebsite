@@ -4,6 +4,8 @@
     "about": "About Us",
     "projects": "Stakeholders and Subsidiaries",
     "academy": "IDEC Academy",
+    "academy_courses": "Courses",
+    "academy_webinars": "Webinars",
     "login": "Login",
     "logout": "Logout",
     "profile": "My Profile",
@@ -116,6 +118,7 @@
     "instructor": "Instructor:",
     "students": "students",
     "no_results": "No courses found matching your criteria.",
+    "title_webinars": "IDEC Academy Webinars",
     "login_required_title": "You Must Login to Access This Course",
     "login_required_desc": "Please login to view course contents and continue your education.",
     "not_found": "Course Not Found",
@@ -128,7 +131,6 @@
     "video_not_supported": "Your browser does not support the video tag.",
     "add_to_favorites": "Add to Favorites",
     "remove_from_favorites": "Remove from Favorites",
-    "mark_lesson_complete": "I Completed This Lesson",
     "lesson_completed": "Completed",
     "items": {
       "Karbonsuzlaştırma Temelleri": {
@@ -320,8 +322,32 @@
     "error": "An error occurred.",
     "search": "Search...",
     "read_more": "Read More",
+    "view_all_announcements": "All Announcements",
     "tel": "Tel:",
     "fax": "Fax:",
     "email_short": "Email:"
+  },
+  "seminar_certificates": {
+    "title": "Seminar Certificates",
+    "subtitle": "Search for your name and download your Zoom training attendance certificate here.",
+    "search_placeholder": "Search by name...",
+    "loading": "Loading certificates...",
+    "no_results": "No certificates found matching your criteria.",
+    "fetch_error": "Could not load certificates.",
+    "download": "Download",
+    "downloading": "Downloading...",
+    "download_error": "An error occurred while downloading the certificate."
+  },
+  "announcement_detail": {
+    "not_found": "Announcement not found.",
+    "back_home": "Back to Home"
+  },
+  "announcements_page": {
+    "title": "All Announcements",
+    "subtitle": "Current announcements and the archive of past announcements on the IDEC-TT platform.",
+    "tab_active": "Active Announcements",
+    "tab_archive": "Announcement Archive",
+    "no_results": "No announcements found in this category.",
+    "fetch_error": "Could not load announcements."
   }
 }

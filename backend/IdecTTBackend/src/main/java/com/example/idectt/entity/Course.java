@@ -38,6 +38,10 @@ public class Course {
     @JsonManagedReference
     private List<Section> sections = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "course_type")
+    private CourseType courseType;
+
     public Course(String title, String description, String image) {
         this.title = title;
         this.description = description;
@@ -47,5 +51,10 @@ public class Course {
     public void addSection(Section section) {
         sections.add(section);
         section.setCourse(this);
+    }
+
+    // Eski kayıtlarda courseType null olabilir; bunlar COURSE gibi davranır.
+    public CourseType getEffectiveCourseType() {
+        return courseType != null ? courseType : CourseType.COURSE;
     }
 }

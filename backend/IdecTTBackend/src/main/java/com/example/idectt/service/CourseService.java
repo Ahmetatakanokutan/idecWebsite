@@ -32,21 +32,24 @@ public class CourseService {
 
 
     @Transactional
-    public Course createCourse(CourseCreateDto courseDto) {
+    public CourseDetailDto createCourse(CourseCreateDto courseDto) {
         Course course = new Course(courseDto.getTitle(), courseDto.getDescription(), courseDto.getImage());
-        
+        course.setCourseType(courseDto.getCourseType());
+
         if (courseDto.getInstructorId() != null) {
             Instructor instructor = instructorRepository.findById(courseDto.getInstructorId())
                     .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + courseDto.getInstructorId()));
             course.setInstructor(instructor);
         }
-        
-        return courseRepository.save(course);
+
+        Course savedCourse = courseRepository.save(course);
+        return mapToCourseDetailDto(savedCourse);
     }
 
     @Transactional(readOnly = true)
-    public List<CourseSummaryDto> getAllCourses() {
+    public List<CourseSummaryDto> getAllCourses(CourseType type) {
         return courseRepository.findAll().stream()
+                .filter(course -> type == null || course.getEffectiveCourseType() == type)
                 .map(this::mapToCourseSummaryDto)
                 .collect(Collectors.toList());
     }
@@ -59,21 +62,28 @@ public class CourseService {
     }
 
     @Transactional
-    public Course updateCourse(Long id, CourseCreateDto courseDetails) {
+    public CourseDetailDto updateCourse(Long id, CourseCreateDto courseDetails) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
 
         course.setTitle(courseDetails.getTitle());
         course.setDescription(courseDetails.getDescription());
         course.setImage(courseDetails.getImage());
-        
+
+        if (courseDetails.getCourseType() != null) {
+            course.setCourseType(courseDetails.getCourseType());
+        }
+
         if (courseDetails.getInstructorId() != null) {
              Instructor instructor = instructorRepository.findById(courseDetails.getInstructorId())
                     .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + courseDetails.getInstructorId()));
             course.setInstructor(instructor);
         }
-        
-        return courseRepository.save(course);
+
+        Course savedCourse = courseRepository.save(course);
+        // Entity'yi değil DTO'yu döndürüyoruz: lazy instructor proxy'si hâlâ açık
+        // transaction içinde DTO'ya çevriliyor, Jackson'a asla Hibernate proxy'si gitmiyor.
+        return mapToCourseDetailDto(savedCourse);
     }
 
     @Transactional
@@ -208,7 +218,8 @@ public class CourseService {
                 course.getImage(),
                 course.getInstructor() != null ? course.getInstructor().getName() : "N/A",
                 course.getRating(),
-                course.getStudents()
+                course.getStudents(),
+                course.getEffectiveCourseType()
         );
     }
 
@@ -229,7 +240,8 @@ public class CourseService {
                 course.getRating(),
                 course.getStudents(),
                 instructorDto,
-                sectionDtos
+                sectionDtos,
+                course.getEffectiveCourseType()
         );
     }
 

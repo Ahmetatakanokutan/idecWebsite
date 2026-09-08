@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Star, Users, Leaf, AlertCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
@@ -13,9 +13,13 @@ interface Course {
   instructorName: string;
   rating: number;
   students: number;
+  courseType?: 'COURSE' | 'WEBINAR';
 }
 
 const CoursesPage = () => {
+  const [searchParams] = useSearchParams();
+  const activeTab: 'COURSE' | 'WEBINAR' = searchParams.get('tab') === 'webinars' ? 'WEBINAR' : 'COURSE';
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +30,7 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const data = await apiService.get('/courses');
+        const data = await apiService.get(`/courses?type=${activeTab}`);
         setCourses(data);
       } catch (err: any) {
         setError(err.message || 'Dersler yüklenemedi.');
@@ -36,7 +40,7 @@ const CoursesPage = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [activeTab]);
 
   const getLocalizedContent = (course: Course) => {
     if (i18n.language === 'en') {
@@ -136,12 +140,12 @@ const CoursesPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t('courses.title')}
+            {activeTab === 'WEBINAR' ? t('courses.title_webinars') : t('courses.title')}
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
             {t('courses.subtitle')}
           </p>
-          
+
           <div className="max-w-xl mx-auto relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />

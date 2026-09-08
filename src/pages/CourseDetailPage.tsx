@@ -281,17 +281,6 @@ const CourseDetailPage = () => {
               <span>•</span>
               <span>{selectedLesson.duration}</span>
             </div>
-            {isLoggedIn && course && !completedLessons.has(selectedLesson.id) && (
-              <button
-                onClick={() => {
-                  progressService.markComplete(selectedLesson.id, course.id).catch(() => {});
-                  setCompletedLessons(prev => new Set([...prev, selectedLesson.id]));
-                }}
-                className="mt-3 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-full transition-colors"
-              >
-                {t('courses.mark_lesson_complete')}
-              </button>
-            )}
             {completedLessons.has(selectedLesson.id) && (
               <span className="mt-3 inline-flex items-center text-emerald-400 text-xs font-medium">
                 <Check className="w-4 h-4 mr-1" />
