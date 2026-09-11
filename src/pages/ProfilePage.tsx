@@ -83,7 +83,7 @@ const ProfilePage = () => {
     return (
       <Layout>
         <div className="flex justify-center py-20">
-          <Loader className="animate-spin h-10 w-10 text-emerald-600" />
+          <Loader className="animate-spin h-10 w-10 text-accent-deep" />
         </div>
       </Layout>
     );
@@ -99,10 +99,11 @@ const ProfilePage = () => {
 
   return (
     <Layout>
+      <div className="font-archivo bg-paper">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white shadow-lg rounded-xl overflow-hidden">
+        <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-100">
           {/* Header Background */}
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 h-32"></div>
+          <div className="bg-ink-gradient h-32" />
           
           <div className="px-8 pb-8">
             {/* Avatar & Basic Info */}
@@ -113,7 +114,7 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div className="ml-4 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">{profile.fullName}</h1>
+                <h1 className="text-2xl font-bold text-ink-deep">{profile.fullName}</h1>
                 <p className="text-gray-500 text-sm flex items-center">
                   {profile.roles.map(r => r.replace('ROLE_', '')).join(', ')}
                 </p>
@@ -147,7 +148,7 @@ const ProfilePage = () => {
 
               {/* Right Column: Edit Form */}
               <div className="md:col-span-2">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">{t('profile_page.edit_profile')}</h2>
+                <h2 className="text-lg font-semibold text-ink-deep mb-4">{t('profile_page.edit_profile')}</h2>
                 
                 {successMessage && (
                     <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded flex items-center">
@@ -164,7 +165,7 @@ const ProfilePage = () => {
 
                 <form onSubmit={handleUpdate} className="space-y-4">
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">{t('profile_page.fullname_label')}</label>
+                    <label htmlFor="fullName" className="block text-sm font-semibold text-ink-deep">{t('profile_page.fullname_label')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <User className="h-5 w-5 text-gray-400" />
@@ -173,7 +174,7 @@ const ProfilePage = () => {
                         type="text"
                         name="fullName"
                         id="fullName"
-                        className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                        className="focus:ring-accent-bright focus:border-transparent block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         required
@@ -182,7 +183,7 @@ const ProfilePage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">{t('profile_page.phone_label')}</label>
+                    <label htmlFor="phone" className="block text-sm font-semibold text-ink-deep">{t('profile_page.phone_label')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Phone className="h-5 w-5 text-gray-400" />
@@ -191,7 +192,7 @@ const ProfilePage = () => {
                         type="text"
                         name="phone"
                         id="phone"
-                        className="focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                        className="focus:ring-accent-bright focus:border-transparent block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+90 555 ..."
@@ -203,7 +204,7 @@ const ProfilePage = () => {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50"
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-gradient hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep disabled:opacity-50"
                     >
                       {saving ? t('profile_page.saving') : (
                         <>
@@ -219,8 +220,8 @@ const ProfilePage = () => {
           </div>
         </div>
         {progressSummary && (
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mt-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('profile_page.learning_progress')}</h3>
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mt-6">
+            <h3 className="text-lg font-bold text-ink-deep mb-4">{t('profile_page.learning_progress')}</h3>
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-gray-600">
                 {t('profile_page.lessons_completed', {
@@ -228,25 +229,25 @@ const ProfilePage = () => {
                   total: progressSummary.totalLessons,
                 })}
               </span>
-              <span className="text-sm font-semibold text-emerald-600">
+              <span className="text-sm font-semibold text-accent-deep">
                 %{progressSummary.completionPercentage.toFixed(1)}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                className="bg-accent-bright/[0.07]0 h-2.5 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(progressSummary.completionPercentage, 100)}%` }}
               />
             </div>
             {progressSummary.certificateEligible && (
               <div className="mt-4">
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-800 font-medium text-center">
+                <div className="p-3 bg-accent-bright/[0.07] border border-accent-bright/30 rounded-lg text-sm text-accent-deep font-medium text-center">
                   {t('profile_page.certificate_eligible')}
                 </div>
                 <div className="mt-4 flex justify-center">
                   <Link
                     to="/certificate"
-                    className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-5 rounded-lg transition-colors text-sm"
+                    className="flex items-center space-x-2 bg-accent-gradient hover:brightness-110 text-white font-bold shadow-md shadow-accent-bright/25 py-2 px-5 rounded-lg transition-colors text-sm"
                   >
                     <Award className="w-4 h-4" />
                     <span>{t('profile_page.get_certificate')}</span>
@@ -256,6 +257,7 @@ const ProfilePage = () => {
             )}
           </div>
         )}
+      </div>
       </div>
     </Layout>
   );

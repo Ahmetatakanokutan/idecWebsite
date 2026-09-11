@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AlertCircle, BookOpen, Check, ChevronDown, ChevronRight, Heart, Loader2, Play, Star, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -182,23 +182,23 @@ const CourseDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
+          <Loader2 className="w-12 h-12 mx-auto animate-spin text-accent-deep" />
       </div>
     );
   }
   
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-paper font-archivo">
         <div className="max-w-md w-full mx-4">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="flex justify-center mb-6"><div className="flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-lg"><BookOpen className="w-8 h-8 text-white" /></div></div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('courses.login_required_title')}</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="flex justify-center mb-6"><div className="flex items-center justify-center w-16 h-16 bg-accent-gradient rounded-xl shadow-md shadow-accent-bright/25"><BookOpen className="w-8 h-8 text-white" /></div></div>
+            <h2 className="text-2xl font-bold text-ink-deep mb-4">{t('courses.login_required_title')}</h2>
             <p className="text-gray-600 mb-6">{t('courses.login_required_desc')}</p>
-            <Link to="/login" className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold mb-4 inline-block">{t('header.login')}</Link>
+            <Link to="/login" className="w-full bg-accent-gradient text-white px-6 py-3 rounded-lg hover:brightness-110 transition-all font-bold mb-4 inline-block shadow-md shadow-accent-bright/25">{t('header.login')}</Link>
             <p className="text-sm text-gray-500">
               {t('courses.no_account')}{' '}
-              <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link to="/register" className="text-accent-deep hover:text-accent-deep font-medium">
                 {t('courses.register_now')}
               </Link>
             </p>
@@ -214,7 +214,7 @@ const CourseDetailPage = () => {
         <div className="text-center bg-red-50 p-8 rounded-lg">
           <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
           <p className="mt-4 text-lg text-red-700 font-semibold">{error}</p>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
+          <Link to="/courses" className="text-accent-deep hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
@@ -225,7 +225,7 @@ const CourseDetailPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800">{t('courses.not_found')}</h1>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
+          <Link to="/courses" className="text-accent-deep hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
@@ -282,7 +282,7 @@ const CourseDetailPage = () => {
               <span>{selectedLesson.duration}</span>
             </div>
             {completedLessons.has(selectedLesson.id) && (
-              <span className="mt-3 inline-flex items-center text-emerald-400 text-xs font-medium">
+              <span className="mt-3 inline-flex items-center text-accent text-xs font-medium">
                 <Check className="w-4 h-4 mr-1" />
                 {t('courses.lesson_completed')}
               </span>
@@ -296,7 +296,7 @@ const CourseDetailPage = () => {
         {/* Sidebar Header */}
         <div className="p-5 border-b border-gray-200 bg-gray-50">
           <div className="flex justify-between items-start mb-1">
-            <h2 className="text-lg font-bold text-gray-900 leading-tight">{localized.title}</h2>
+            <h2 className="text-lg font-bold text-ink-deep leading-tight">{localized.title}</h2>
             <button 
                 onClick={handleToggleFavorite} 
                 className={`p-1.5 rounded-full hover:bg-gray-200 transition-colors ${isFavorited ? 'text-red-500' : 'text-gray-400'}`}
@@ -333,13 +333,13 @@ const CourseDetailPage = () => {
                                     <div 
                                         key={lesson.id} 
                                         onClick={() => handleSelectLesson(lesson)}
-                                        className={`flex items-start p-3 cursor-pointer transition-all border-l-4 ${isActive ? 'border-emerald-500 bg-emerald-50' : 'border-transparent hover:bg-gray-50'}`}
+                                        className={`flex items-start p-3 cursor-pointer transition-all border-l-4 ${isActive ? 'border-accent-bright bg-accent-bright/[0.07]' : 'border-transparent hover:bg-gray-50'}`}
                                     >
                                         <div className="mt-0.5 mr-3">
                                             {isActive ? (
-                                                <Play className="w-4 h-4 text-emerald-600 fill-current" />
+                                                <Play className="w-4 h-4 text-accent-deep fill-current" />
                                             ) : completedLessons.has(lesson.id) ? (
-                                                <Check className="w-4 h-4 text-emerald-500" />
+                                                <Check className="w-4 h-4 text-accent-deep" />
                                             ) : (
                                                 <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
@@ -347,7 +347,7 @@ const CourseDetailPage = () => {
                                             )}
                                         </div>
                                         <div>
-                                            <p className={`text-sm font-medium ${isActive ? 'text-emerald-900' : 'text-gray-700'}`}>
+                                            <p className={`text-sm font-medium ${isActive ? 'text-ink-deep font-semibold' : 'text-gray-700'}`}>
                                                 {lesson.title}
                                             </p>
                                             <div className="flex items-center mt-1 text-xs text-gray-400">

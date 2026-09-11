@@ -41,6 +41,9 @@ interface DropdownNav {
   items: SubNavItem[];
 }
 
+// Ust seritteki dil segmenti — yeni bir dil eklemek buraya bir kod eklemek kadar basit.
+const LANGUAGES = ['tr', 'en'] as const;
+
 type MainNavEntry =
   | { type: 'link'; data: NavLink }
   | { type: 'dropdown'; data: DropdownNav };
@@ -70,10 +73,8 @@ const Header = () => {
   };
 
   const handleContactClick = () => {
-    if (location.pathname === '/about' || location.pathname === '/contact') {
-      setTimeout(() => {
-        document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 0);
+    if (location.pathname === '/contact') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -125,8 +126,8 @@ const Header = () => {
       onClick={item.onClick}
       className={
         variant === 'desktop'
-          ? 'text-gray-600 hover:text-brand font-medium transition-colors whitespace-nowrap flex-shrink-0'
-          : 'block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-brand'
+          ? 'text-gray-600 hover:text-ink-deep font-medium transition-colors whitespace-nowrap flex-shrink-0 relative after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 hover:after:w-full after:bg-accent-bright after:transition-all after:duration-300'
+          : 'block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-accent-bright/10 hover:text-ink-deep'
       }
     >
       {t(item.labelKey)}
@@ -135,7 +136,7 @@ const Header = () => {
 
   const renderDropdown = (menu: DropdownNav) => (
     <Menu key={menu.key} as="div" className="relative inline-block text-left flex-shrink-0">
-      <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-brand-light/10 hover:text-brand focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand whitespace-nowrap">
+      <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-accent-bright/15 hover:text-ink-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep whitespace-nowrap">
         {menu.labelKey ? t(menu.labelKey) : menu.label}
         <ChevronDown className="w-4 h-4 ml-1" />
       </Menu.Button>
@@ -177,7 +178,7 @@ const Header = () => {
                         href={sub.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${active ? 'bg-brand-light/10 text-brand' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                        className={`${active ? 'bg-accent-bright/12 text-ink-deep' : 'text-gray-700'} block px-4 py-2 text-sm`}
                       >
                         {label}
                       </a>
@@ -191,7 +192,7 @@ const Header = () => {
                   {({ active }) => (
                     <Link
                       to={sub.to!}
-                      className={`${active ? 'bg-brand-light/10 text-brand' : 'text-gray-700'} block px-4 py-2 text-sm`}
+                      className={`${active ? 'bg-accent-bright/12 text-ink-deep' : 'text-gray-700'} block px-4 py-2 text-sm`}
                     >
                       {label}
                     </Link>
@@ -212,8 +213,8 @@ const Header = () => {
       rel="noopener noreferrer"
       className={
         variant === 'desktop'
-          ? 'flex items-center space-x-2 bg-brand text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-dark transition-colors shadow-sm hover:shadow-md flex-shrink-0 whitespace-nowrap'
-          : 'flex items-center justify-center space-x-2 bg-brand text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-dark transition-colors shadow-sm'
+          ? 'flex items-center space-x-2 bg-accent-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition-all shadow-md shadow-accent-bright/25 hover:shadow-lg flex-shrink-0 whitespace-nowrap'
+          : 'flex items-center justify-center space-x-2 bg-accent-gradient text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:brightness-110 transition-all shadow-md shadow-accent-bright/25'
       }
     >
       <Globe2 className="w-4 h-4" />
@@ -224,29 +225,48 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50 font-archivo">
       {/* Üst şerit: ince, koyu marka yeşili, sağa hizalı yönetim/dil/giriş */}
-      <div className="bg-brand-dark">
+      <div className="bg-ink-deep">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-          <div className="flex items-center justify-between h-9">
-            <div />
-            <div className="flex items-center gap-4 flex-shrink-0 whitespace-nowrap">
+          <div className="flex items-center justify-between h-10 gap-4">
+            {/* Sol: IDEC-TT kisaltmasinin acilimi — ziyaretci daha kaydirmadan
+                sitenin ne oldugunu ogrensin. Dar ekranda gizleniyor. */}
+            <p className="hidden md:flex items-center gap-2 min-w-0 text-xs text-white/70">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+              <span className="truncate">{t('header.tagline')}</span>
+            </p>
+            <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 whitespace-nowrap ml-auto">
               {isLoggedIn && roles.includes('ROLE_ADMIN') && (
                 <Link
                   to="/admin"
-                  className="text-white font-semibold hover:text-brand-light transition-colors bg-brand-light/20 px-2.5 py-0.5 rounded-md text-xs"
+                  className="text-white font-semibold hover:text-ink-deep hover:bg-accent transition-colors bg-white/15 px-2.5 py-0.5 rounded-md text-xs"
                 >
                   {t('header.admin_panel')}
                 </Link>
               )}
-              <button
-                onClick={() => i18n.changeLanguage(i18n.language === 'tr' ? 'en' : 'tr')}
-                className="text-xs font-medium text-white/80 hover:text-brand-light transition-colors"
-              >
-                {i18n.language === 'tr' ? 'EN' : 'TR'}
-              </button>
+              {/* Iki secenegi de gosteren segment: aktif olan dolu, digeri tiklanabilir.
+                  Tek harflik eski buton fark edilmiyordu. */}
+              <div className="flex items-center gap-0.5 rounded-md bg-white/10 p-0.5" role="group" aria-label="Language">
+                {LANGUAGES.map((lng) => {
+                  const isActive = i18n.language?.startsWith(lng);
+                  return (
+                    <button
+                      key={lng}
+                      type="button"
+                      onClick={() => i18n.changeLanguage(lng)}
+                      aria-pressed={isActive}
+                      className={`px-2 py-0.5 rounded text-[11px] font-bold tracking-wide transition-colors ${
+                        isActive ? 'bg-accent text-ink-deep' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      {lng.toUpperCase()}
+                    </button>
+                  );
+                })}
+              </div>
               {isLoggedIn ? (
                 <Menu as="div" className="relative inline-block text-left">
                   <div>
-                    <Menu.Button className="flex items-center justify-center w-7 h-7 bg-white/10 text-white rounded-full hover:bg-white/20 hover:text-brand-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-dark focus:ring-brand-light transition-all">
+                    <Menu.Button className="flex items-center justify-center w-7 h-7 bg-white/10 text-white rounded-full hover:bg-white/20 hover:text-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-ink-deep focus:ring-accent transition-all">
                       <UserCircle className="w-4 h-4" />
                     </Menu.Button>
                   </div>
@@ -273,7 +293,7 @@ const Header = () => {
                             <Link
                               to="/favorites"
                               className={`${
-                                active ? 'bg-brand text-white' : 'text-gray-700'
+                                active ? 'bg-ink-deep text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Heart className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -286,7 +306,7 @@ const Header = () => {
                             <Link
                               to="/profile"
                               className={`${
-                                active ? 'bg-brand text-white' : 'text-gray-700'
+                                active ? 'bg-ink-deep text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -299,7 +319,7 @@ const Header = () => {
                             <Link
                               to="/certificate"
                               className={`${
-                                active ? 'bg-brand text-white' : 'text-gray-700'
+                                active ? 'bg-ink-deep text-white' : 'text-gray-700'
                               } group flex rounded-md items-center w-full px-2 py-2 text-sm transition-colors`}
                             >
                               <Award className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -330,11 +350,10 @@ const Header = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="text-white/80 hover:text-brand-light transition-colors"
-                  title={t('header.login')}
-                  aria-label={t('header.login')}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-accent transition-colors"
                 >
                   <LogIn className="w-4 h-4" />
+                  <span>{t('header.login')}</span>
                 </Link>
               )}
             </div>
@@ -343,14 +362,14 @@ const Header = () => {
       </div>
 
       {/* Ana satır: logo + ana menü / hamburger */}
-      <div className="border-b border-brand-light/30">
+      <div className="border-b border-gray-200">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div className="flex items-center justify-between py-4">
             <Link to="/" className="flex items-center space-x-3 flex-shrink-0">
-              <div className="flex items-center justify-center w-12 h-12 bg-brand rounded-lg shadow-sm">
+              <div className="flex items-center justify-center w-12 h-12 bg-accent-gradient rounded-lg shadow-md shadow-accent-bright/25">
                 <Leaf className="w-7 h-7 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight whitespace-nowrap">IDEC-TT</h1>
+              <h1 className="text-3xl font-bold text-ink-deep tracking-tight whitespace-nowrap">IDEC-TT</h1>
             </Link>
 
             {/* Masaüstü ana menü */}
@@ -365,7 +384,7 @@ const Header = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="xl:hidden flex-shrink-0 p-2 rounded-lg text-gray-600 hover:bg-brand-light/10 hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand transition-colors"
+              className="xl:hidden flex-shrink-0 p-2 rounded-lg text-gray-600 hover:bg-accent-bright/15 hover:text-ink-deep focus:outline-none focus:ring-2 focus:ring-accent-deep transition-colors"
               aria-label={mobileMenuOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}
               aria-expanded={mobileMenuOpen}
             >

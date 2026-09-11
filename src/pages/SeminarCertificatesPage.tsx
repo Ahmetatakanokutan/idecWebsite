@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Search, Download, Loader2, AlertCircle, FileText } from 'lucide-react';
 import Layout from '../components/Layout';
+import PageHero from '../components/PageHero';
 import { seminarCertificateService } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
@@ -72,24 +73,28 @@ const SeminarCertificatesPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('seminar_certificates.title')}</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">{t('seminar_certificates.subtitle')}</p>
-        </div>
-
-        <div className="max-w-xl mx-auto relative mb-8">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+      <div className="font-archivo">
+        <PageHero
+          title={t('seminar_certificates.title')}
+          description={t('seminar_certificates.subtitle')}
+          compact
+        >
+          <div className="max-w-xl relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-white/50" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-12 pr-4 py-3.5 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/25 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+              placeholder={t('seminar_certificates.search_placeholder')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm sm:text-sm transition-all"
-            placeholder={t('seminar_certificates.search_placeholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        </PageHero>
+
+        <div className="bg-paper py-16 md:py-20">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {downloadError && (
           <div className="max-w-xl mx-auto mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center">
@@ -100,7 +105,7 @@ const SeminarCertificatesPage = () => {
 
         {loading ? (
           <div className="text-center py-16">
-            <Loader2 className="w-10 h-10 mx-auto animate-spin text-emerald-600" />
+            <Loader2 className="w-10 h-10 mx-auto animate-spin text-accent-deep" />
             <p className="mt-4 text-gray-600">{t('seminar_certificates.loading')}</p>
           </div>
         ) : error ? (
@@ -109,17 +114,17 @@ const SeminarCertificatesPage = () => {
             <p className="mt-4 text-red-700 font-semibold">{error}</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-200">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100 overflow-hidden">
             {certificates.map((cert) => (
               <div key={cert.id} className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center space-x-3">
-                  <FileText className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <span className="text-gray-900 font-medium">{cert.fullName}</span>
+                  <FileText className="w-5 h-5 text-accent-deep flex-shrink-0" />
+                  <span className="text-ink-deep font-semibold">{cert.fullName}</span>
                 </div>
                 <button
                   onClick={() => handleDownload(cert.id, cert.fullName)}
                   disabled={downloadingId === cert.id}
-                  className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 bg-accent-gradient hover:brightness-110 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md shadow-accent-bright/25 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {downloadingId === cert.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -134,7 +139,9 @@ const SeminarCertificatesPage = () => {
               <div className="text-center py-10 text-gray-500">{t('seminar_certificates.no_results')}</div>
             )}
           </div>
-        )}
+            )}
+          </div>
+        </div>
       </div>
     </Layout>
   );

@@ -3,6 +3,7 @@ import { useRoutes } from 'react-router-dom';
 import { Loader } from 'lucide-react';
 import HomePage from '../pages/HomePage';
 import AboutPage from '../pages/AboutPage';
+import ContactPage from '../pages/ContactPage';
 import ProjectsPage from '../pages/ProjectsPage';
 import ProjectDetailPage from '../pages/ProjectDetailPage';
 import CoursesPage from '../pages/CoursesPage';
@@ -37,7 +38,7 @@ export const AppRoutes = () => {
   const routes = useRoutes([
     { path: '/', element: <HomePage /> },
     { path: '/about', element: <AboutPage /> },
-    { path: '/contact', element: <AboutPage /> },
+    { path: '/contact', element: <ContactPage /> },
     { path: '/projects', element: <ProjectsPage /> },
     { path: '/projects/:projectId', element: <ProjectDetailPage /> },
     { path: '/courses', element: <CoursesPage /> },

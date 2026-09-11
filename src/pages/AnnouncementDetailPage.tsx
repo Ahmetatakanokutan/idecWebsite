@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import Layout from '../components/Layout';
+import PageHero from '../components/PageHero';
+import Reveal from '../components/Reveal';
 import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
@@ -59,7 +61,7 @@ const AnnouncementDetailPage = () => {
         return (
             <Layout>
                 <div className="flex justify-center items-center py-24">
-                    <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
+                    <Loader2 className="w-10 h-10 animate-spin text-accent-deep" />
                 </div>
             </Layout>
         );
@@ -70,8 +72,8 @@ const AnnouncementDetailPage = () => {
             <Layout>
                 <div className="max-w-2xl mx-auto px-4 py-24 text-center">
                     <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-                    <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('announcement_detail.not_found')}</h1>
-                    <Link to="/" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    <h1 className="text-2xl font-bold text-ink-deep mb-6">{t('announcement_detail.not_found')}</h1>
+                    <Link to="/" className="text-accent-deep hover:text-ink-deep font-bold">
                         {t('announcement_detail.back_home')}
                     </Link>
                 </div>
@@ -79,38 +81,56 @@ const AnnouncementDetailPage = () => {
         );
     }
 
+    const publishedOn = new Date(announcement.createdAt).toLocaleDateString(i18n.language, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+
     return (
         <Layout>
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <Link
-                    to="/"
-                    className="inline-flex items-center gap-2 text-gray-500 hover:text-emerald-600 mb-6 text-sm font-medium transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    {t('announcement_detail.back_home')}
-                </Link>
-
-                {announcement.imageUrl && (
-                    <img
-                        src={resolveAssetUrl(announcement.imageUrl)}
-                        alt={announcement.title}
-                        className="w-full h-64 sm:h-80 object-cover rounded-2xl shadow-lg mb-8"
-                    />
-                )}
-
-                <div className="flex items-center text-emerald-600 text-sm font-semibold mb-4 uppercase tracking-widest">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {new Date(announcement.createdAt).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' })}
-                </div>
-
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                    {announcement.title}
-                </h1>
-
-                <div
-                    className="text-gray-700 text-lg leading-relaxed whitespace-pre-line mb-10 [&_p]:mb-4 [&_strong]:font-bold [&_em]:italic [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_li]:mb-1 [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:mb-3 [&_h3]:mt-6 [&_h4]:text-xl [&_h4]:font-bold [&_h4]:mb-2 [&_h4]:mt-4 [&_a]:text-emerald-600 [&_a]:underline hover:[&_a]:text-emerald-700"
-                    dangerouslySetInnerHTML={{ __html: prepareContentHtml(announcement.content) }}
+            <div className="font-archivo">
+                <PageHero
+                    eyebrow={publishedOn}
+                    title={announcement.title}
+                    align="center"
                 />
+
+                <section className="bg-paper py-16 md:py-20">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <Link
+                            to="/announcements"
+                            className="inline-flex items-center gap-2 text-accent-deep hover:text-ink-deep mb-8 font-bold transition-colors group"
+                        >
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                            {t('announcement_detail.back_home')}
+                        </Link>
+
+                        <Reveal>
+                            <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                                {announcement.imageUrl && (
+                                    <img
+                                        src={resolveAssetUrl(announcement.imageUrl)}
+                                        alt={announcement.title}
+                                        className="w-full h-64 sm:h-80 object-cover"
+                                    />
+                                )}
+
+                                <div className="p-7 md:p-10">
+                                    <div className="flex items-center text-accent-deep text-sm font-bold mb-6 uppercase tracking-widest">
+                                        <Calendar className="w-4 h-4 mr-2" />
+                                        {publishedOn}
+                                    </div>
+
+                                    <div
+                                        className="text-gray-700 text-lg leading-relaxed whitespace-pre-line [&_p]:mb-4 [&_strong]:font-bold [&_strong]:text-ink-deep [&_em]:italic [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_li]:mb-1 [&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-ink-deep [&_h3]:mb-3 [&_h3]:mt-6 [&_h4]:text-xl [&_h4]:font-bold [&_h4]:text-ink-deep [&_h4]:mb-2 [&_h4]:mt-4 [&_a]:text-accent-deep [&_a]:underline hover:[&_a]:text-ink-deep"
+                                        dangerouslySetInnerHTML={{ __html: prepareContentHtml(announcement.content) }}
+                                    />
+                                </div>
+                            </article>
+                        </Reveal>
+                    </div>
+                </section>
             </div>
         </Layout>
     );

@@ -1,32 +1,33 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
-// Lazy initial state: ilk render'dan itibaren dogru degeri verir, boylece
-// reduced-motion acikken bir anlik animasyon "flas"i yasanmaz.
 export function usePrefersReducedMotion(): boolean {
-    const [reduced, setReduced] = useState(() =>
-        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-            ? window.matchMedia(REDUCED_MOTION_QUERY).matches
-            : false
-    );
+    const [reducedMotion, setReducedMotion] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+    });
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
         const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
-        const handleChange = (event: MediaQueryListEvent) => setReduced(event.matches);
+        const handleChange = () => setReducedMotion(mediaQuery.matches);
+
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
 
-    return reduced;
+    return reducedMotion;
 }
 
-// Bir eleman ekrana girdiginde (bir kez) devreye giren, prefers-reduced-motion'a
-// saygili basit bir IntersectionObserver kancasi. Kutuphane gerektirmez.
 export function useScrollReveal<T extends HTMLElement>(options?: IntersectionObserverInit) {
     const reducedMotion = usePrefersReducedMotion();
-    const ref = useRef<T | null>(null);
+    const [node, setNode] = useState<T | null>(null);
     const [isVisible, setIsVisible] = useState(reducedMotion);
+
+    const ref = useCallback((element: T | null) => {
+        setNode(element);
+    }, []);
 
     useEffect(() => {
         if (reducedMotion) {
@@ -34,34 +35,26 @@ export function useScrollReveal<T extends HTMLElement>(options?: IntersectionObs
             return;
         }
 
-        const node = ref.current;
         if (!node) return;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true);
-                    observer.unobserve(node);
+                    observer.disconnect();
                 }
             },
-            // Pozitif alt margin: eleman görünüme girmeden ~150px önce tetiklenir,
-            // böylece kullanıcı oraya kaydırdığında içerik zaten belirmiş olur —
-            // önceki negatif margin gecikmeye ve uzun süre "boş" görünmeye yol açıyordu.
-            { threshold: 0.05, rootMargin: '0px 0px 150px 0px', ...options }
+            {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px',
+                ...options,
+            }
         );
 
         observer.observe(node);
 
-        // Güvenlik ağı: bazı tarayıcı/ortamlarda (örn. IntersectionObserver'ın hiç
-        // tetiklenmediği uç durumlar) içerik kalıcı olarak opacity:0'da takılı
-        // kalmasın diye, makul bir süre sonra ne olursa olsun görünür yap.
-        const fallback = setTimeout(() => setIsVisible(true), 1500);
-
-        return () => {
-            observer.disconnect();
-            clearTimeout(fallback);
-        };
-    }, [reducedMotion]);
+        return () => observer.disconnect();
+    }, [node, reducedMotion]);
 
     return { ref, isVisible, reducedMotion };
 }
