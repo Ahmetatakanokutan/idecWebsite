@@ -1,4 +1,6 @@
 import Layout from '../components/Layout';
+import PageHero from '../components/PageHero';
+import Reveal from '../components/Reveal';
 import { useTranslation } from 'react-i18next';
 
 interface Organization {
@@ -74,105 +76,131 @@ const LogoImage = ({ name, src, className }: { name: string; src: string; classN
   />
 );
 
+/** Web sitesi varsa yeni sekmede acan link, yoksa sade bir sarmalayici. */
+const MaybeExternalLink = ({ href, children }: { href?: string; children: React.ReactNode }) =>
+  href ? (
+    <a href={href} target="_blank" rel="noreferrer" className="block h-full">
+      {children}
+    </a>
+  ) : (
+    <div className="h-full">{children}</div>
+  );
+
 const ProjectsPage = () => {
   const { t } = useTranslation();
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('projects.title')}</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t('projects.subtitle')}</p>
-        </div>
+      <div className="font-archivo">
+        <PageHero
+          eyebrow={t('projects.hero_eyebrow')}
+          title={t('projects.title')}
+          description={t('projects.subtitle')}
+        />
 
-        <section className="mb-14">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-2xl font-bold text-gray-900">{t('projects.project_partners_title')}</h2>
-            <span className="text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-              {projectPartners.length} {t('projects.org_count_label')}
-            </span>
-          </div>
+        {/* Proje ortakları */}
+        <section className="bg-white py-20 md:py-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              title={t('projects.project_partners_title')}
+              count={`${projectPartners.length} ${t('projects.org_count_label')}`}
+            />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {projectPartners.map((partner) => {
-              const isTalsad = partner.name === 'TALSAD';
-              const card = (
-                <article className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 h-full hover:shadow-md transition-shadow">
-                  <div className={`h-40 bg-gray-50 rounded-xl flex items-center justify-center mb-4 ${isTalsad ? 'p-0 overflow-hidden' : 'p-6'}`}>
-                    <LogoImage
-                      name={partner.name}
-                      src={partner.image}
-                      className={isTalsad ? 'h-full w-full object-cover' : 'max-h-28 max-w-full object-contain'}
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 text-center leading-snug">{partner.name}</h3>
-                </article>
-              );
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {projectPartners.map((partner, i) => {
+                const isTalsad = partner.name === 'TALSAD';
+                const card = (
+                  <article className="group h-full bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-xl hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0 transition-all duration-300">
+                    <div
+                      className={`h-40 bg-paper rounded-xl flex items-center justify-center mb-4 ${
+                        isTalsad ? 'p-0 overflow-hidden' : 'p-6'
+                      }`}
+                    >
+                      <LogoImage
+                        name={partner.name}
+                        src={partner.image}
+                        className={isTalsad ? 'h-full w-full object-cover' : 'max-h-28 max-w-full object-contain'}
+                      />
+                    </div>
+                    <h3 className="text-lg font-semibold text-ink-deep text-center leading-snug">{partner.name}</h3>
+                  </article>
+                );
 
-              if (!partner.website) {
-                return <div key={partner.name}>{card}</div>;
-              }
-
-              return (
-                <a
-                  key={partner.name}
-                  href={partner.website}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block"
-                >
-                  {card}
-                </a>
-              );
-            })}
+                return (
+                  <Reveal key={partner.name} delay={i * 100} className="h-full">
+                    {partner.website ? (
+                      <a href={partner.website} target="_blank" rel="noreferrer" className="block h-full">
+                        {card}
+                      </a>
+                    ) : (
+                      card
+                    )}
+                  </Reveal>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section>
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-2xl font-bold text-gray-900">{t('projects.project_participants_title')}</h2>
-            <span className="text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-              {participants.length} {t('projects.org_count_label')}
-            </span>
-          </div>
+        {/* Proje iştirakçileri */}
+        <section className="bg-paper py-20 md:py-24 border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeading
+              title={t('projects.project_participants_title')}
+              count={`${participants.length} ${t('projects.org_count_label')}`}
+            />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-            {participants.map((participant) => {
-              const shouldContain = fitContainParticipants.has(participant.name);
-              const card = (
-                <article className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow h-full">
-                  <div className="h-28 rounded-lg overflow-hidden mb-3">
-                    <LogoImage
-                      name={participant.name}
-                      src={participant.image}
-                      className={
-                        shouldContain
-                          ? 'h-full w-full object-contain object-center p-1'
-                          : 'h-full w-full object-cover object-center'
-                      }
-                    />
-                  </div>
-                  <h3 className="text-[13px] leading-5 font-medium text-gray-800 line-clamp-3">{participant.name}</h3>
-                </article>
-              );
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+              {participants.map((participant, i) => {
+                const shouldContain = fitContainParticipants.has(participant.name);
 
-              return (
-                <a
-                  key={participant.name}
-                  href={participant.website || '#'}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block"
-                >
-                  {card}
-                </a>
-              );
-            })}
+                return (
+                  <Reveal key={participant.name} delay={(i % 5) * 80} className="h-full">
+                    {/* Web sitesi olmayanlar eskiden href="#" ile yeni sekmede ayni sayfayi aciyordu;
+                        artik link degil ve tiklanabilir gibi gorunmuyor. */}
+                    <MaybeExternalLink href={participant.website}>
+                      <article
+                        className={`h-full bg-white rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-300 ${
+                          participant.website
+                            ? 'hover:shadow-lg hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0'
+                            : ''
+                        }`}
+                      >
+                        <div className="h-28 rounded-lg overflow-hidden mb-3">
+                          <LogoImage
+                            name={participant.name}
+                            src={participant.image}
+                            className={
+                              shouldContain
+                                ? 'h-full w-full object-contain object-center p-1'
+                                : 'h-full w-full object-cover object-center'
+                            }
+                          />
+                        </div>
+                        <h3 className="text-[13px] leading-5 font-medium text-gray-700 line-clamp-3">
+                          {participant.name}
+                        </h3>
+                      </article>
+                    </MaybeExternalLink>
+                  </Reveal>
+                );
+              })}
+            </div>
           </div>
         </section>
       </div>
     </Layout>
   );
 };
+
+/** Bolum basligi + sagda kurum sayisi rozeti. */
+const SectionHeading = ({ title, count }: { title: string; count: string }) => (
+  <Reveal className="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <h2 className="font-archivo text-2xl md:text-3xl font-bold text-ink-deep">{title}</h2>
+    <span className="text-sm font-bold text-accent-deep bg-accent-bright/10 border border-accent-bright/25 px-4 py-1.5 rounded-full">
+      {count}
+    </span>
+  </Reveal>
+);
 
 export default ProjectsPage;

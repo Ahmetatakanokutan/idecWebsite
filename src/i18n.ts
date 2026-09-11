@@ -30,4 +30,14 @@ i18n
     }
   });
 
+// <html lang> secili dili gostersin: ekran okuyucular dogru telaffuzu, tarayici
+// dogru heceleme/ceviri onerisini buna gore seciyor. index.html'deki "tr" ilk degerdir.
+const syncHtmlLang = (lng?: string) => {
+  if (typeof document !== 'undefined' && lng) {
+    document.documentElement.lang = lng.split('-')[0];
+  }
+};
+syncHtmlLang(i18n.language);
+i18n.on('languageChanged', syncHtmlLang);
+
 export default i18n;

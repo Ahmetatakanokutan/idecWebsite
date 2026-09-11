@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,8 +25,14 @@ public class AnnouncementController {
     private AnnouncementService announcementService;
 
     @GetMapping("/active")
-    public List<Announcement> getActiveAnnouncements() {
-        return announcementService.getActiveAnnouncements();
+    public List<Announcement> getActiveAnnouncements(@RequestParam(required = false) Integer limit) {
+        return announcementService.getActiveAnnouncements(limit);
+    }
+
+    // Public: arşiv (active=false) duyurular da herkese açık listelenebilir.
+    @GetMapping("/archive")
+    public List<Announcement> getArchivedAnnouncements() {
+        return announcementService.getArchivedAnnouncements();
     }
 
     @GetMapping
@@ -34,8 +41,9 @@ public class AnnouncementController {
         return announcementService.getAllAnnouncements();
     }
 
+    // Public: giriş yapmamış kullanıcı da bir duyurunun detayını görebilir (aktif veya arşiv).
+    // Var olmayan bir id için 404 döner.
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
         return announcementService.getAnnouncementById(id)
                 .map(ResponseEntity::ok)

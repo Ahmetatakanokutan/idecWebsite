@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Mail } from 'lucide-react';
+import {Mail} from 'lucide-react';
 import { apiService } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
+import AuthShell, {
+  authButtonClass,
+  authInputClass,
+  authLabelClass,
+  authLinkClass,
+} from '../components/AuthShell';
 
 const ForgotPasswordPage = () => {
   const { t } = useTranslation();
@@ -27,78 +33,50 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <div className="flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-lg">
-              <Leaf className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            {t('forgot_password.title')}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {t('forgot_password.subtitle')}
-          </p>
+    <AuthShell title={t('forgot_password.title')} subtitle={t('forgot_password.subtitle')}>
+      {submitted ? (
+        <div className="bg-accent-bright/[0.07] border border-accent-bright/25 rounded-xl p-6 text-center">
+          <Mail className="w-12 h-12 text-accent-deep mx-auto mb-4" />
+          <p className="text-gray-700 leading-relaxed">{t('forgot_password.success_message')}</p>
+          <Link to="/login" className={`mt-5 inline-block ${authLinkClass}`}>
+            {t('forgot_password.login_now')} &rarr;
+          </Link>
         </div>
-        {submitted ? (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-            <Mail className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <p className="text-green-800 text-sm leading-relaxed">
-              {t('forgot_password.success_message')}
-            </p>
-            <Link to="/login" className="mt-4 inline-block text-emerald-600 hover:text-emerald-700 font-medium text-sm">
-              {t('forgot_password.login_now')} →
-            </Link>
-          </div>
-        ) : (
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+      ) : (
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
           )}
-          <div>
-              <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                {t('forgot_password.email_label')}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                placeholder={t('forgot_password.email_placeholder')}
-              />
-            </div>
-          </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {loading ? t('forgot_password.sending') : t('forgot_password.submit')}
-            </button>
+            <label htmlFor="email" className={authLabelClass}>
+              {t('forgot_password.email_label')}
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={authInputClass}
+              placeholder={t('forgot_password.email_placeholder')}
+            />
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              {t('forgot_password.remembered_password')}{' '}
-              <Link to="/login" className="font-medium text-emerald-600 hover:text-emerald-500">
-                {t('forgot_password.login_now')}
-              </Link>
-            </p>
-          </div>
+          <button type="submit" disabled={loading} className={authButtonClass}>
+            {loading ? t('forgot_password.sending') : t('forgot_password.submit')}
+          </button>
+
+          <p className="text-center text-sm text-gray-600">
+            {t('forgot_password.remembered_password')}{' '}
+            <Link to="/login" className={authLinkClass}>
+              {t('forgot_password.login_now')}
+            </Link>
+          </p>
         </form>
-        )}
-      </div>
-    </div>
+      )}
+    </AuthShell>
   );
 };
 

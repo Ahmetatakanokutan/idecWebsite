@@ -22,11 +22,17 @@ public class FileUploadController {
     private static final long MAX_UPLOAD_SIZE_BYTES = 500L * 1024 * 1024;
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             ".jpg", ".jpeg", ".png", ".webp", ".gif",
-            ".mp4", ".webm", ".ogg", ".mov"
+            ".mp4", ".webm", ".ogg", ".mov",
+            ".pdf", ".docx", ".doc", ".xlsx", ".xls"
     );
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "image/jpeg", "image/png", "image/webp", "image/gif",
-            "video/mp4", "video/webm", "video/ogg", "video/quicktime"
+            "video/mp4", "video/webm", "video/ogg", "video/quicktime",
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel"
     );
 
     private final Path fileStorageLocation;

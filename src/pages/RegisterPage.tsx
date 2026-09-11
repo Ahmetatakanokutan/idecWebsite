@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building, Leaf, User, X } from 'lucide-react';
+import { Building, User, X } from 'lucide-react';
 import { apiService } from '../services/apiService';
+import AuthShell, {
+  authButtonClass,
+  authInputClass,
+  authLinkClass,
+} from '../components/AuthShell';
 import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
@@ -103,29 +108,15 @@ const RegisterPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <div className="flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-lg">
-              <Leaf className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            {t('register_page.title')}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {t('register_page.subtitle')}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+    <AuthShell title={t('register_page.title')} subtitle={t('register_page.subtitle')} wide>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             onClick={() => setUserType('individual')}
             className={`flex items-center justify-center p-4 border rounded-lg transition-colors ${
               userType === 'individual'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-emerald-50'
+                ? 'bg-cta-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-accent-bright/50 hover:bg-accent-bright/[0.06]'
             }`}
           >
             <User className="w-5 h-5 mr-2" />
@@ -135,8 +126,8 @@ const RegisterPage = () => {
             onClick={() => setUserType('corporate')}
             className={`flex items-center justify-center p-4 border rounded-lg transition-colors ${
               userType === 'corporate'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-emerald-50'
+                ? 'bg-cta-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-accent-bright/50 hover:bg-accent-bright/[0.06]'
             }`}
           >
             <Building className="w-5 h-5 mr-2" />
@@ -162,48 +153,48 @@ const RegisterPage = () => {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">{t('register_page.fullname_label')}</label>
+              <label htmlFor="fullname" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.fullname_label')}</label>
               <input id="fullname" name="fullname" type="text" required
                 value={fullName} onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                className={authInputClass}
                 placeholder={t('register_page.fullname_placeholder')} />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">{t('register_page.email_label')}</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.email_label')}</label>
               <input id="email" name="email" type="email" required
                 value={email} onChange={handleEmailChange}
-                className="mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 border-gray-300"
+                className={authInputClass}
                 placeholder={t('register_page.email_placeholder')} />
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">{t('register_page.phone_label')}</label>
+              <label htmlFor="phone" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.phone_label')}</label>
               <input id="phone" name="phone" type="tel"
                 value={phone} onChange={handlePhoneChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                className={authInputClass}
                 placeholder={t('register_page.phone_placeholder')} />
             </div>
 
             {userType === 'corporate' && (
               <>
                 <div>
-                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">{t('register_page.company_name_label')}</label>
+                  <label htmlFor="companyName" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.company_name_label')}</label>
                   <input id="companyName" name="companyName" type="text" required={userType === 'corporate'}
                     value={companyName} onChange={(e) => setCompanyName(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className={authInputClass}
                     placeholder={t('register_page.company_name_placeholder')} />
                 </div>
                 <div>
-                  <label htmlFor="taxId" className="block text-sm font-medium text-gray-700">{t('register_page.tax_id_label')}</label>
+                  <label htmlFor="taxId" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.tax_id_label')}</label>
                   <input id="taxId" name="taxId" type="text" required={userType === 'corporate'}
                     value={taxId} onChange={(e) => setTaxId(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className={authInputClass}
                     placeholder={t('register_page.tax_id_placeholder')} />
                 </div>
                 <div>
-                  <label htmlFor="sector" className="block text-sm font-medium text-gray-700">{t('register_page.sector_label')}</label>
+                  <label htmlFor="sector" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.sector_label')}</label>
                   <select id="sector" name="sector" required={userType === 'corporate'}
                     value={sector} onChange={(e) => setSector(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                    className={authInputClass}
                   >
                     <option value="">{t('register_page.sector_placeholder')}</option>
                     <option value="demir-celik">{t('register_page.sector_demir_celik')}</option>
@@ -218,27 +209,27 @@ const RegisterPage = () => {
             
             {userType === 'individual' && (
                 <div>
-                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700">{t('register_page.profession_label')}</label>
+                    <label htmlFor="profession" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.profession_label')}</label>
                     <input id="profession" name="profession" type="text"
                         value={profession} onChange={(e) => setProfession(e.target.value)}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                        className={authInputClass}
                         placeholder={t('register_page.profession_placeholder')}
                     />
                 </div>
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">{t('register_page.password_label')}</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.password_label')}</label>
               <input id="password" name="password" type="password" required
                 value={password} onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                className={authInputClass}
                 placeholder="••••••••" />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">{t('register_page.confirm_password_label')}</label>
+              <label htmlFor="confirm-password" className="block text-sm font-semibold text-ink-deep mb-1.5">{t('register_page.confirm_password_label')}</label>
               <input id="confirm-password" name="confirm-password" type="password" required
                 value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                className={authInputClass}
                 placeholder="••••••••" />
             </div>
           </div>
@@ -250,14 +241,14 @@ const RegisterPage = () => {
               type="checkbox"
               checked={consentChecked}
               onChange={(e) => setConsentChecked(e.target.checked)}
-              className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer flex-shrink-0"
+              className="mt-1 h-4 w-4 text-accent-deep border-gray-300 rounded focus:ring-accent-bright cursor-pointer flex-shrink-0"
             />
             <label htmlFor="consent" className="text-sm text-gray-700 cursor-pointer leading-relaxed">
               {t('register_page.consent_checkbox_text')}
               <button
                 type="button"
                 onClick={() => setShowConsentModal(true)}
-                className="text-emerald-600 hover:text-emerald-700 font-medium underline underline-offset-2 focus:outline-none"
+                className="text-accent-deep hover:text-ink-deep font-bold underline underline-offset-2 focus:outline-none"
               >
                 {t('register_page.consent_link_text')}
               </button>
@@ -267,20 +258,18 @@ const RegisterPage = () => {
           <div className="pt-4">
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+              className={authButtonClass}
             >
               {t('register_page.submit')}
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              {t('register_page.already_have_account')}{' '}
-              <Link to="/login" className="font-medium text-emerald-600 hover:text-emerald-500">
-                {t('register_page.login_now')}
-              </Link>
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-600">
+            {t('register_page.already_have_account')}{' '}
+            <Link to="/login" className={authLinkClass}>
+              {t('register_page.login_now')}
+            </Link>
+          </p>
         </form>
       </div>
       {showConsentModal && (
@@ -289,11 +278,11 @@ const RegisterPage = () => {
           onClick={() => setShowConsentModal(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col font-archivo"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900">{t('register_page.consent_modal_title')}</h3>
+              <h3 className="text-lg font-bold text-ink-deep">{t('register_page.consent_modal_title')}</h3>
               <button
                 type="button"
                 onClick={() => setShowConsentModal(false)}
@@ -315,7 +304,7 @@ const RegisterPage = () => {
                   setConsentChecked(true);
                   setShowConsentModal(false);
                 }}
-                className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors text-sm"
+                className="px-6 py-2.5 bg-cta-gradient text-white rounded-lg hover:brightness-105 font-bold transition-all text-sm shadow-md shadow-accent-bright/25"
               >
                 {t('register_page.consent_modal_close')}
               </button>
@@ -323,7 +312,7 @@ const RegisterPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </AuthShell>
   );
 };
 

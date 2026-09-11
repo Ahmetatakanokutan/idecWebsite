@@ -57,10 +57,10 @@ const CertificatePage = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-paper font-archivo">
         <div className="text-center p-8">
           <p className="text-gray-600 mb-4">Sertifikanızı görüntülemek için giriş yapmalısınız.</p>
-          <Link to="/login" className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700">
+          <Link to="/login" className="bg-cta-gradient text-white px-6 py-2.5 rounded-lg hover:brightness-105 font-bold shadow-md shadow-accent-bright/25">
             Giriş Yap
           </Link>
         </div>
@@ -70,23 +70,23 @@ const CertificatePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-10 h-10 animate-spin text-emerald-600" />
+      <div className="min-h-screen flex items-center justify-center bg-paper">
+        <Loader2 className="w-10 h-10 animate-spin text-accent-deep" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-paper font-archivo flex items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {eligible ? (
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-emerald-100">
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-accent-bright/25">
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
-                <Award className="w-10 h-10 text-emerald-600" />
+              <div className="w-20 h-20 bg-accent-gradient rounded-full flex items-center justify-center shadow-lg shadow-accent-bright/25">
+                <Award className="w-10 h-10 text-white" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Tebrikler!</h2>
+            <h2 className="text-2xl font-bold text-ink-deep mb-2">Tebrikler!</h2>
             <p className="text-gray-600 mb-2">
               IDEC-TT platformundaki eğitimlerin en az %80'ini başarıyla tamamladınız.
             </p>
@@ -102,7 +102,7 @@ const CertificatePage = () => {
             <button
               onClick={handleDownload}
               disabled={downloading}
-              className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              className="w-full flex items-center justify-center space-x-2 bg-cta-gradient hover:brightness-105 text-white font-bold shadow-md shadow-accent-bright/25 py-3 px-6 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
             >
               {downloading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -119,7 +119,7 @@ const CertificatePage = () => {
                 <Award className="w-10 h-10 text-gray-400" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sertifika Henüz Hazır Değil</h2>
+            <h2 className="text-2xl font-bold text-ink-deep mb-2">Sertifika Henüz Hazır Değil</h2>
             <p className="text-gray-600 mb-4">
               Başarı belgesi alabilmek için platformdaki tüm eğitimlerin en az <strong>%80'ini</strong> tamamlamanız gerekiyor.
             </p>
@@ -128,7 +128,7 @@ const CertificatePage = () => {
             </p>
             <Link
               to="/courses"
-              className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+              className="inline-block bg-cta-gradient hover:brightness-105 text-white font-bold py-3 px-6 rounded-lg transition-all"
             >
               Eğitimlere Devam Et
             </Link>

@@ -13,6 +13,7 @@ interface CourseFormDto {
   description: string;
   image: string;
   instructorId: string; // Form uses string for select, converted to number for API
+  courseType: 'COURSE' | 'WEBINAR';
 }
 
 interface CourseFormModalProps {
@@ -27,6 +28,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSu
     description: '',
     image: '',
     instructorId: '',
+    courseType: 'COURSE',
   });
   
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -60,7 +62,8 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSu
         title: course.title,
         description: course.description,
         image: course.image || '',
-        instructorId: course.instructor ? course.instructor.id.toString() : (course.instructorId ? course.instructorId.toString() : ''), 
+        instructorId: course.instructor ? course.instructor.id.toString() : (course.instructorId ? course.instructorId.toString() : ''),
+        courseType: course.courseType === 'WEBINAR' ? 'WEBINAR' : 'COURSE',
       });
     } else {
         setFormData({
@@ -68,6 +71,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSu
             description: '',
             image: '',
             instructorId: '',
+            courseType: 'COURSE',
         });
     }
   }, [course, isEditing]);
@@ -133,7 +137,21 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ course, onClose, onSu
                     <label className="block text-sm font-medium text-gray-700 mb-1">Kurs Başlığı</label>
                     <input name="title" value={formData.title} onChange={handleChange} placeholder="Örn: Sürdürülebilirlik 101" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />
                 </div>
-                
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tür</label>
+                    <select
+                        name="courseType"
+                        value={formData.courseType}
+                        onChange={handleChange}
+                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                        required
+                    >
+                        <option value="COURSE">Ders</option>
+                        <option value="WEBINAR">Webinar</option>
+                    </select>
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
                     <textarea name="description" value={formData.description} onChange={handleChange} rows={3} placeholder="Kurs içeriği hakkında kısa bilgi..." className="w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required />

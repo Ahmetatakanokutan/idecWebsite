@@ -1,5 +1,6 @@
 package com.example.idectt.payload.dto;
 
+import com.example.idectt.entity.CourseType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,5 @@ public class CourseDetailDto {
     private int students;
     private InstructorDto instructor;
     private List<SectionDto> sections;
+    private CourseType courseType;
 }

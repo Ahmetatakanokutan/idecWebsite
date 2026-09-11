@@ -1,7 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
-import { Globe, Target, AlertCircle, Loader2 } from 'lucide-react';
+import { Globe, Target, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import React from 'react';
 import Layout from '../components/Layout';
+import PageHero from '../components/PageHero';
+import Reveal from '../components/Reveal';
 import { apiService, resolveAssetUrl } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
@@ -65,7 +68,7 @@ const ProjectDetailPage = () => {
     return (
       <Layout>
         <div className="text-center py-20">
-          <Loader2 className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
+          <Loader2 className="w-12 h-12 mx-auto animate-spin text-accent-deep" />
         </div>
       </Layout>
     );
@@ -86,8 +89,8 @@ const ProjectDetailPage = () => {
     return (
       <Layout>
         <div className="text-center py-20">
-          <h1 className="text-2xl font-bold">{t('projects.not_found')}</h1>
-          <Link to="/projects" className="text-emerald-600 hover:underline mt-4 inline-block">
+          <h1 className="text-2xl font-bold text-ink-deep">{t('projects.not_found')}</h1>
+          <Link to="/projects" className="text-accent-deep hover:text-ink-deep font-bold mt-4 inline-block">
             {t('projects.back_to_all')}
           </Link>
         </div>
@@ -99,69 +102,105 @@ const ProjectDetailPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-6">
-          <Link to="/projects" className="text-emerald-600 hover:text-emerald-700 font-medium mb-4">
-            ← {t('projects.back_to_projects')}
-          </Link>
-        </div>
+      <div className="font-archivo">
+        <PageHero title={localized.title} description={localized.description} />
 
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <img src={resolveAssetUrl(project.image)} alt={localized.title} className="w-full h-64 object-cover" />
-          <div className="p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{localized.title}</h1>
-            <p className="text-lg text-gray-600 mb-6">{localized.description}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('projects.objectives')}</h3>
-                <ul className="space-y-2">
-                  {project.objectives.map((objective, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <Target className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{objective}</span>
-                    </li>
-                  ))}
-                </ul>
+        <section className="bg-paper py-16 md:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Link
+              to="/projects"
+              className="inline-flex items-center gap-2 text-accent-deep hover:text-ink-deep font-bold mb-8 group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              {t('projects.back_to_projects')}
+            </Link>
+
+            <Reveal>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                {project.image && (
+                  <img
+                    src={resolveAssetUrl(project.image)}
+                    alt={localized.title}
+                    className="w-full h-64 md:h-80 object-cover"
+                  />
+                )}
+
+                <div className="p-8 md:p-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                      <DetailHeading icon={<Target className="w-5 h-5" />} title={t('projects.objectives')} />
+                      <ul className="space-y-3">
+                        {project.objectives.map((objective, index) => (
+                          <li key={index} className="flex items-start gap-3 text-gray-700 leading-relaxed">
+                            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-accent-bright flex-shrink-0" />
+                            {objective}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div>
+                      <DetailHeading icon={<Globe className="w-5 h-5" />} title={t('projects.outcomes')} />
+                      <ul className="space-y-3">
+                        {project.outcomes.map((outcome, index) => (
+                          <li key={index} className="flex items-start gap-3 text-gray-700 leading-relaxed">
+                            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-ink-mid flex-shrink-0" />
+                            {outcome}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="mt-10 pt-10 border-t border-gray-100">
+                    <h3 className="text-lg font-bold text-ink-deep mb-4">{t('projects.target_sectors')}</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {project.sectors.map((sector, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 bg-accent-bright/10 border border-accent-bright/25 text-accent-deep rounded-full font-semibold text-sm"
+                        >
+                          {sector}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-10">
+                    <h3 className="text-lg font-bold text-ink-deep mb-4">{t('projects.stakeholders')}</h3>
+                    <div className="bg-paper border border-gray-100 rounded-2xl p-6">
+                      <p className="text-gray-700 mb-4">
+                        <strong className="text-ink-deep">{t('projects.leader_label')}</strong> {project.leader}
+                      </p>
+                      <p className="text-ink-deep font-bold mb-2">{t('projects.partners_label')}</p>
+                      <ul className="space-y-2">
+                        {project.partners.map((partner, index) => (
+                          <li key={index} className="flex items-start gap-3 text-gray-600">
+                            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0" />
+                            {partner}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('projects.outcomes')}</h3>
-                <ul className="space-y-2">
-                  {project.outcomes.map((outcome, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <Globe className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{outcome}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('projects.target_sectors')}</h3>
-              <div className="flex flex-wrap gap-3">
-                {project.sectors.map((sector, index) => (
-                  <span key={index} className="px-4 py-2 bg-emerald-100 text-emerald-800 rounded-lg font-medium">
-                    {sector}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('projects.stakeholders')}</h3>
-              <div className="bg-gray-50 rounded-lg p-6">
-                <p className="text-gray-700 mb-2"><strong>{t('projects.leader_label')}</strong> {project.leader}</p>
-                <p className="text-gray-700"><strong>{t('projects.partners_label')}</strong></p>
-                <ul className="mt-2 space-y-1">
-                  {project.partners.map((partner, index) => (
-                    <li key={index} className="text-gray-600 ml-4">• {partner}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            </Reveal>
           </div>
-        </div>
+        </section>
       </div>
     </Layout>
   );
 };
+
+/** Detay sayfasindaki alt baslik: kucuk vurgu ikonu + baslik. */
+const DetailHeading = ({ icon, title }: { icon: React.ReactNode; title: string }) => (
+  <div className="flex items-center gap-3 mb-5">
+    <span className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center text-white flex-shrink-0">
+      {icon}
+    </span>
+    <h3 className="text-lg font-bold text-ink-deep">{title}</h3>
+  </div>
+);
 
 export default ProjectDetailPage;

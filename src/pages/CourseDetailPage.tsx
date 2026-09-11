@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AlertCircle, BookOpen, Check, ChevronDown, ChevronRight, Heart, Loader2, Play, Star, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -44,6 +44,8 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
+  // Kullanici kalbe tikladi mi? Tikladiysa gec gelen favori listesi onun sonucunu ezmesin.
+  const favoriteTouchedRef = useRef(false);
   const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
   
   // Accordion state: keep track of open sections
@@ -116,12 +118,27 @@ const CourseDetailPage = () => {
     const fetchCourseDetail = async () => {
       try {
         setLoading(true);
+        setIsFavorited(false);
+        favoriteTouchedRef.current = false;
         
         // Enroll user
         apiService.post(`/courses/${courseId}/enroll`, {}).catch((err) => console.error("Enrollment failed:", err));
 
         const data: CourseDetail = await apiService.get(`/courses/${courseId}`);
         setCourse(data);
+
+        // Kursun zaten favoride olup olmadigi. Eskiden kalp her acilista bos geliyordu;
+        // backend favoriyi "tersine cevirdigi" icin kullanicinin "ekle" sandigi ilk
+        // tiklama, zaten favorideki kursu siliyordu. Kullanici bu sirada kalbe
+        // tiklamissa onun sonucu gecerli kalir, bu cevap ustune yazmaz.
+        apiService
+          .get('/courses/favorites')
+          .then((favorites) => {
+            if (!favoriteTouchedRef.current && Array.isArray(favorites)) {
+              setIsFavorited(favorites.some((fav: { id: number }) => fav.id === Number(courseId)));
+            }
+          })
+          .catch(() => { /* Favori bilgisi gelmezse kalp bos kalir, sayfa calismaya devam eder. */ });
 
         try {
           const progressData = await progressService.getCourseProgress(Number(courseId));
@@ -155,6 +172,7 @@ const CourseDetailPage = () => {
   }, [courseId, isLoggedIn]);
 
   const handleToggleFavorite = async () => {
+    favoriteTouchedRef.current = true;
     try {
         const response = await apiService.post(`/courses/${courseId}/favorite`, {});
         setIsFavorited(response); // Backend returns true (added) or false (removed)
@@ -182,23 +200,23 @@ const CourseDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="w-12 h-12 mx-auto animate-spin text-emerald-600" />
+          <Loader2 className="w-12 h-12 mx-auto animate-spin text-accent-deep" />
       </div>
     );
   }
   
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-paper font-archivo">
         <div className="max-w-md w-full mx-4">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="flex justify-center mb-6"><div className="flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-lg"><BookOpen className="w-8 h-8 text-white" /></div></div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('courses.login_required_title')}</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="flex justify-center mb-6"><div className="flex items-center justify-center w-16 h-16 bg-cta-gradient rounded-xl shadow-md shadow-accent-bright/25"><BookOpen className="w-8 h-8 text-white" /></div></div>
+            <h2 className="text-2xl font-bold text-ink-deep mb-4">{t('courses.login_required_title')}</h2>
             <p className="text-gray-600 mb-6">{t('courses.login_required_desc')}</p>
-            <Link to="/login" className="w-full bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold mb-4 inline-block">{t('header.login')}</Link>
+            <Link to="/login" className="w-full bg-cta-gradient text-white px-6 py-3 rounded-lg hover:brightness-105 transition-all font-bold mb-4 inline-block shadow-md shadow-accent-bright/25">{t('header.login')}</Link>
             <p className="text-sm text-gray-500">
               {t('courses.no_account')}{' '}
-              <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link to="/register" className="text-accent-deep hover:text-accent-deep font-medium">
                 {t('courses.register_now')}
               </Link>
             </p>
@@ -214,7 +232,7 @@ const CourseDetailPage = () => {
         <div className="text-center bg-red-50 p-8 rounded-lg">
           <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
           <p className="mt-4 text-lg text-red-700 font-semibold">{error}</p>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
+          <Link to="/courses" className="text-accent-deep hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
@@ -225,7 +243,7 @@ const CourseDetailPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800">{t('courses.not_found')}</h1>
-          <Link to="/courses" className="text-emerald-600 hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
+          <Link to="/courses" className="text-accent-deep hover:underline mt-4 inline-block">{t('courses.back_to_all')}</Link>
         </div>
       </div>
     );
@@ -281,19 +299,8 @@ const CourseDetailPage = () => {
               <span>•</span>
               <span>{selectedLesson.duration}</span>
             </div>
-            {isLoggedIn && course && !completedLessons.has(selectedLesson.id) && (
-              <button
-                onClick={() => {
-                  progressService.markComplete(selectedLesson.id, course.id).catch(() => {});
-                  setCompletedLessons(prev => new Set([...prev, selectedLesson.id]));
-                }}
-                className="mt-3 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-full transition-colors"
-              >
-                {t('courses.mark_lesson_complete')}
-              </button>
-            )}
             {completedLessons.has(selectedLesson.id) && (
-              <span className="mt-3 inline-flex items-center text-emerald-400 text-xs font-medium">
+              <span className="mt-3 inline-flex items-center text-accent text-xs font-medium">
                 <Check className="w-4 h-4 mr-1" />
                 {t('courses.lesson_completed')}
               </span>
@@ -307,11 +314,14 @@ const CourseDetailPage = () => {
         {/* Sidebar Header */}
         <div className="p-5 border-b border-gray-200 bg-gray-50">
           <div className="flex justify-between items-start mb-1">
-            <h2 className="text-lg font-bold text-gray-900 leading-tight">{localized.title}</h2>
-            <button 
-                onClick={handleToggleFavorite} 
+            <h2 className="text-lg font-bold text-ink-deep leading-tight">{localized.title}</h2>
+            <button
+                type="button"
+                onClick={handleToggleFavorite}
                 className={`p-1.5 rounded-full hover:bg-gray-200 transition-colors ${isFavorited ? 'text-red-500' : 'text-gray-400'}`}
                 title={isFavorited ? t('courses.remove_from_favorites') : t('courses.add_to_favorites')}
+                aria-label={isFavorited ? t('courses.remove_from_favorites') : t('courses.add_to_favorites')}
+                aria-pressed={isFavorited}
             >
                 <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
             </button>
@@ -327,8 +337,10 @@ const CourseDetailPage = () => {
             {course.sections && course.sections.map((section) => (
                 <div key={section.id} className="border-b border-gray-100 last:border-0">
                     {/* Section Header */}
-                    <button 
+                    <button
+                        type="button"
                         onClick={() => toggleSection(section.id)}
+                        aria-expanded={openSections.includes(section.id)}
                         className="w-full flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100 transition-colors text-left"
                     >
                         <span className="font-semibold text-gray-800 text-sm">{section.title}</span>
@@ -338,35 +350,38 @@ const CourseDetailPage = () => {
                     {/* Section Lessons */}
                     {openSections.includes(section.id) && (
                         <div className="bg-white">
-                            {section.lessons.map((lesson, index) => {
+                            {section.lessons.map((lesson) => {
                                 const isActive = selectedLesson?.id === lesson.id;
                                 return (
-                                    <div 
-                                        key={lesson.id} 
+                                    // Eskiden tiklanabilir bir div'di: klavyeyle (Tab/Enter) secilemiyordu.
+                                    <button
+                                        type="button"
+                                        key={lesson.id}
                                         onClick={() => handleSelectLesson(lesson)}
-                                        className={`flex items-start p-3 cursor-pointer transition-all border-l-4 ${isActive ? 'border-emerald-500 bg-emerald-50' : 'border-transparent hover:bg-gray-50'}`}
+                                        aria-current={isActive ? 'true' : undefined}
+                                        className={`w-full text-left flex items-start p-3 transition-all border-l-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-deep ${isActive ? 'border-accent-bright bg-accent-bright/[0.07]' : 'border-transparent hover:bg-gray-50'}`}
                                     >
-                                        <div className="mt-0.5 mr-3">
+                                        <span className="mt-0.5 mr-3">
                                             {isActive ? (
-                                                <Play className="w-4 h-4 text-emerald-600 fill-current" />
+                                                <Play className="w-4 h-4 text-accent-deep fill-current" />
                                             ) : completedLessons.has(lesson.id) ? (
-                                                <Check className="w-4 h-4 text-emerald-500" />
+                                                <Check className="w-4 h-4 text-accent-deep" />
                                             ) : (
-                                                <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-                                                </div>
+                                                <span className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                                </span>
                                             )}
-                                        </div>
-                                        <div>
-                                            <p className={`text-sm font-medium ${isActive ? 'text-emerald-900' : 'text-gray-700'}`}>
+                                        </span>
+                                        <span>
+                                            <span className={`block text-sm font-medium ${isActive ? 'text-ink-deep font-semibold' : 'text-gray-700'}`}>
                                                 {lesson.title}
-                                            </p>
-                                            <div className="flex items-center mt-1 text-xs text-gray-400">
+                                            </span>
+                                            <span className="flex items-center mt-1 text-xs text-gray-500">
                                                 <Play className="w-3 h-3 mr-1" />
                                                 {lesson.duration}
-                                            </div>
-                                        </div>
-                                    </div>
+                                            </span>
+                                        </span>
+                                    </button>
                                 );
                             })}
                             {section.lessons.length === 0 && (

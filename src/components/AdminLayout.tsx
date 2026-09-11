@@ -1,6 +1,5 @@
-import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { FolderKanban, Library, LayoutDashboard, Users, Shield, Bell } from 'lucide-react';
+import { FolderKanban, Library, LayoutDashboard, Users, Shield, Bell, Award } from 'lucide-react';
 import Layout from './Layout';
 
 const AdminLayout = () => {
@@ -39,6 +38,10 @@ const AdminLayout = () => {
               <NavLink to="/admin/users" className={navLinkClasses}>
                 <Shield className="mr-3 h-5 w-5" />
                 <span>Kullanıcıları Yönet</span>
+              </NavLink>
+              <NavLink to="/admin/seminar-certificates" className={navLinkClasses}>
+                <Award className="mr-3 h-5 w-5" />
+                <span>Seminer Sertifikalarını Yönet</span>
               </NavLink>
             </nav>
           </aside>
