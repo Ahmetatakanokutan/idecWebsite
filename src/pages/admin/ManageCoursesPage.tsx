@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, BookOpen, Loader, AlertTriangle, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, Loader, Search } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import CourseFormModal from './CourseFormModal';
 

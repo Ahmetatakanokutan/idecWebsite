@@ -76,6 +76,16 @@ const LogoImage = ({ name, src, className }: { name: string; src: string; classN
   />
 );
 
+/** Web sitesi varsa yeni sekmede acan link, yoksa sade bir sarmalayici. */
+const MaybeExternalLink = ({ href, children }: { href?: string; children: React.ReactNode }) =>
+  href ? (
+    <a href={href} target="_blank" rel="noreferrer" className="block h-full">
+      {children}
+    </a>
+  ) : (
+    <div className="h-full">{children}</div>
+  );
+
 const ProjectsPage = () => {
   const { t } = useTranslation();
 
@@ -146,13 +156,16 @@ const ProjectsPage = () => {
 
                 return (
                   <Reveal key={participant.name} delay={(i % 5) * 80} className="h-full">
-                    <a
-                      href={participant.website || '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block h-full"
-                    >
-                      <article className="h-full bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0 transition-all duration-300">
+                    {/* Web sitesi olmayanlar eskiden href="#" ile yeni sekmede ayni sayfayi aciyordu;
+                        artik link degil ve tiklanabilir gibi gorunmuyor. */}
+                    <MaybeExternalLink href={participant.website}>
+                      <article
+                        className={`h-full bg-white rounded-xl border border-gray-200 p-5 shadow-sm transition-all duration-300 ${
+                          participant.website
+                            ? 'hover:shadow-lg hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0'
+                            : ''
+                        }`}
+                      >
                         <div className="h-28 rounded-lg overflow-hidden mb-3">
                           <LogoImage
                             name={participant.name}
@@ -168,7 +181,7 @@ const ProjectsPage = () => {
                           {participant.name}
                         </h3>
                       </article>
-                    </a>
+                    </MaybeExternalLink>
                   </Reveal>
                 );
               })}

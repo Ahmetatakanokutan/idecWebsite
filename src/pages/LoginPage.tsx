@@ -7,7 +7,7 @@ import AuthShell, {
   authLinkClass,
 } from '../components/AuthShell';
 import { useAuth } from '../context/AuthContext';
-import { apiService } from '../services/apiService';
+import { apiService, ApiError } from '../services/apiService';
 import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
@@ -65,7 +65,8 @@ const LoginPage = () => {
       const backendMessage = error?.message || '';
       if (backendMessage.toLowerCase().includes('verify your email')) {
         setError(t('login_page.error_verify_email'));
-      } else if (backendMessage.includes('401')) {
+      } else if (error instanceof ApiError && error.status === 401) {
+        // Eskiden mesaj metninde "401" araniyordu; backend mesaj gonderince bu tutmuyordu.
         setError(t('login_page.error_invalid_credentials'));
       } else {
         setError(backendMessage || t('login_page.error_generic'));

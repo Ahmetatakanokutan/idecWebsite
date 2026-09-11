@@ -204,7 +204,7 @@ const ProfilePage = () => {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-accent-gradient hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep disabled:opacity-50"
+                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cta-gradient hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep disabled:opacity-50"
                     >
                       {saving ? t('profile_page.saving') : (
                         <>
@@ -247,7 +247,7 @@ const ProfilePage = () => {
                 <div className="mt-4 flex justify-center">
                   <Link
                     to="/certificate"
-                    className="flex items-center space-x-2 bg-accent-gradient hover:brightness-110 text-white font-bold shadow-md shadow-accent-bright/25 py-2 px-5 rounded-lg transition-colors text-sm"
+                    className="flex items-center space-x-2 bg-cta-gradient hover:brightness-105 text-white font-bold shadow-md shadow-accent-bright/25 py-2 px-5 rounded-lg transition-colors text-sm"
                   >
                     <Award className="w-4 h-4" />
                     <span>{t('profile_page.get_certificate')}</span>

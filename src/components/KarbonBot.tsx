@@ -7,6 +7,26 @@ interface KarbonBotProps {
 const LOGIN_STATUS_REQUEST = 'CHECK_KYDDTR_LOGIN';
 const LOGIN_STATUS_EVENT = 'KYDDTR_LOGIN_STATUS';
 
+const isNarrowScreen = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+
+/**
+ * Sayfanin en altindaki logo bandi (footer'in son katmani) ekrana girdikce bot
+ * butonunu bandin ustune kaldirir; eskiden buton Bakanlik/ISTKA logolarinin
+ * ustune biniyordu. Bandin koduna dokunulmuyor, sadece ekrandaki konumu okunuyor.
+ * Sadece yuvarlak butonun sarmalayicisi kayar; sohbet penceresi yerinde kalir.
+ * (.button-wrapper widget'in ic yapisi; bulunamazsa hicbir sey yapilmaz.)
+ */
+const liftBotAboveLogoBand = () => {
+  const wrapper = document
+    .querySelector('knowhy-bot')
+    ?.shadowRoot?.querySelector<HTMLElement>('.button-wrapper');
+  if (!wrapper) return;
+
+  const band = document.querySelector('footer')?.lastElementChild;
+  const overlap = band ? Math.max(0, window.innerHeight - band.getBoundingClientRect().top) : 0;
+  wrapper.style.transform = overlap > 0 ? `translateY(-${Math.round(overlap)}px)` : '';
+};
+
 const KarbonBot = ({ isLoggedIn }: KarbonBotProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -26,11 +46,12 @@ const KarbonBot = ({ isLoggedIn }: KarbonBotProps) => {
       botElement.setAttribute('buton_konum', 'sag');
       botElement.setAttribute('buton_sag_bosluk', '20');
       botElement.setAttribute('buton_alt_bosluk', '20');
-      botElement.setAttribute('buton_boyut', '70');
+      // Mobilde karakter butonlarin ve metnin ustune biniyordu; dar ekranda biraz kucuk.
+      botElement.setAttribute('buton_boyut', isNarrowScreen() ? '56' : '70');
       botElement.setAttribute('buton_surumle_birak', 'true');
       botElement.setAttribute('buton_ikon_rengi', '#ffffff');
       botElement.setAttribute('buton_ikon_src', 'https://cdn.knowhy.dev/1755319135802_6394_nazli.png');
-      botElement.setAttribute('buton_ikon_boyut', '60');
+      botElement.setAttribute('buton_ikon_boyut', isNarrowScreen() ? '46' : '60');
 
       botElement.setAttribute('pencere_otomatik_ac', 'true');
       botElement.setAttribute('pencere_otomatik_ac_gecikme', '2');
@@ -166,6 +187,29 @@ const KarbonBot = ({ isLoggedIn }: KarbonBotProps) => {
       if (existingScript) {
         existingScript.remove();
       }
+    };
+  }, []);
+
+  // Logo bandi takibi: kaydirma/boyut degisiminde karede bir kez; bot gec yuklendigi
+  // ve sayfa gecislerinde footer degistigi icin ayrica saniyede bir kontrol.
+  useEffect(() => {
+    let frame = 0;
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          liftBotAboveLogoBand();
+        });
+      }
+    };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    const interval = window.setInterval(schedule, 1000);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      window.clearInterval(interval);
+      if (frame) cancelAnimationFrame(frame);
     };
   }, []);
 

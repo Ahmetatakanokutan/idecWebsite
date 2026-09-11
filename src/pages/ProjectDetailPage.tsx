@@ -196,7 +196,7 @@ const ProjectDetailPage = () => {
 /** Detay sayfasindaki alt baslik: kucuk vurgu ikonu + baslik. */
 const DetailHeading = ({ icon, title }: { icon: React.ReactNode; title: string }) => (
   <div className="flex items-center gap-3 mb-5">
-    <span className="w-9 h-9 rounded-lg bg-accent-gradient flex items-center justify-center text-white flex-shrink-0">
+    <span className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center text-white flex-shrink-0">
       {icon}
     </span>
     <h3 className="text-lg font-bold text-ink-deep">{title}</h3>

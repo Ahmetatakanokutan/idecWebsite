@@ -2,7 +2,7 @@
   "header": {
     "home": "Ana Sayfa",
     "about": "Hakkımızda",
-    "projects": "Ortaklarımız ve İştirakcilerimiz",
+    "projects": "Ortaklarımız ve İştirakçilerimiz",
     "academy": "IDEC Akademi",
     "academy_courses": "Dersler",
     "academy_webinars": "Webinarlar",
@@ -10,14 +10,19 @@
     "logout": "Çıkış Yap",
     "profile": "Profilim",
     "admin_panel": "Yönetim Paneli",
-    "welcome": "Hoşgeldiniz",
+    "welcome": "Hoş geldiniz",
     "user": "Kullanıcı",
     "favorites": "Favorilerim",
     "profile_settings": "Profil Ayarları",
     "contact": "İletişim",
     "carbon_calc_button": "Karbon Ayak İzinizi Hesaplayın",
     "certificate": "Sertifikam",
-    "tagline": "İkiz Dönüşüm Yoluyla Endüstriyel Dekarbonizasyon"
+    "tagline": "İkiz Dönüşüm Yoluyla Endüstriyel Dekarbonizasyon",
+    "workshops": "Çalıştaylarımız",
+    "workshop_carbon_symposium": "Karbon Azaltım Sempozyumu",
+    "coming_soon": "Yakında",
+    "menu_open": "Menüyü aç",
+    "menu_close": "Menüyü kapat"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",
@@ -63,7 +68,7 @@
     "stat_item_4_label": "Faaliyet Alanı",
     "vision_title_section": "Vizyonumuz",
     "vision_subtitle_section": "Sürdürülebilirlik İçin",
-    "vision_main_title_section": "3 Temel Adım",
+    "vision_main_title_section": "Üç Temel İlke",
     "vision_description_section": "Karmaşık sorunlara basit ve etkili çözümler üretiyoruz.",
     "feature_card_1_title": "Net Sıfır Stratejisi",
     "feature_card_1_desc": "2053 hedefleri doğrultusunda karbon emisyonlarını sıfıra indiren yol haritaları.",
@@ -81,9 +86,6 @@
     "cta_description": "Bugün atacağınız küçük bir adım, yarın büyük bir ormana dönüşebilir. Projelerimize katılın, eğitim alın veya destek olun.",
     "cta_contact": "İletişime Geçin",
     "cta_register": "Üye Olun",
-    "hero_chip_free": "Ücretsiz eğitim",
-    "hero_chip_certificate": "Katılım sertifikalı",
-    "hero_chip_ai": "KarbonBot yapay zekâ",
     "hero_learn_project": "Projeyi Tanıyın",
     "hero_badge_label": "Destekleyen",
     "hero_badge_value": "İstanbul Kalkınma Ajansı",
@@ -122,10 +124,13 @@
     "faq_5_q": "Projeye ortak veya iştirakçi olarak nasıl katılabiliriz?",
     "faq_5_a": "Kurumunuzun niteliğine göre dört model var: karbon yakalama, mineralizasyon veya enerji verimliliğinde pilot alan sunan ya da teknoloji geliştiren teknik uygulama ortaklığı; sektörel bilgi paylaşımı ve yaygınlaştırma faaliyetlerinde rol alan stratejik iştirakçilik; sertifikasyon ve personel eğitimi ihtiyaçlarını belirleyen eğitim ortaklığı; merkezin laboratuvar ve akademik altyapısıyla ortak proje geliştiren Ar-Ge iş birliği. Süreç üç adımda ilerliyor: kurumunuzun hangi alanda katkı sunabileceğini belirten bir niyet beyanı, merkez uzmanlarıyla kapsamı netleştiren teknik görüşme ve iş birliğini resmileştiren protokol. Başlamak için İletişim sayfasından kurum bilgilerinizi ve iş birliği teklifinizi iletmeniz yeterli.",
     "faq_6_q": "Karbon ayak izi hesaplamaya nereden başlamalıyım?",
-    "faq_6_a": "Önce sınırlarınızı belirleyin: hangi tesisler kapsama girecek ve hangi kapsamları hesaplayacaksınız. Kapsam 1 doğrudan emisyonlar (bacalar, şirket araçlarının yakıtı), Kapsam 2 satın alınan elektrik, ısı ve buhar, Kapsam 3 ise tedarik zinciri, hammadde, atık ve nakliye — SKDM açısından en kritik olan bu sonuncusu. Ardından bir yıllık geriye dönük veriyi toplayın: doğalgaz ve elektrik faturaları, akaryakıt fişleri, hammadde ve atık miktarları. Hesaplama basit bir çarpımdır: faaliyet verisi × emisyon faktörü. Son adım envanteri raporlamak ve gerekiyorsa akredite bir kuruluşa doğrulatmak. TS EN ISO 14064-1 ve SKDM raporlama eğitimlerimiz tam da bu süreci yönetebilmeniz için hazırlandı."
+    "faq_6_a": "Önce sınırlarınızı belirleyin: hangi tesisler kapsama girecek ve hangi kapsamları hesaplayacaksınız. Kapsam 1 doğrudan emisyonlar (bacalar, şirket araçlarının yakıtı), Kapsam 2 satın alınan elektrik, ısı ve buhar, Kapsam 3 ise tedarik zinciri, hammadde, atık ve nakliye — SKDM açısından en kritik olan bu sonuncusu. Ardından bir yıllık geriye dönük veriyi toplayın: doğalgaz ve elektrik faturaları, akaryakıt fişleri, hammadde ve atık miktarları. Hesaplama basit bir çarpımdır: faaliyet verisi × emisyon faktörü. Son adım envanteri raporlamak ve gerekiyorsa akredite bir kuruluşa doğrulatmak. TS EN ISO 14064-1 ve SKDM raporlama eğitimlerimiz tam da bu süreci yönetebilmeniz için hazırlandı.",
+    "tech_eyebrow": "Bugünden 2053'e",
+    "tech_img_now": "Bugün: yoğun emisyonlu üretim",
+    "tech_img_goal": "2053: net sıfır, temiz enerji"
   },
   "projects": {
-    "title": "Ortaklarımız ve İştirakcilerimiz",
+    "title": "Ortaklarımız ve İştirakçilerimiz",
     "subtitle": "IDEC-TT projesinin proje ortakları ve proje iştirakçileri",
     "project_partners_title": "Proje Ortaklarımız",
     "project_participants_title": "Proje İştirakçilerimiz",
@@ -466,7 +471,16 @@
     "view_all_announcements": "Tüm Duyurular",
     "tel": "Tel:",
     "fax": "Fax:",
-    "email_short": "E-Posta:"
+    "email_short": "E-Posta:",
+    "network_error": "Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyin.",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "server_error": "Sunucuda bir sorun oluştu. Lütfen biraz sonra tekrar deneyin.",
+    "unauthorized": "Bu işlem için giriş yapmanız gerekiyor ya da oturumunuzun süresi dolmuş olabilir.",
+    "forbidden": "Bu işlem için yetkiniz yok.",
+    "not_found_error": "Aradığınız kayıt bulunamadı.",
+    "file_too_large": "Dosya çok büyük.",
+    "too_many_requests": "Çok fazla istek gönderildi. Lütfen biraz bekleyip tekrar deneyin."
   },
   "seminar_certificates": {
     "title": "Seminer Sertifikaları",
@@ -491,5 +505,13 @@
     "no_results": "Bu kategoride duyuru bulunamadı.",
     "fetch_error": "Duyurular yüklenemedi.",
     "hero_eyebrow": "Projeden Haberler"
+  },
+  "not_found": {
+    "eyebrow": "Hata 404",
+    "title": "Aradığınız sayfa bulunamadı",
+    "description": "Sayfa taşınmış, silinmiş ya da adres yanlış yazılmış olabilir. Aşağıdaki bağlantılardan devam edebilirsiniz.",
+    "home": "Ana sayfaya dön",
+    "courses": "Eğitimlere göz at",
+    "contact": "Bize ulaşın"
   }
 }

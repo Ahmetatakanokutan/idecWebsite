@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Loader, ArrowLeft, ChevronDown, ChevronUp, Video, FileText, PlayCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader, ArrowLeft, PlayCircle } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import LessonFormModal from './LessonFormModal';
 

@@ -75,7 +75,7 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mt-2">{t('favorites_page.empty_desc')}</p>
                 <Link
                   to="/courses"
-                  className="mt-6 inline-block bg-accent-gradient text-white px-6 py-3 rounded-lg font-bold hover:brightness-110 transition-all shadow-md shadow-accent-bright/25"
+                  className="mt-6 inline-block bg-cta-gradient text-white px-6 py-3 rounded-lg font-bold hover:brightness-105 transition-all shadow-md shadow-accent-bright/25"
                 >
                   {t('favorites_page.explore_courses')}
                 </Link>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Loader, Search } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import ProjectFormModal from './ProjectFormModal';

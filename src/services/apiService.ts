@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 const getAuthToken = () => {
     return localStorage.getItem('token');
 };
@@ -42,6 +44,55 @@ const resolveAssetUrl = (url?: string | null) => {
     return url;
 };
 
+// fetch yalnizca sunucuya hic ulasilamadiginda (ag yok, CORS, sunucu kapali) TypeError
+// atar; mesaji tarayiciya gore degisen Ingilizce "Failed to fetch" olur ve sayfalar bunu
+// oldugu gibi gosteriyordu. Kullaniciya secili dilde anlasilir bir mesaj veriyoruz.
+// HTTP hata yanitlari (4xx/5xx) buraya dusmez, onlarin mesaji asagida ayrica uretiliyor.
+const safeFetch = async (input: string, init: RequestInit) => {
+    try {
+        return await fetch(input, init);
+    } catch {
+        throw new Error(i18n.t('common.network_error'));
+    }
+};
+
+/** HTTP hata yaniti. `status` ile kod bazli karar verilebilir (orn. giris sayfasi 401'e bakar). */
+export class ApiError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+    }
+}
+
+const statusMessage = (status: number) => {
+    if (status >= 500) return i18n.t('common.server_error');
+    switch (status) {
+        case 401: return i18n.t('common.unauthorized');
+        case 403: return i18n.t('common.forbidden');
+        case 404: return i18n.t('common.not_found_error');
+        case 413: return i18n.t('common.file_too_large');
+        case 429: return i18n.t('common.too_many_requests');
+        default: return i18n.t('common.error');
+    }
+};
+
+// Eskiden backend mesaj gondermezse kullaniciya "HTTP error! status: 500" gidiyordu.
+// - 4xx: backend'in aciklamasi (dogrulama hatasi vb.) varsa o, yoksa secili dilde hazir mesaj.
+// - 5xx: backend'in mesaji ic hata detayi olabilir (SQL, dosya yolu); kullaniciya hep genel mesaj.
+const throwApiError = async (response: Response): Promise<never> => {
+    let backendMessage = '';
+    try {
+        const errorData = await response.json();
+        backendMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || '';
+    } catch { /* govde JSON degil */ }
+
+    const message = response.status < 500 && backendMessage ? backendMessage : statusMessage(response.status);
+    throw new ApiError(message, response.status);
+};
+
 const parseResponseBody = async (response: Response) => {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
@@ -56,71 +107,51 @@ const parseResponseBody = async (response: Response) => {
 
 const apiService = {
     get: async (endpoint: string) => {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await safeFetch(`${API_URL}${endpoint}`, {
             method: 'GET',
             headers: buildHeaders()
         });
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
-            } catch (e) { /* ignore */ }
-            throw new Error(errorMessage);
+            await throwApiError(response);
         }
         return await parseResponseBody(response);
     },
     post: async (endpoint: string, data: any) => {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await safeFetch(`${API_URL}${endpoint}`, {
             method: 'POST',
             headers: buildHeaders(),
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
-            } catch (e) { /* ignore */ }
-            throw new Error(errorMessage);
+            await throwApiError(response);
         }
         return await parseResponseBody(response);
     },
     put: async (endpoint: string, data: any) => {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await safeFetch(`${API_URL}${endpoint}`, {
             method: 'PUT',
             headers: buildHeaders(),
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
-            } catch (e) { /* ignore */ }
-            throw new Error(errorMessage);
+            await throwApiError(response);
         }
         return await parseResponseBody(response);
     },
     delete: async (endpoint: string) => {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await safeFetch(`${API_URL}${endpoint}`, {
             method: 'DELETE',
             headers: buildHeaders()
         });
         if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMessage = errorData.message || (errorData.errors && errorData.errors.map((err: any) => err.defaultMessage).join(', ')) || errorMessage;
-            } catch (e) { /* ignore */ }
-            throw new Error(errorMessage);
+            await throwApiError(response);
         }
     },
     uploadFile: async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch(`${API_URL}/upload`, {
+        const response = await safeFetch(`${API_URL}/upload`, {
             method: 'POST',
             headers: buildHeaders(false),
             body: formData
@@ -160,7 +191,7 @@ const seminarCertificateService = {
             formData.append('fullName', fullName);
         }
 
-        const response = await fetch(`${API_URL}/seminar-certificates`, {
+        const response = await safeFetch(`${API_URL}/seminar-certificates`, {
             method: 'POST',
             headers: buildHeaders(false),
             body: formData

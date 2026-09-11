@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Award,
   ChevronDown,
+  ExternalLink,
   Globe2,
   Heart,
   Leaf,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SubNavItem {
@@ -53,11 +54,49 @@ const Header = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   // Sayfa değişince açık kalan mobil menüyü kapat.
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Kaydirinca: ana satir incelir + cam efekti alir, altindaki ince cizgi okuma
+  // ilerlemesini gosterir. Ilerleme cizgisi her karede React render'i tetiklemesin
+  // diye dogrudan ref uzerinden transform ile guncelleniyor; `scrolled` sadece
+  // esik gecildiginde degisir.
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      // Histerezis: header incelince sayfa ~20px kisaliyor; tek esik olsaydi
+      // zar zor kayan sayfalarda ince/kalin arasinda gidip gelirdi.
+      setScrolled((prev) => (prev ? y > 8 : y > 40));
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [location.pathname]);
+
+  const isActivePath = (to?: string) => {
+    if (!to) return false;
+    const path = to.split('?')[0];
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   const getDisplayName = () => {
     if (roles.includes('ROLE_ADMIN')) {
@@ -97,10 +136,10 @@ const Header = () => {
     },
     {
       key: 'workshops',
-      label: 'Çalıştaylarımız',
+      labelKey: 'header.workshops',
       items: [
         { key: 'kydd-2025', label: 'KYDD 2025', href: 'https://kyddtr.wixsite.com/ulusal-karbon-yakala' },
-        { key: 'karbon-azaltim', label: 'Karbon Azaltım Sempozyumunu', disabled: true },
+        { key: 'karbon-azaltim', labelKey: 'header.workshop_carbon_symposium', disabled: true },
         { key: 'zemin-istanbul', label: 'Zemin İstanbul', disabled: true },
       ],
     },
@@ -119,111 +158,174 @@ const Header = () => {
     })
     .filter((entry): entry is MainNavEntry => entry !== null);
 
-  const renderNavLink = (item: NavLink, variant: 'desktop' | 'mobile') => (
+  // Masaustu menu ogelerinin ortak gorunumu: duz metin + altta yesil cizgi.
+  // Aktif sayfada cizgi kalici, digerlerinde hover'da soldan saga dolar.
+  const desktopItemClass = (active: boolean) =>
+    `relative inline-flex items-center font-medium whitespace-nowrap flex-shrink-0 transition-colors after:absolute after:left-0 after:-bottom-1.5 after:h-0.5 after:rounded-full after:bg-accent-bright after:transition-all after:duration-300 after:ease-out-expo ${
+      active ? 'text-ink-deep after:w-full' : 'text-gray-600 hover:text-ink-deep after:w-0 hover:after:w-full'
+    }`;
+
+  const renderNavLink = (item: NavLink) => (
     <Link
       key={item.key}
       to={item.to}
       onClick={item.onClick}
-      className={
-        variant === 'desktop'
-          ? 'text-gray-600 hover:text-ink-deep font-medium transition-colors whitespace-nowrap flex-shrink-0 relative after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0 hover:after:w-full after:bg-accent-bright after:transition-all after:duration-300'
-          : 'block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-accent-bright/10 hover:text-ink-deep'
-      }
+      aria-current={isActivePath(item.to) ? 'page' : undefined}
+      className={desktopItemClass(isActivePath(item.to))}
     >
       {t(item.labelKey)}
     </Link>
   );
 
-  const renderDropdown = (menu: DropdownNav) => (
-    <Menu key={menu.key} as="div" className="relative inline-block text-left flex-shrink-0">
-      <Menu.Button className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-accent-bright/15 hover:text-ink-deep focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep whitespace-nowrap">
-        {menu.labelKey ? t(menu.labelKey) : menu.label}
-        <ChevronDown className="w-4 h-4 ml-1" />
-      </Menu.Button>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <Menu.Items className="absolute right-0 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-          <div className="py-1">
-            {menu.items.map((sub) => {
-              const label = sub.labelKey ? t(sub.labelKey) : sub.label;
+  const subLabel = (sub: SubNavItem) => (sub.labelKey ? t(sub.labelKey) : sub.label);
 
-              if (sub.disabled) {
-                return (
-                  <Menu.Item key={sub.key} disabled>
-                    {({ active }) => (
-                      <button
-                        type="button"
-                        disabled
-                        className={`${active ? 'bg-gray-50' : ''} block w-full text-left px-4 py-2 text-sm text-gray-500 cursor-not-allowed`}
-                      >
-                        {label}
-                      </button>
-                    )}
-                  </Menu.Item>
-                );
-              }
+  const renderDropdown = (menu: DropdownNav) => {
+    const groupActive = menu.items.some((sub) => isActivePath(sub.to));
+    return (
+      <Menu key={menu.key} as="div" className="relative inline-block text-left flex-shrink-0">
+        {({ open }) => (
+          <>
+            <Menu.Button
+              className={`${desktopItemClass(groupActive || open)} gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-deep focus-visible:ring-offset-4 rounded-sm`}
+            >
+              {menu.labelKey ? t(menu.labelKey) : menu.label}
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+            </Menu.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 -translate-y-2"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-100"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 -translate-y-1"
+            >
+              <Menu.Items className="absolute right-0 mt-4 w-72 origin-top-right rounded-xl bg-white p-1.5 shadow-xl shadow-ink-deep/10 ring-1 ring-black/5 focus:outline-none z-50">
+                {menu.items.map((sub) => {
+                  const label = subLabel(sub);
 
-              if (sub.href) {
-                return (
-                  <Menu.Item key={sub.key}>
-                    {({ active }) => (
-                      <a
-                        href={sub.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`${active ? 'bg-accent-bright/12 text-ink-deep' : 'text-gray-700'} block px-4 py-2 text-sm`}
-                      >
-                        {label}
-                      </a>
-                    )}
-                  </Menu.Item>
-                );
-              }
+                  if (sub.disabled) {
+                    return (
+                      <Menu.Item key={sub.key} disabled>
+                        <span className="flex items-center justify-between gap-3 w-full px-3 py-2 text-sm text-gray-400 cursor-not-allowed">
+                          {label}
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded px-1.5 py-0.5">
+                            {t('header.coming_soon')}
+                          </span>
+                        </span>
+                      </Menu.Item>
+                    );
+                  }
 
-              return (
-                <Menu.Item key={sub.key}>
-                  {({ active }) => (
-                    <Link
-                      to={sub.to!}
-                      className={`${active ? 'bg-accent-bright/12 text-ink-deep' : 'text-gray-700'} block px-4 py-2 text-sm`}
-                    >
-                      {label}
-                    </Link>
-                  )}
-                </Menu.Item>
-              );
-            })}
-          </div>
-        </Menu.Items>
-      </Transition>
-    </Menu>
-  );
+                  const itemClass = (active: boolean) =>
+                    `${active ? 'bg-accent-bright/10 text-ink-deep' : 'text-gray-700'} flex items-center justify-between w-full rounded-lg px-3 py-2 text-sm transition-colors`;
+
+                  if (sub.href) {
+                    return (
+                      <Menu.Item key={sub.key}>
+                        {({ active }) => (
+                          <a href={sub.href} target="_blank" rel="noopener noreferrer" className={itemClass(active)}>
+                            {label}
+                            <ExternalLink className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" />
+                          </a>
+                        )}
+                      </Menu.Item>
+                    );
+                  }
+
+                  return (
+                    <Menu.Item key={sub.key}>
+                      {({ active }) => (
+                        <Link to={sub.to!} className={itemClass(active)}>
+                          {label}
+                        </Link>
+                      )}
+                    </Menu.Item>
+                  );
+                })}
+              </Menu.Items>
+            </Transition>
+          </>
+        )}
+      </Menu>
+    );
+  };
 
   const carbonButton = (variant: 'desktop' | 'mobile') => (
     <a
       href="https://greentim.com/"
       target="_blank"
       rel="noopener noreferrer"
-      className={
-        variant === 'desktop'
-          ? 'flex items-center space-x-2 bg-accent-gradient text-white px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition-all shadow-md shadow-accent-bright/25 hover:shadow-lg flex-shrink-0 whitespace-nowrap'
-          : 'flex items-center justify-center space-x-2 bg-accent-gradient text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:brightness-110 transition-all shadow-md shadow-accent-bright/25'
-      }
+      className={`group flex items-center gap-2 bg-cta-gradient text-white rounded-lg text-sm font-semibold hover:brightness-105 transition-all shadow-md shadow-accent-deep/25 hover:shadow-lg ${
+        variant === 'desktop' ? 'px-4 py-2 flex-shrink-0 whitespace-nowrap' : 'justify-center px-4 py-2.5'
+      }`}
     >
-      <Globe2 className="w-4 h-4" />
+      <Globe2 className="w-4 h-4 transition-transform duration-700 ease-out-expo group-hover:rotate-[360deg]" />
       <span>{t('header.carbon_calc_button')}</span>
     </a>
   );
 
+  // Mobil panel: acilir menuler ayri bir katman olarak degil, baslik + alt linkler
+  // halinde duz liste. Her satir soldan sirayla kayarak gelir.
+  const mobileRows: ReactNode[] =mainNavEntries.flatMap((entry) => {
+    if (entry.type === 'link') {
+      const active = isActivePath(entry.data.to);
+      return [
+        <Link
+          key={entry.data.key}
+          to={entry.data.to}
+          onClick={entry.data.onClick}
+          aria-current={active ? 'page' : undefined}
+          className={`block px-3 py-2.5 rounded-lg text-base font-medium ${
+            active ? 'bg-accent-bright/10 text-ink-deep' : 'text-gray-700 hover:bg-accent-bright/10 hover:text-ink-deep'
+          }`}
+        >
+          {t(entry.data.labelKey)}
+        </Link>,
+      ];
+    }
+    const menu = entry.data;
+    return [
+      <p key={`${menu.key}-title`} className="px-3 pt-4 pb-1 text-[11px] font-bold uppercase tracking-[0.18em] text-accent-deep">
+        {menu.labelKey ? t(menu.labelKey) : menu.label}
+      </p>,
+      ...menu.items.map((sub) => {
+        const label = subLabel(sub);
+        const base = 'flex items-center justify-between gap-3 pl-6 pr-3 py-2 rounded-lg text-[15px]';
+        if (sub.disabled) {
+          return (
+            <span key={sub.key} className={`${base} text-gray-400`}>
+              {label}
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded px-1.5 py-0.5">
+                {t('header.coming_soon')}
+              </span>
+            </span>
+          );
+        }
+        if (sub.href) {
+          return (
+            <a key={sub.key} href={sub.href} target="_blank" rel="noopener noreferrer" className={`${base} text-gray-700 hover:bg-accent-bright/10`}>
+              {label}
+              <ExternalLink className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" />
+            </a>
+          );
+        }
+        const active = isActivePath(sub.to);
+        return (
+          <Link
+            key={sub.key}
+            to={sub.to!}
+            className={`${base} ${active ? 'bg-accent-bright/10 text-ink-deep' : 'text-gray-700 hover:bg-accent-bright/10'}`}
+          >
+            {label}
+          </Link>
+        );
+      }),
+    ];
+  });
+
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50 font-archivo">
+    <header className="shadow-sm sticky top-0 z-50 font-archivo">
       {/* Üst şerit: ince, koyu marka yeşili, sağa hizalı yönetim/dil/giriş */}
       <div className="bg-ink-deep">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
@@ -361,21 +463,37 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Ana satır: logo + ana menü / hamburger */}
-      <div className="border-b border-gray-200">
+      {/* Ana satır: logo + ana menü / hamburger. Kaydırınca incelir ve cam efekti alır. */}
+      <div
+        className={`relative border-b transition-colors duration-500 ${
+          scrolled ? 'bg-white/85 backdrop-blur-lg border-gray-200/70' : 'bg-white border-gray-200'
+        }`}
+      >
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-          <div className="flex items-center justify-between py-4">
-            <Link to="/" className="flex items-center space-x-3 flex-shrink-0">
-              <div className="flex items-center justify-center w-12 h-12 bg-accent-gradient rounded-lg shadow-md shadow-accent-bright/25">
-                <Leaf className="w-7 h-7 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold text-ink-deep tracking-tight whitespace-nowrap">IDEC-TT</h1>
+          <div className={`flex items-center justify-between transition-[padding] duration-500 ease-out-expo ${scrolled ? 'py-2.5' : 'py-4'}`}>
+            <Link to="/" className="group flex items-center gap-3 flex-shrink-0" aria-label="IDEC-TT">
+              <span
+                className={`flex items-center justify-center bg-accent-gradient rounded-lg shadow-md shadow-accent-bright/25 transition-all duration-500 ease-out-expo ${
+                  scrolled ? 'w-10 h-10' : 'w-12 h-12'
+                }`}
+              >
+                <Leaf className="w-7 h-7 text-white transition-transform duration-700 ease-out-expo group-hover:-rotate-12 group-hover:scale-110" />
+              </span>
+              {/* Logo metni h1 degil: her sayfanin kendi h1'i var, sayfada tek h1 kalsin. */}
+              <span
+                className={`font-bold text-ink-deep tracking-tight whitespace-nowrap transition-all duration-500 ease-out-expo ${
+                  scrolled ? 'text-2xl' : 'text-3xl'
+                }`}
+              >
+                IDEC-TT
+              </span>
             </Link>
 
             {/* Masaüstü ana menü */}
-            <nav className="hidden xl:flex flex-wrap items-center justify-end gap-x-8 gap-y-2">
+            {/* 1280-1440px laptoplarda gap-x-8 ile karbon butonu ikinci satira dusuyordu */}
+            <nav className="hidden xl:flex flex-wrap items-center justify-end gap-x-6 2xl:gap-x-8 gap-y-2">
               {mainNavEntries.map((entry) =>
-                entry.type === 'link' ? renderNavLink(entry.data, 'desktop') : renderDropdown(entry.data)
+                entry.type === 'link' ? renderNavLink(entry.data) : renderDropdown(entry.data)
               )}
               {carbonButton('desktop')}
             </nav>
@@ -385,29 +503,43 @@ const Header = () => {
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               className="xl:hidden flex-shrink-0 p-2 rounded-lg text-gray-600 hover:bg-accent-bright/15 hover:text-ink-deep focus:outline-none focus:ring-2 focus:ring-accent-deep transition-colors"
-              aria-label={mobileMenuOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}
+              aria-label={mobileMenuOpen ? t('header.menu_close') : t('header.menu_open')}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+              <span className="relative block w-6 h-6">
+                <MenuIcon
+                  className={`absolute inset-0 w-6 h-6 transition-all duration-300 ${mobileMenuOpen ? 'opacity-0 rotate-90 scale-50' : 'opacity-100'}`}
+                />
+                <X
+                  className={`absolute inset-0 w-6 h-6 transition-all duration-300 ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 -rotate-90 scale-50'}`}
+                />
+              </span>
             </button>
           </div>
 
-          {/* Mobil menü paneli: ana satırdaki tüm öğeler burada toplanıyor */}
+          {/* Mobil menü paneli: ana satırdaki tüm öğeler burada, soldan sırayla kayarak gelir */}
           {mobileMenuOpen && (
-            <div className="xl:hidden pb-4 space-y-1 border-t border-gray-100 pt-3">
-              {mainNavEntries.map((entry) =>
-                entry.type === 'link' ? (
-                  renderNavLink(entry.data, 'mobile')
-                ) : (
-                  <div key={entry.data.key} className="px-3 py-1">
-                    {renderDropdown(entry.data)}
-                  </div>
-                )
-              )}
-              <div className="px-3 pt-2">{carbonButton('mobile')}</div>
+            <div className="xl:hidden pb-4 border-t border-gray-100 pt-3 max-h-[calc(100vh-7rem)] overflow-y-auto">
+              {[...mobileRows, <div key="carbon" className="px-3 pt-4">{carbonButton('mobile')}</div>].map((row, i) => (
+                <div
+                  key={i}
+                  className="motion-safe:animate-menu-item-in"
+                  style={{ animationDelay: `${i * 35}ms` }}
+                >
+                  {row}
+                </div>
+              ))}
             </div>
           )}
         </div>
+
+        {/* Okuma ilerlemesi: sayfa kaydıkça soldan sağa dolan ince çizgi */}
+        <div
+          ref={progressRef}
+          className="absolute left-0 right-0 -bottom-px h-0.5 origin-left bg-gradient-to-r from-accent-bright via-sky-bright to-accent-bright"
+          style={{ transform: 'scaleX(0)' }}
+          aria-hidden="true"
+        />
       </div>
     </header>
   );

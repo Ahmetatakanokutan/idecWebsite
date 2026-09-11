@@ -60,7 +60,7 @@ const CertificatePage = () => {
       <div className="min-h-screen flex items-center justify-center bg-paper font-archivo">
         <div className="text-center p-8">
           <p className="text-gray-600 mb-4">Sertifikanızı görüntülemek için giriş yapmalısınız.</p>
-          <Link to="/login" className="bg-accent-gradient text-white px-6 py-2.5 rounded-lg hover:brightness-110 font-bold shadow-md shadow-accent-bright/25">
+          <Link to="/login" className="bg-cta-gradient text-white px-6 py-2.5 rounded-lg hover:brightness-105 font-bold shadow-md shadow-accent-bright/25">
             Giriş Yap
           </Link>
         </div>
@@ -102,7 +102,7 @@ const CertificatePage = () => {
             <button
               onClick={handleDownload}
               disabled={downloading}
-              className="w-full flex items-center justify-center space-x-2 bg-accent-gradient hover:brightness-110 text-white font-bold shadow-md shadow-accent-bright/25 py-3 px-6 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              className="w-full flex items-center justify-center space-x-2 bg-cta-gradient hover:brightness-105 text-white font-bold shadow-md shadow-accent-bright/25 py-3 px-6 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
             >
               {downloading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -128,7 +128,7 @@ const CertificatePage = () => {
             </p>
             <Link
               to="/courses"
-              className="inline-block bg-accent-gradient hover:brightness-110 text-white font-bold py-3 px-6 rounded-lg transition-all"
+              className="inline-block bg-cta-gradient hover:brightness-105 text-white font-bold py-3 px-6 rounded-lg transition-all"
             >
               Eğitimlere Devam Et
             </Link>

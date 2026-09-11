@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -20,8 +19,10 @@ import {
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import Reveal from '../components/Reveal';
+import SplitReveal from '../components/SplitReveal';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useCountUp } from '../hooks/useCountUp';
+import { openKarbonBot } from '../utils/karbonBot';
 import { useTranslation } from 'react-i18next';
 
 interface TeamMember {
@@ -34,19 +35,51 @@ interface TeamMember {
 // `support` her adimi projenin hangi bileseninin destekledigini soyluyor —
 // dort bilesen dort adima birebir dagiliyor, sema boylece IDEC-TT'ye ozgu oluyor.
 const companyJourney = [
-  { key: 1, icon: Gauge, support: 'about.component_3_title' },      // Egitim Modulleri
-  { key: 2, icon: LineChart, support: 'about.component_1_title' },  // KarbonBot
-  { key: 3, icon: TrendingDown, support: 'about.component_4_title' }, // Mentorluk
-  { key: 4, icon: FileCheck, support: 'about.component_2_title' },  // Dijital Kutuphane
+  { key: 1, icon: Gauge, support: 3 },        // Egitim Modulleri
+  { key: 2, icon: LineChart, support: 1 },    // KarbonBot
+  { key: 3, icon: TrendingDown, support: 4 }, // Mentorluk
+  { key: 4, icon: FileCheck, support: 2 },    // Dijital Kutuphane
 ];
 
-// Projenin dort bileseni.
-const components = [
-  { key: 1, icon: Bot },
-  { key: 2, icon: Library },
-  { key: 3, icon: GraduationCap },
-  { key: 4, icon: Handshake },
+// Projenin dort bileseni ve tiklaninca gidecegi yer (kartlarda ve "Destek:" rozetlerinde ortak).
+// Dijital Kutuphane'nin ayri bir sayfasi yok; ogrenme arsivi olarak webinar kayitlarina gidiyor
+// (dersler zaten Egitim Modulleri'nde).
+type ComponentTarget = { to?: string; bot?: true };
+const components: { key: number; icon: typeof Bot; target: ComponentTarget }[] = [
+  { key: 1, icon: Bot, target: { bot: true } },
+  { key: 2, icon: Library, target: { to: '/courses?tab=webinars' } },
+  { key: 3, icon: GraduationCap, target: { to: '/courses' } },
+  { key: 4, icon: Handshake, target: { to: '/contact' } },
 ];
+const componentTarget = (key: number) => components.find((c) => c.key === key)?.target ?? {};
+const isActionable = (target: ComponentTarget) => Boolean(target.to || target.bot);
+
+/** Hedefe gore Link, KarbonBot'u acan buton ya da duz kutu. */
+const ComponentAction = ({
+  target,
+  className,
+  children,
+}: {
+  target: ComponentTarget;
+  className: string;
+  children: React.ReactNode;
+}) => {
+  if (target.to) {
+    return (
+      <Link to={target.to} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  if (target.bot) {
+    return (
+      <button type="button" onClick={openKarbonBot} className={`${className} text-left`}>
+        {children}
+      </button>
+    );
+  }
+  return <div className={className}>{children}</div>;
+};
 
 // TUIK Sera Gazi Emisyon Istatistikleri, 2024: toplam 584,5 Mt CO2 esdegeri.
 // Sektorel paylar resmi bultendeki degerlerdir, yuvarlanmamistir.
@@ -82,10 +115,6 @@ const EXPOSURE_STYLES: Record<string, string> = {
 
 const AboutPage = () => {
   const { t } = useTranslation();
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }, []);
 
   const teamMembers: TeamMember[] = [
     {
@@ -133,15 +162,19 @@ const AboutPage = () => {
           <div className="pointer-events-none absolute -top-24 right-10 w-96 h-96 rounded-full bg-accent/10 blur-3xl animate-float-slow motion-reduce:animate-none" />
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-28">
-            <Reveal className="max-w-3xl">
-              <p className="text-accent text-sm font-bold tracking-[0.2em] uppercase mb-4">
-                {t('about.hero_eyebrow')}
-              </p>
+            <div className="max-w-3xl">
+              <Reveal from="left">
+                <p className="text-accent text-sm font-bold tracking-[0.2em] uppercase mb-4">
+                  {t('about.hero_eyebrow')}
+                </p>
+              </Reveal>
               <h1 className="font-archivo text-4xl md:text-6xl font-bold text-white mb-6 leading-[1.08]">
-                {t('about.title')}
+                <SplitReveal text={t('about.title')} delay={120} />
               </h1>
-              <p className="text-lg md:text-xl text-white/75 leading-relaxed">{t('about.subtitle')}</p>
-            </Reveal>
+              <Reveal from="left" delay={350}>
+                <p className="text-lg md:text-xl text-white/75 leading-relaxed">{t('about.subtitle')}</p>
+              </Reveal>
+            </div>
 
             {/* Künye: destekleyen, yürütücü, alan, süre */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-14">
@@ -151,7 +184,7 @@ const AboutPage = () => {
                 { icon: Sprout, labelKey: 'about.fact_3_label', valueKey: 'about.fact_3_value' },
                 { icon: Cpu, labelKey: 'about.fact_4_label', valueKey: 'about.fact_4_value' },
               ].map((fact, i) => (
-                <Reveal key={fact.labelKey} delay={i * 110}>
+                <Reveal key={fact.labelKey} from="right" delay={450 + i * 120} className="h-full">
                   <div className="h-full rounded-xl bg-white/[0.08] backdrop-blur-md border border-white/[0.18] p-5">
                     <fact.icon className="w-5 h-5 text-accent mb-3" />
                     <p className="text-[11px] uppercase tracking-widest text-white/50 font-bold mb-1">
@@ -169,7 +202,7 @@ const AboutPage = () => {
         <section className="bg-paper py-24 md:py-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row items-center gap-16">
-              <Reveal className="lg:w-1/2">
+              <Reveal from="left" className="lg:w-1/2">
                 <p className="text-accent-deep text-sm font-bold tracking-[0.2em] uppercase mb-3">
                   {t('about.project_vision_title')}
                 </p>
@@ -180,7 +213,7 @@ const AboutPage = () => {
                 <p className="text-gray-700 text-lg leading-relaxed">{t('about.project_vision_desc_2')}</p>
               </Reveal>
 
-              <Reveal delay={180} className="lg:w-1/2 w-full">
+              <Reveal from="right" delay={180} className="lg:w-1/2 w-full">
                 <TwinTransitionDiagram />
               </Reveal>
             </div>
@@ -214,34 +247,37 @@ const AboutPage = () => {
               </p>
             </div>
 
+            {/* Her satırda problem soldan, çözüm sağdan gelip ortadaki okta buluşur */}
             <div className="space-y-5">
               {[1, 2, 3, 4].map((n, i) => (
-                <Reveal key={n} delay={i * 120}>
-                  <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-6 items-stretch">
-                    {/* Problem */}
-                    <div className="rounded-2xl border border-red-100 bg-red-50/60 p-6 flex gap-4">
+                <div key={n} className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-6 items-stretch">
+                  {/* Problem */}
+                  <Reveal from="left" delay={i * 120} className="h-full">
+                    <div className="h-full rounded-2xl border border-red-100 bg-red-50/60 p-6 flex gap-4">
                       <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                       <p className="text-gray-700 leading-relaxed">{t(`about.problem_${n}`)}</p>
                     </div>
+                  </Reveal>
 
-                    {/* Ok */}
-                    <div className="flex items-center justify-center">
-                      <span className="w-10 h-10 rounded-full bg-ink-deep text-white flex items-center justify-center shadow-md">
-                        <ArrowRight className="w-5 h-5 hidden md:block" />
-                        <ArrowDown className="w-5 h-5 md:hidden" />
-                      </span>
-                    </div>
+                  {/* Ok */}
+                  <Reveal from="scale" delay={i * 120 + 250} className="flex items-center justify-center">
+                    <span className="w-10 h-10 rounded-full bg-ink-deep text-white flex items-center justify-center shadow-md">
+                      <ArrowRight className="w-5 h-5 hidden md:block" />
+                      <ArrowDown className="w-5 h-5 md:hidden" />
+                    </span>
+                  </Reveal>
 
-                    {/* Çözüm */}
-                    <div className="rounded-2xl border border-accent-bright/25 bg-accent-bright/[0.07] p-6 flex gap-4">
+                  {/* Çözüm */}
+                  <Reveal from="right" delay={i * 120 + 120} className="h-full">
+                    <div className="h-full rounded-2xl border border-accent-bright/25 bg-accent-bright/[0.07] p-6 flex gap-4">
                       <CheckCircle2 className="w-5 h-5 text-accent-deep flex-shrink-0 mt-0.5" />
                       <div>
                         <h3 className="font-bold text-ink-deep mb-1">{t(`about.solution_${n}_title`)}</h3>
                         <p className="text-gray-600 leading-relaxed text-[15px]">{t(`about.solution_${n}_desc`)}</p>
                       </div>
                     </div>
-                  </div>
-                </Reveal>
+                  </Reveal>
+                </div>
               ))}
             </div>
           </div>
@@ -264,17 +300,33 @@ const AboutPage = () => {
             </Reveal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {components.map((c, i) => (
-                <Reveal key={c.key} delay={i * 110}>
-                  <div className="group h-full rounded-2xl border border-gray-100 bg-paper p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 motion-reduce:hover:translate-y-0 transition-all duration-300">
-                    <div className="w-12 h-12 rounded-xl bg-accent-gradient flex items-center justify-center mb-5 shadow-md shadow-accent-bright/20 group-hover:scale-105 motion-reduce:group-hover:scale-100 transition-transform">
-                      <c.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-lg font-bold text-ink-deep mb-2">{t(`about.component_${c.key}_title`)}</h3>
-                    <p className="text-gray-600 text-[15px] leading-relaxed">{t(`about.component_${c.key}_desc`)}</p>
-                  </div>
-                </Reveal>
-              ))}
+              {components.map((c, i) => {
+                const actionable = isActionable(c.target);
+                return (
+                  <Reveal key={c.key} delay={i * 110} className="h-full">
+                    {/* Sadece bir yere giden kartlar hover'da kalkar ve ok gosterir */}
+                    <ComponentAction
+                      target={c.target}
+                      className={`group block w-full h-full rounded-2xl border border-gray-100 bg-paper p-7 shadow-sm transition-all duration-300 ${
+                        actionable
+                          ? 'hover:shadow-xl hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-deep'
+                          : ''
+                      }`}
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-accent-gradient flex items-center justify-center mb-5 shadow-md shadow-accent-bright/20 group-hover:scale-105 motion-reduce:group-hover:scale-100 transition-transform">
+                        <c.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="flex items-center gap-2 text-lg font-bold text-ink-deep mb-2">
+                        {t(`about.component_${c.key}_title`)}
+                        {actionable && (
+                          <ArrowRight className="w-4 h-4 text-accent-deep opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                        )}
+                      </h3>
+                      <p className="text-gray-600 text-[15px] leading-relaxed">{t(`about.component_${c.key}_desc`)}</p>
+                    </ComponentAction>
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -438,7 +490,7 @@ const CompanyJourneySection = () => {
 
           <ol className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-6">
             {companyJourney.map((step, i) => (
-              <Reveal as="li" key={step.key} delay={i * 150} className="h-full">
+              <Reveal as="li" key={step.key} from="left" delay={i * 200} className="h-full">
                 {/* Masaüstü */}
                 <div className="hidden md:flex flex-col items-center text-center h-full">
                   <span className="relative flex items-center justify-center w-28 h-28 rounded-full bg-ink-night border-2 border-accent/40 mb-5">
@@ -452,7 +504,11 @@ const CompanyJourneySection = () => {
                   <p className="text-white/60 text-[15px] leading-relaxed max-w-[15rem] mb-4 flex-grow">
                     {t(`about.journey_step_${step.key}_desc`)}
                   </p>
-                  <SupportChip label={t('about.journey_support_label')} value={t(step.support)} />
+                  <SupportChip
+                    label={t('about.journey_support_label')}
+                    value={t(`about.component_${step.support}_title`)}
+                    target={componentTarget(step.support)}
+                  />
                 </div>
 
                 {/* Mobil */}
@@ -470,7 +526,11 @@ const CompanyJourneySection = () => {
                     <p className="text-white/60 text-[15px] leading-relaxed mb-3">
                       {t(`about.journey_step_${step.key}_desc`)}
                     </p>
-                    <SupportChip label={t('about.journey_support_label')} value={t(step.support)} />
+                    <SupportChip
+                      label={t('about.journey_support_label')}
+                      value={t(`about.component_${step.support}_title`)}
+                      target={componentTarget(step.support)}
+                    />
                   </div>
                 </div>
               </Reveal>
@@ -483,12 +543,22 @@ const CompanyJourneySection = () => {
 };
 
 /** Adimin altindaki kucuk etiket: bu adimi projenin hangi bileseni destekliyor. */
-const SupportChip = ({ label, value }: { label: string; value: string }) => (
-  <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs">
-    <span className="text-white/50">{label}</span>
-    <span className="font-semibold text-accent">{value}</span>
-  </span>
-);
+/** "Destek: <bilesen>" rozeti. Bileseni bir yere gidiyorsa rozet de oraya goturur. */
+const SupportChip = ({ label, value, target }: { label: string; value: string; target: ComponentTarget }) => {
+  const actionable = isActionable(target);
+  return (
+    <ComponentAction
+      target={target}
+      className={`inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs transition-colors ${
+        actionable ? 'hover:bg-accent/20 hover:border-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent' : ''
+      }`}
+    >
+      <span className="text-white/60">{label}</span>
+      <span className="font-semibold text-accent">{value}</span>
+      {actionable && <ArrowRight className="w-3 h-3 text-accent" aria-hidden="true" />}
+    </ComponentAction>
+  );
+};
 
 /**
  * "Neden simdi?" — uc parca:
@@ -516,7 +586,7 @@ const WhyNowSection = () => {
         {/* Tek bakışta Türkiye'nin toplam emisyonu */}
         <Reveal className="mb-10">
           <div className="rounded-2xl bg-accent/[0.08] border border-accent/25 px-7 py-8 text-center">
-            <p className="font-source-serif text-5xl md:text-6xl font-extrabold text-accent tabular-nums leading-none mb-3">
+            <p className="text-5xl md:text-6xl font-extrabold text-accent tabular-nums leading-none mb-3">
               {totalShown.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
               <span className="text-2xl md:text-3xl ml-2 align-middle">Mt CO₂e</span>
             </p>
@@ -528,7 +598,7 @@ const WhyNowSection = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Sektörel pay grafiği */}
-          <Reveal>
+          <Reveal from="left">
             <div className="h-full rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/[0.14] p-7 md:p-9">
               <h3 className="text-white font-bold text-xl mb-1">{t('about.chart_title')}</h3>
               <p className="text-white/50 text-sm mb-8">{t('about.chart_subtitle')}</p>
@@ -553,7 +623,7 @@ const WhyNowSection = () => {
           </Reveal>
 
           {/* SKDM takvimi */}
-          <Reveal delay={180}>
+          <Reveal from="right" delay={180}>
             <div className="h-full rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/[0.14] p-7 md:p-9">
               <h3 className="text-white font-bold text-xl mb-1">{t('about.cbam_title')}</h3>
               <p className="text-white/50 text-sm mb-8">{t('about.cbam_subtitle')}</p>
@@ -571,7 +641,7 @@ const WhyNowSection = () => {
                         <span className="absolute inset-0 rounded-full bg-accent/40 animate-pulse-ring motion-reduce:animate-none" />
                       )}
                     </span>
-                    <Reveal delay={i * 140}>
+                    <Reveal from="right" delay={i * 140}>
                       <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-1">
                         {t(`about.cbam_step_${n}_period`)}
                       </p>
@@ -650,7 +720,7 @@ const SectorBar = ({
       <div className="flex items-baseline justify-between gap-3 mb-2">
         <span className={highlight ? 'text-white font-semibold' : 'text-white/75'}>{label}</span>
         <span
-          className={`font-source-serif text-2xl font-extrabold tabular-nums ${
+          className={`text-2xl font-extrabold tabular-nums ${
             highlight ? 'text-accent' : 'text-white/70'
           }`}
         >

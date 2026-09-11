@@ -15,7 +15,7 @@ export const authLabelClass = 'block text-sm font-semibold text-ink-deep mb-1.5'
 export const authInputClass =
   'block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent-bright focus:border-transparent transition-all';
 export const authButtonClass =
-  'w-full flex justify-center items-center gap-2 py-3 px-4 rounded-lg text-white font-bold bg-accent-gradient shadow-md shadow-accent-bright/25 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep transition-all disabled:opacity-60 disabled:cursor-not-allowed';
+  'w-full flex justify-center items-center gap-2 py-3 px-4 rounded-lg text-white font-bold bg-cta-gradient shadow-md shadow-accent-bright/25 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-deep transition-all disabled:opacity-60 disabled:cursor-not-allowed';
 export const authLinkClass = 'font-bold text-accent-deep hover:text-ink-deep transition-colors';
 
 type AuthShellProps = {

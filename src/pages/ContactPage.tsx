@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Printer, MapPin, Bus, Mail, Navigation, Train } from 'lucide-react';
 import Layout from '../components/Layout';
 import Reveal from '../components/Reveal';
+import PageHero from '../components/PageHero';
 import { useTranslation } from 'react-i18next';
 
 // Yeditepe Universitesi Teknoloji Ussu — haritanin merkezi.
@@ -15,28 +15,11 @@ const MAP_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=4
 const ContactPage = () => {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }, []);
-
   return (
     <Layout>
       <div className="font-archivo">
-        {/* Giriş bandı */}
-        <section className="relative overflow-hidden bg-ink-drift bg-[length:200%_200%] animate-drift motion-reduce:animate-none">
-          <div className="pointer-events-none absolute -top-20 right-16 w-80 h-80 rounded-full bg-accent/10 blur-3xl animate-float-slow motion-reduce:animate-none" />
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
-            <Reveal className="max-w-3xl">
-              <p className="text-accent text-sm font-bold tracking-[0.2em] uppercase mb-4">
-                {t('contact.eyebrow')}
-              </p>
-              <h1 className="font-archivo text-4xl md:text-6xl font-bold text-white mb-6 leading-[1.08]">
-                {t('contact.title')}
-              </h1>
-              <p className="text-lg md:text-xl text-white/75 leading-relaxed">{t('contact.subtitle')}</p>
-            </Reveal>
-          </div>
-        </section>
+        {/* Giriş bandı — diğer iç sayfalarla aynı bileşen */}
+        <PageHero eyebrow={t('contact.eyebrow')} title={t('contact.title')} description={t('contact.subtitle')} />
 
         {/* Hızlı iletişim kartları */}
         <section className="bg-white py-20 md:py-24">
@@ -59,7 +42,11 @@ const ContactPage = () => {
                 delay={200}
                 icon={<Bus className="w-5 h-5 text-white" />}
                 title={t('contact.card_service_title')}
-                lines={['(0216) 578 01 34', '(0216) 578 01 35', 'istekservis@istek.org.tr']}
+                lines={[
+                  { text: '(0216) 578 01 34', href: 'tel:+902165780134' },
+                  { text: '(0216) 578 01 35', href: 'tel:+902165780135' },
+                  { text: 'istekservis@istek.org.tr', href: 'mailto:istekservis@istek.org.tr' },
+                ]}
               />
               <ContactCard
                 delay={300}
@@ -76,7 +63,7 @@ const ContactPage = () => {
         <section className="bg-paper py-20 md:py-24 border-y border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-              <Reveal>
+              <Reveal from="left">
                 <p className="text-accent-deep text-sm font-bold tracking-[0.2em] uppercase mb-3">
                   {t('contact.address_eyebrow')}
                 </p>
@@ -125,7 +112,7 @@ const ContactPage = () => {
                 </div>
               </Reveal>
 
-              <Reveal delay={160}>
+              <Reveal from="right" delay={160}>
                 <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg bg-gray-200 h-[540px]">
                   <iframe
                     src={MAP_EMBED_SRC}
@@ -173,6 +160,9 @@ const ContactPage = () => {
   );
 };
 
+/** Kart satiri: duz metin ya da kendi baglantisi olan satir (servis kartindaki telefonlar/e-posta gibi). */
+type ContactLine = string | { text: string; href: string };
+
 const ContactCard = ({
   icon,
   title,
@@ -182,26 +172,41 @@ const ContactCard = ({
 }: {
   icon: React.ReactNode;
   title: string;
-  lines: string[];
+  lines: ContactLine[];
+  /** Kartin tamami tek bir yere gidiyorsa (telefon, e-posta) */
   href?: string;
   delay?: number;
 }) => {
   const body = (
-    <div className="group h-full rounded-2xl border border-gray-100 bg-paper p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 motion-reduce:hover:translate-y-0 transition-all duration-300">
+    <div
+      className={`group h-full rounded-2xl border border-gray-100 bg-paper p-7 shadow-sm transition-all duration-300 ${
+        href ? 'hover:shadow-xl hover:-translate-y-1 hover:border-accent-bright/40 motion-reduce:hover:translate-y-0' : ''
+      }`}
+    >
       <div className="w-11 h-11 rounded-xl bg-accent-gradient flex items-center justify-center mb-5 shadow-md shadow-accent-bright/20 group-hover:scale-105 motion-reduce:group-hover:scale-100 transition-transform">
         {icon}
       </div>
-      <p className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2">{title}</p>
-      {lines.map((line) => (
-        <p key={line} className="text-ink-deep font-semibold leading-snug break-words">
-          {line}
-        </p>
-      ))}
+      <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-2">{title}</p>
+      {lines.map((line) =>
+        typeof line === 'string' ? (
+          <p key={line} className="text-ink-deep font-semibold leading-snug break-words">
+            {line}
+          </p>
+        ) : (
+          <a
+            key={line.text}
+            href={line.href}
+            className="block text-ink-deep font-semibold leading-snug break-words hover:text-accent-deep underline-offset-4 hover:underline transition-colors"
+          >
+            {line.text}
+          </a>
+        )
+      )}
     </div>
   );
 
   return (
-    <Reveal delay={delay} className="h-full">
+    <Reveal delay={delay} from="scale" className="h-full">
       {href ? (
         <a href={href} className="block h-full">
           {body}

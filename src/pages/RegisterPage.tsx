@@ -115,7 +115,7 @@ const RegisterPage = () => {
             onClick={() => setUserType('individual')}
             className={`flex items-center justify-center p-4 border rounded-lg transition-colors ${
               userType === 'individual'
-                ? 'bg-accent-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
+                ? 'bg-cta-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-accent-bright/50 hover:bg-accent-bright/[0.06]'
             }`}
           >
@@ -126,7 +126,7 @@ const RegisterPage = () => {
             onClick={() => setUserType('corporate')}
             className={`flex items-center justify-center p-4 border rounded-lg transition-colors ${
               userType === 'corporate'
-                ? 'bg-accent-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
+                ? 'bg-cta-gradient text-white border-transparent shadow-md shadow-accent-bright/25'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-accent-bright/50 hover:bg-accent-bright/[0.06]'
             }`}
           >
@@ -304,7 +304,7 @@ const RegisterPage = () => {
                   setConsentChecked(true);
                   setShowConsentModal(false);
                 }}
-                className="px-6 py-2.5 bg-accent-gradient text-white rounded-lg hover:brightness-110 font-bold transition-all text-sm shadow-md shadow-accent-bright/25"
+                className="px-6 py-2.5 bg-cta-gradient text-white rounded-lg hover:brightness-105 font-bold transition-all text-sm shadow-md shadow-accent-bright/25"
               >
                 {t('register_page.consent_modal_close')}
               </button>

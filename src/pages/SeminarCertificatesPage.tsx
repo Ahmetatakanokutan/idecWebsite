@@ -124,7 +124,7 @@ const SeminarCertificatesPage = () => {
                 <button
                   onClick={() => handleDownload(cert.id, cert.fullName)}
                   disabled={downloadingId === cert.id}
-                  className="flex items-center space-x-2 bg-accent-gradient hover:brightness-110 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md shadow-accent-bright/25 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 bg-cta-gradient hover:brightness-105 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow-md shadow-accent-bright/25 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {downloadingId === cert.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

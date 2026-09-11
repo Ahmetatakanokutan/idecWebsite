@@ -37,10 +37,16 @@ export default {
         // Genis, yavas kayan versiyon (animate-drift ile birlikte)
         'ink-drift': 'linear-gradient(115deg, #0B2E7A 0%, #0F63B5 30%, #0F9B62 55%, #0F63B5 80%, #0B2E7A 100%)',
         'accent-gradient': 'linear-gradient(135deg, #22C55E 0%, #0F9B62 100%)',
+        // Uzerinde BEYAZ METIN olan butonlar icin: accent-gradient'in acik ucu beyazla
+        // ~2.3:1 veriyordu (AA icin 4.5 gerekir). Bu iki ton beyazla 5.0 ve 5.3.
+        'cta-gradient': 'linear-gradient(135deg, #15803D 0%, #0D7A55 100%)',
+      },
+      transitionTimingFunction: {
+        // Hizli baslayip yumusakca oturan egri — tum giris animasyonlarinda ortak.
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       fontFamily: {
         archivo: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        'source-serif': ['"Source Serif 4"', 'ui-serif', 'Georgia', 'serif'],
       },
       keyframes: {
         // Gradyanin cok yavas saga kaymasi — hero ve CTA bantlarinda "canli" his.
@@ -89,6 +95,20 @@ export default {
           '0%, 100%': { opacity: '0.35' },
           '50%': { opacity: '0.9' },
         },
+        // Duyuru carousel'inde yeni slaytin gelis yonune gore yandan kayarak girmesi.
+        'slide-in-right': {
+          from: { opacity: '0', transform: 'translate3d(48px, 0, 0)' },
+          to: { opacity: '1', transform: 'translate3d(0, 0, 0)' },
+        },
+        'slide-in-left': {
+          from: { opacity: '0', transform: 'translate3d(-48px, 0, 0)' },
+          to: { opacity: '1', transform: 'translate3d(0, 0, 0)' },
+        },
+        // Mobil menu ogeleri: soldan sirayla.
+        'menu-item-in': {
+          from: { opacity: '0', transform: 'translate3d(-16px, 0, 0)' },
+          to: { opacity: '1', transform: 'translate3d(0, 0, 0)' },
+        },
       },
       animation: {
         drift: 'drift 18s ease-in-out infinite',
@@ -101,6 +121,9 @@ export default {
         marquee: 'marquee 42s linear infinite',
         travel: 'travel 7s ease-in-out infinite',
         glow: 'glow 3.5s ease-in-out infinite',
+        'slide-in-right': 'slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'slide-in-left': 'slide-in-left 0.7s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'menu-item-in': 'menu-item-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

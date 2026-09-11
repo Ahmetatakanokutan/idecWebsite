@@ -1,24 +1,54 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { Loader } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Layout from '../components/Layout';
+
+// Hemen yuklenenler: ana sayfa (ilk giris) ve kucuk giris/kayit sayfalari.
+// Giris sayfalari header'siz (AuthShell); sonradan yuklenseler, beklerken gosterilen
+// header'li iskelet bir an gorunup kaybolurdu.
 import HomePage from '../pages/HomePage';
-import AboutPage from '../pages/AboutPage';
-import ContactPage from '../pages/ContactPage';
-import ProjectsPage from '../pages/ProjectsPage';
-import ProjectDetailPage from '../pages/ProjectDetailPage';
-import CoursesPage from '../pages/CoursesPage';
-import CourseDetailPage from '../pages/CourseDetailPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
-import CertificatePage from '../pages/CertificatePage';
-import SeminarCertificatesPage from '../pages/SeminarCertificatesPage';
-import AnnouncementsPage from '../pages/AnnouncementsPage';
-import AnnouncementDetailPage from '../pages/AnnouncementDetailPage';
-import ProfilePage from '../pages/ProfilePage';
-import FavoritesPage from '../pages/FavoritesPage';
+
+// Digerleri ilk ziyaret edildiklerinde iner; boylece ilk acilista indirilen
+// JavaScript kuculur. Sik gidilenler asagida tarayici bosta kalinca onceden indirilir.
+const loadAbout = () => import('../pages/AboutPage');
+const loadCourses = () => import('../pages/CoursesPage');
+const loadProjects = () => import('../pages/ProjectsPage');
+const loadContact = () => import('../pages/ContactPage');
+const loadAnnouncements = () => import('../pages/AnnouncementsPage');
+
+const AboutPage = lazy(loadAbout);
+const CoursesPage = lazy(loadCourses);
+const ProjectsPage = lazy(loadProjects);
+const ContactPage = lazy(loadContact);
+const AnnouncementsPage = lazy(loadAnnouncements);
+const ProjectDetailPage = lazy(() => import('../pages/ProjectDetailPage'));
+const CourseDetailPage = lazy(() => import('../pages/CourseDetailPage'));
+const CertificatePage = lazy(() => import('../pages/CertificatePage'));
+const SeminarCertificatesPage = lazy(() => import('../pages/SeminarCertificatesPage'));
+const AnnouncementDetailPage = lazy(() => import('../pages/AnnouncementDetailPage'));
+const ProfilePage = lazy(() => import('../pages/ProfilePage'));
+const FavoritesPage = lazy(() => import('../pages/FavoritesPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+
+const PREFETCH = [loadAbout, loadCourses, loadProjects, loadContact, loadAnnouncements];
+
+/** Sayfa dosyasi inerken: header/footer yerinde, ortada yukleniyor gostergesi. */
+const PageFallback = () => {
+  const { t } = useTranslation();
+  return (
+    <Layout>
+      <div className="min-h-[60vh] flex items-center justify-center" aria-busy="true">
+        <Loader className="w-8 h-8 text-accent-deep animate-spin" aria-label={t('common.loading')} />
+      </div>
+    </Layout>
+  );
+};
 
 // Admin Components
 // Lazy-loaded: Tiptap (ManageAnnouncementsPage'in zengin metin editörü) ve diğer admin
@@ -92,7 +122,22 @@ export const AppRoutes = () => {
         },
       ],
     },
+
+    // Yukaridakilerden hicbiriyle eslesmeyen her adres (yanlis yazilmis link vb.)
+    { path: '*', element: <NotFoundPage /> },
   ]);
 
-  return routes;
+  // Ilk sayfa acildiktan sonra, tarayici bosta kalinca sik gidilen sayfalari onceden
+  // indir: kullanici menuden tikladiginda beklemeden acilsin.
+  useEffect(() => {
+    const prefetch = () => PREFETCH.forEach((load) => load().catch(() => { /* ag hatasi: tiklaninca yeniden denenir */ }));
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(prefetch, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(prefetch, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return <Suspense fallback={<PageFallback />}>{routes}</Suspense>;
 };

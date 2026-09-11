@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { FolderKanban, Library, LayoutDashboard, Users, Shield, Bell, Award } from 'lucide-react';
 import Layout from './Layout';

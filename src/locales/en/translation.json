@@ -17,7 +17,12 @@
     "contact": "Contact",
     "carbon_calc_button": "Calculate Your Carbon Footprint",
     "certificate": "My Certificate",
-    "tagline": "Industrial Decarbonization Through Twin Transition"
+    "tagline": "Industrial Decarbonization Through Twin Transition",
+    "workshops": "Our Workshops",
+    "workshop_carbon_symposium": "Carbon Reduction Symposium",
+    "coming_soon": "Soon",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
   },
   "footer": {
     "rights": "All rights reserved.",
@@ -63,7 +68,7 @@
     "stat_item_4_label": "Areas of Activity",
     "vision_title_section": "Our Vision",
     "vision_subtitle_section": "For Sustainability",
-    "vision_main_title_section": "3 Key Steps",
+    "vision_main_title_section": "Three Core Principles",
     "vision_description_section": "We produce simple and effective solutions to complex problems.",
     "feature_card_1_title": "Net Zero Strategy",
     "feature_card_1_desc": "Roadmaps reducing carbon emissions to zero in line with 2053 targets.",
@@ -81,9 +86,6 @@
     "cta_description": "A small step you take today can turn into a big forest tomorrow. Join our projects, get training, or offer support.",
     "cta_contact": "Contact Us",
     "cta_register": "Become a Member",
-    "hero_chip_free": "Free training",
-    "hero_chip_certificate": "Certificate of attendance",
-    "hero_chip_ai": "KarbonBot AI",
     "hero_learn_project": "Explore the Project",
     "hero_badge_label": "Supported by",
     "hero_badge_value": "Istanbul Development Agency",
@@ -122,7 +124,10 @@
     "faq_5_q": "How can we join the project as a partner or participant?",
     "faq_5_a": "There are four models depending on your organisation: technical implementation partnership for those offering a pilot site or developing technology in carbon capture, mineralisation or energy efficiency; strategic participation for organisations active in sector knowledge sharing and dissemination; training partnership for those shaping certification and staff training needs; and R&D collaboration for joint projects using the centre's laboratory and academic infrastructure. The process runs in three steps: a letter of intent stating where your organisation can contribute, a technical meeting with the centre's experts to define scope, and a protocol formalising the collaboration. To start, send your organisation details and proposal through the Contact page.",
     "faq_6_q": "Where do I start with calculating our carbon footprint?",
-    "faq_6_a": "Start by setting your boundaries: which facilities are in scope, and which emission scopes you will account for. Scope 1 covers direct emissions (stacks, company vehicle fuel), Scope 2 purchased electricity, heat and steam, and Scope 3 the supply chain, raw materials, waste and transport — the last being the most critical for CBAM. Then gather a year of historical data: gas and electricity bills, fuel receipts, raw material and waste quantities. The calculation itself is a simple multiplication: activity data x emission factor. The final step is reporting the inventory and, where required, having it verified by an accredited body. Our TS EN ISO 14064-1 and CBAM reporting trainings are built precisely to help you run this process."
+    "faq_6_a": "Start by setting your boundaries: which facilities are in scope, and which emission scopes you will account for. Scope 1 covers direct emissions (stacks, company vehicle fuel), Scope 2 purchased electricity, heat and steam, and Scope 3 the supply chain, raw materials, waste and transport — the last being the most critical for CBAM. Then gather a year of historical data: gas and electricity bills, fuel receipts, raw material and waste quantities. The calculation itself is a simple multiplication: activity data x emission factor. The final step is reporting the inventory and, where required, having it verified by an accredited body. Our TS EN ISO 14064-1 and CBAM reporting trainings are built precisely to help you run this process.",
+    "tech_eyebrow": "From today to 2053",
+    "tech_img_now": "Today: emission-heavy production",
+    "tech_img_goal": "2053: net zero, clean energy"
   },
   "projects": {
     "title": "Our Stakeholders and Subsidiaries",
@@ -466,7 +471,16 @@
     "view_all_announcements": "All Announcements",
     "tel": "Tel:",
     "fax": "Fax:",
-    "email_short": "Email:"
+    "email_short": "Email:",
+    "network_error": "Could not reach the server. Please check your connection and refresh the page.",
+    "previous": "Previous",
+    "next": "Next",
+    "server_error": "Something went wrong on the server. Please try again shortly.",
+    "unauthorized": "You need to sign in for this action, or your session may have expired.",
+    "forbidden": "You don't have permission for this action.",
+    "not_found_error": "The requested record could not be found.",
+    "file_too_large": "The file is too large.",
+    "too_many_requests": "Too many requests. Please wait a moment and try again."
   },
   "seminar_certificates": {
     "title": "Seminar Certificates",
@@ -491,5 +505,13 @@
     "no_results": "No announcements found in this category.",
     "fetch_error": "Could not load announcements.",
     "hero_eyebrow": "Project News"
+  },
+  "not_found": {
+    "eyebrow": "Error 404",
+    "title": "We couldn't find that page",
+    "description": "The page may have been moved or deleted, or the address may be mistyped. You can continue from the links below.",
+    "home": "Back to home",
+    "courses": "Browse trainings",
+    "contact": "Contact us"
   }
 }

@@ -25,7 +25,7 @@ const Footer = () => {
   return (
     <footer className="w-full">
       {/* Ana katman: koyu, dort sutunlu */}
-      <div className="bg-ink-night text-white border-t border-white/10">
+      <div className="bg-ink-night text-white border-t border-white/10 font-archivo">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.7fr_1fr_1fr_1.3fr] gap-10 lg:gap-12">
             {/* 1) Marka + kisa tanim */}
